@@ -1,4 +1,4 @@
-package kmpTest
+package test
 
 //kmpTest Component
 import "runtime"
@@ -8,7 +8,12 @@ import "reflect"
 type Fatalfer interface{
 	Fatalf(s string, v...interface{})
 }
-
+func Ok(T Fatalfer,expectTrue bool){
+	if (!expectTrue){
+		assertFail(T, "ok fail", 2)
+	}
+	return
+}
 func Assert(T Fatalfer, get interface{}, expect interface{}) {
 	if isEqual(expect, get) {
 		return
