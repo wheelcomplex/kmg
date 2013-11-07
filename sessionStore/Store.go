@@ -1,4 +1,4 @@
-package session
+package sessionStore
 
 import "sync"
 
@@ -15,7 +15,8 @@ func NewStore(guid string, values map[string]interface{}) *Store {
 func (store *Store) Get(key string) (value interface{}, exist bool) {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
-	return store.values[key]
+	value,exist= store.values[key]
+	return
 }
 func (store *Store) Set(key string, value interface{}) {
 	store.lock.Lock()

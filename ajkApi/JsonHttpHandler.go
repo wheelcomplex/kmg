@@ -2,7 +2,7 @@ package ajkApi
 
 import (
 	"encoding/json"
-	"kmg/session"
+	"kmg/sessionStore"
 	"net/http"
 	"reflect"
 )
@@ -18,8 +18,8 @@ type httpOutput struct {
 	Data interface{}
 }
 type JsonHttpHandler struct {
-	ApiManager     ApiManagerInterface
-	SessionManager *session.Manager
+	ApiManager          ApiManagerInterface
+	SessionStoreManager *sessionStore.Manager
 }
 
 func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -32,7 +32,7 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 		return
 	}
 	var apiOutputValue reflect.Value
-	session := NewSession(rawInput.Guid, handler.SessionManager)
+	session := NewSession(rawInput.Guid, handler.SessionStoreManager)
 	err = handler.ApiManager.RpcCall(session, rawInput.Name, func(meta *ApiFuncMeta) error {
 		funcType := meta.Func.Type()
 		var inValues []reflect.Value

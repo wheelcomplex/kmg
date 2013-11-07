@@ -1,4 +1,4 @@
-package session
+package sessionStore
 
 import (
 	"errors"
@@ -15,11 +15,11 @@ var GuidNotExistErr = errors.New("guid not exist")
 func (memoryProvider *MemoryProvider) NewByGuid(guid string) (store *Store, err error) {
 	memoryProvider.lock.Lock()
 	defer memoryProvider.lock.Unlock()
-	store := NewStore(guid, make(map[string]interface{}))
+	store = NewStore(guid, make(map[string]interface{}))
 	return store, nil
 }
 
-func (memoryProvider *MemoryProvider) Read(guid string) (store *Store, err error) {
+func (memoryProvider *MemoryProvider) Get(guid string) (store *Store, err error) {
 	memoryProvider.lock.RLock()
 	defer memoryProvider.lock.RUnlock()
 	store, ok := memoryProvider.stores[guid]

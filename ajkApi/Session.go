@@ -1,24 +1,24 @@
 package ajkApi
 
 import (
-	"kmg/session"
+	"kmg/sessionStore"
 )
 
 // a lazy load session
 type Session struct {
 	//Self  *Peer
 	//Other *Peer
-	guid    string
-	store   *session.Store
-	manager *session.Manager
+	guid         string
+	store        *sessionStore.Store
+	storeManager *sessionStore.Manager
 }
 
-func NewSession(guid string, manager session.Manager) *Session {
-	return &Session{guid: guid, manager: manager}
+func NewSession(guid string, storeManager *sessionStore.Manager) *Session {
+	return &Session{guid: guid, storeManager: storeManager}
 }
 
 //lazy load session
-func (sess *Session) GetStore() (store *Store, err error) {
+func (sess *Session) GetStore() (store *sessionStore.Store, err error) {
 	err = sess.ConfirmSessionStart()
 	if err != nil {
 		return
@@ -35,11 +35,11 @@ func (sess *Session) ConfirmSessionStart() (err error) {
 		return nil
 	}
 	if sess.guid == "" {
-		sess.store, err = sess.manager.New()
-		sess.guid = sess.store.guid
+		sess.store, err = sess.storeManager.New()
+		sess.guid = sess.store.Guid()
 		return err
 	}
-	sess.store, err = sess.manager.LoadStoreOrNewIfNotExist(sess.guid)
-	sess.guid = sess.store.guid
+	sess.store, err = sess.storeManager.LoadStoreOrNewIfNotExist(sess.guid)
+	sess.guid = sess.store.Guid()
 	return err
 }
