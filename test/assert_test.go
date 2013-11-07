@@ -4,12 +4,12 @@ package test
 
 import "testing"
 
-type logFatalfer struct{
+type logFatalfer struct {
 	call_num int
 }
 
-func (l *logFatalfer) Fatalf(s string, v...interface{}) {
-	l.call_num+=1
+func (l *logFatalfer) Fatalf(s string, v ...interface{}) {
+	l.call_num += 1
 }
 func (l *logFatalfer) getCallNum() int {
 	return l.call_num
@@ -31,5 +31,5 @@ func TestAssert(T *testing.T) {
 	}
 }
 func TestIsEqual(T *testing.T) {
-	Assert(T, true, isEqual(map[string]interface{}{"a":1}, map[string]interface{}{"a":1}))
+	Assert(T, true, isEqual(map[string]interface{}{"a": 1}, map[string]interface{}{"a": 1}))
 }

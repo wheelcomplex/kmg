@@ -2,8 +2,7 @@ package kernel
 
 import "kmg/dependencyInjection"
 
-
-type BundleInterface interface{
+type BundleInterface interface {
 	dependencyInjection.ContainerAwareInterface
 	//can use dic here
 	Boot() error
@@ -19,7 +18,7 @@ type BundleInterface interface{
 	GetPackageName() string
 }
 
-type KernelInterface interface{
+type KernelInterface interface {
 	//register bundles to this kernel
 	//all register bundles name should be unique
 	RegisterBundles() []BundleInterface

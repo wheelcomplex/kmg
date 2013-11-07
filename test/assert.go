@@ -5,49 +5,71 @@ import "runtime"
 import "fmt"
 import "reflect"
 
-type Fatalfer interface{
-	Fatalf(s string, v...interface{})
+type Fatalfer interface {
+	Fatalf(s string, v ...interface{})
 }
-func Ok(T Fatalfer,expectTrue bool){
-	if (!expectTrue){
-		assertFail(T, "ok fail", 2)
+
+func Ok(T Fatalfer, expectTrue bool) {
+	(&TestTools{T:T}).Ok(expectTrue)
+}
+func Assert(T Fatalfer, get interface{}, expect interface{}) {
+		(&TestTools{T:T}).Equal(get,expect)
+}
+func AssertMsg(T Fatalfer, get interface{}, expect interface{}, msg string) {
+		(&TestTools{T:T}).EqualMsg(get,expect,msg)
+}
+
+type TestTools struct{
+	T Fatalfer
+}
+func NewTestTools(T Fatalfer)*TestTools{
+	return &TestTools{T:T}
+}
+
+func (tools *TestTools)Ok(expectTrue bool){
+	if !expectTrue {
+		tools.assertFail("ok fail", 2)
 	}
 	return
 }
-func Assert(T Fatalfer, get interface{}, expect interface{}) {
+func (tools *TestTools)Equal(get interface{}, expect interface{}) {
 	if isEqual(expect, get) {
 		return
 	}
-	assertFail(T, fmt.Sprintf("expect:%#v\nget:%#v", expect, get), 2)
+	tools.assertFail(fmt.Sprintf("expect:%#v\nget:%#v", expect, get), 2)
 }
-func AssertMsg(T Fatalfer, get interface{}, expect interface{}, msg string) {
+func (tools *TestTools)EqualMsg(get interface{}, expect interface{}, msg string) {
 	if isEqual(expect, get) {
 		return
 	}
-	assertFail(T, fmt.Sprintf("%s\nexpect:%#v\nget:%#v", msg, expect, get), 2)
+	tools.assertFail(fmt.Sprintf("%s\nexpect:%#v\nget:%#v", msg, expect, get), 2)
 }
+
+func (tools *TestTools)assertFail(msg string, skip int) {
+	pc, file, line, ok := runtime.Caller(skip)
+	line_info := ""
+	if ok != false {
+		line_info = fmt.Sprintf("%v:%v:%x", file, line, pc)
+	}
+	tools.T.Fatalf("%s\n%s", msg, line_info)
+}
+
+
 func isEqual(a interface{}, b interface{}) bool {
 	if reflect.DeepEqual(a, b) {
 		return true
 	}
-	rva := reflect.ValueOf(a);
-	rvb := reflect.ValueOf(b);
+	rva := reflect.ValueOf(a)
+	rvb := reflect.ValueOf(b)
 	//every nil is same stuff...
 	if isNil(rva) && isNil(rvb) {
 		return true
 	}
 	return false
 }
-func assertFail(T Fatalfer, msg string, skip int) {
-	pc, file, line, ok := runtime.Caller(skip)
-	line_info := ""
-	if ok != false {
-		line_info = fmt.Sprintf("%v:%v:%x", file, line, pc)
-	}
-	T.Fatalf("%s\n%s", msg, line_info)
-}
+
 func isNil(rv reflect.Value) bool {
-	switch rv.Kind(){
+	switch rv.Kind() {
 	case reflect.Invalid:
 		return true
 	case reflect.Chan, reflect.Func, reflect.Map, reflect.Interface, reflect.Ptr, reflect.Slice:
