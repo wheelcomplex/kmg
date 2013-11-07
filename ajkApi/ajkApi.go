@@ -12,9 +12,9 @@ import "reflect"
 */
 type ApiManagerInterface interface {
 	/*
-	input and output can be
-	*struct{xxx}
-	map[string]interface
+		input and output can be
+		*struct{xxx}
+		map[string]interface
 	*/
 	RpcCall(session *Session, name string, caller func(*ApiFuncMeta) error) error
 }

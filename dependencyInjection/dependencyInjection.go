@@ -19,7 +19,7 @@ type Container interface {
 	Set(id string, obj interface{}, scope string) error
 	// set a new service into container
 	// if error happen,it panic
-	MustSet(id string,obj interface {},scope string)
+	MustSet(id string, obj interface{}, scope string)
 	Has(id string) bool
 	//return a new container with that scope
 	EnterScope(name string) (Container, error)

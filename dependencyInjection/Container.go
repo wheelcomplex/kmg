@@ -92,9 +92,9 @@ func (c *container) IsScopeActive(name string) bool {
 	return false
 }
 
-func (c *container) MustSet(id string,obj interface {},scope string){
-	err:=c.Set(id,obj,scope)
-	if err!=nil{
+func (c *container) MustSet(id string, obj interface{}, scope string) {
+	err := c.Set(id, obj, scope)
+	if err != nil {
 		panic(err)
 	}
 }

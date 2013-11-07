@@ -1,9 +1,9 @@
 package session
 
-type Provider interface{
-	NewByGuid(guid string)(*Store,error)
+type Provider interface {
+	NewByGuid(guid string) (*Store, error)
 	//read a store,if this store not exist,return a new empty store
-	Read(guid string) (*Store,error)
+	Read(guid string) (*Store, error)
 	//save a store to someplace,should not change this store after save.
 	Save(session *Store) error
 	Exist(guid string) bool
@@ -11,4 +11,3 @@ type Provider interface{
 	Delete(guid string) error
 	GC()
 }
-
