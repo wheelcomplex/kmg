@@ -13,7 +13,7 @@ import (
 )
 
 type TestHttpHandlerService struct {
-	container dependencyInjection.Container
+	container *dependencyInjection.Container
 }
 
 func (this *TestHttpHandlerService) TestFunc1(

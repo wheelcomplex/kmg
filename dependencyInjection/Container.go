@@ -58,6 +58,13 @@ func (c *Container)Get(id string)(service interface {},err error) {
 	container.service_map[id] = service
 	return
 }
+func (c *Container)MustGet(id string)interface {}{
+	service,err:=c.Get(id)
+	if err!=nil{
+		panic(err)
+	}
+	return service
+}
 //TODO Concurrent safe
 func (c *Container)Set(id string,obj interface {},scope string)error{
 	if scope == "" {
