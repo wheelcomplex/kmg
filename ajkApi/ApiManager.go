@@ -58,5 +58,11 @@ func (manager *containerAwareApiManager) RpcCall(
 	if ok == false {
 		return &ApiFuncNotFoundError{Reason: "method not on service", ApiName: name}
 	}
+	manager.c.EnterScope(dependencyInjection.ScopeRequest)
+	defer manager.c.LeaveScope()
+	err=manager.c.Set("session",session,dependencyInjection.ScopeRequest)
+	if err!=nil{
+		return err
+	}
 	return caller(&ApiFuncMeta{IsMethod: true, Func: method.Func, AttachObject: reflect.ValueOf(service)})
 }

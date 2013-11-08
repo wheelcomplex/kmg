@@ -1,14 +1,12 @@
 package dependencyInjection
 
-type ContainerBuilder struct {
-}
-
 const (
-	ScopeContainer = "container"
+	ScopeSingleton = "singleton"
 	ScopePrototype = "prototype"
 	ScopeRequest   = "request"
 )
 
+/*
 // For end user
 type Container interface {
 	//it is concurrency safe to call this function
@@ -27,6 +25,7 @@ type Container interface {
 	LeaveScope() (Container, error)
 	IsScopeActive(name string) bool
 }
+*/
 type ContainerAwareInterface interface {
 	SetContainer(container Container)
 }
