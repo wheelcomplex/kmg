@@ -13,6 +13,9 @@ func TestContainer(ot *testing.T) {
 	t.Ok(err == nil)
 	t.Equal(num, 1)
 
+	c.SetFactory("factory1",func(c *Container)(interface {},error){
+		return 5,nil
+		},ScopeRequest)
 	RequestContainer, err := c.EnterScope(ScopeRequest)
 	t.Ok(err == nil)
 
