@@ -1,6 +1,6 @@
 package kernel
 
-import "kmg/dependencyInjection"
+import "github.com/bronze1man/kmg/dependencyInjection"
 
 type BundleInterface interface {
 	dependencyInjection.ContainerAwareInterface

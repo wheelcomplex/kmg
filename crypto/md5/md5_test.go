@@ -2,7 +2,7 @@ package md5
 
 import (
 	"encoding/hex"
-	"kmg/kmpTest"
+	"github.com/bronze1man/kmg/kmpTest"
 	"strings"
 	"testing"
 )

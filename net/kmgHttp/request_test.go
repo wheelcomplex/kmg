@@ -1,7 +1,7 @@
 package kmgHttp
 
 import (
-	"kmg/kmpTest"
+	"github.com/bronze1man/kmg/kmpTest"
 	"net/http"
 	"net/url"
 	"testing"

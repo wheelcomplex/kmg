@@ -1,7 +1,7 @@
 package ajkApi
 
 import (
-	"kmg/sessionStore"
+	"github.com/bronze1man/kmg/sessionStore"
 )
 
 // a lazy load session

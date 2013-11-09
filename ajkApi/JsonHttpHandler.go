@@ -2,7 +2,7 @@ package ajkApi
 
 import (
 	"encoding/json"
-	"kmg/sessionStore"
+	"github.com/bronze1man/kmg/sessionStore"
 	"net/http"
 	"reflect"
 )

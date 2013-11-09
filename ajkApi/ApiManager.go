@@ -2,7 +2,7 @@ package ajkApi
 
 import (
 	"fmt"
-	"kmg/dependencyInjection"
+	"github.com/bronze1man/kmg/dependencyInjection"
 	"reflect"
 	"strings"
 )

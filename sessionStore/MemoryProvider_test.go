@@ -1,7 +1,7 @@
 package sessionStore
 
 import "testing"
-import "kmg/test"
+import "github.com/bronze1man/kmg/test"
 
 func TestManagerProvider(ot *testing.T) {
 	t := test.NewTestTools(ot)

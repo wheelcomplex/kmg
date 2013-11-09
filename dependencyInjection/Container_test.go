@@ -1,7 +1,7 @@
 package dependencyInjection
 
 import "testing"
-import "kmg/test"
+import "github.com/bronze1man/kmg/test"
 
 func TestContainer(ot *testing.T) {
 	t := test.NewTestTools(ot)

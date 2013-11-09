@@ -1,8 +1,6 @@
 package ajkApi
 
 import (
-	//"kmg/dependencyInjection"
-	//"kmg/test"
 	"errors"
 	"testing"
 )

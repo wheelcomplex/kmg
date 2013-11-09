@@ -1,7 +1,7 @@
 package kmgHttp
 
 import (
-	"kmg/test"
+	"github.com/bronze1man/kmg/test"
 	"testing"
 )
 
