@@ -28,7 +28,7 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 	rawInput := &httpInput{}
 	err = json.NewDecoder(req.Body).Decode(rawInput)
 	if err != nil {
-		handler.returnError(w, err)
+		handler.returnOutput(w, &httpOutput{Err: err.Error()})
 		return
 	}
 	var apiOutputValue reflect.Value
@@ -86,10 +86,10 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 		return nil
 	})
 	if err != nil {
-		handler.returnError(w, err)
+		handler.returnOutput(w, &httpOutput{Err: err.Error(), Guid: session.GetGuid()})
 		return
 	}
-	handler.returnSuccess(w, apiOutputValue.Interface())
+	handler.returnOutput(w, &httpOutput{Data: apiOutputValue.Interface(), Guid: session.GetGuid()})
 }
 func jsonUnmarshalFromPtrReflectType(inputType reflect.Type, data []byte) (reflect.Value, error) {
 	var apiInputValue = reflect.New(inputType.Elem())
@@ -100,17 +100,8 @@ func jsonUnmarshalFromPtrReflectType(inputType reflect.Type, data []byte) (refle
 	}
 	return apiInputValue, nil
 }
-func (handler *JsonHttpHandler) returnError(w http.ResponseWriter, err error) {
-	rawOutput := &httpOutput{Err: err.Error()}
-	err = json.NewEncoder(w).Encode(rawOutput)
-	if err != nil {
-		//TODO log error
-		panic(err)
-	}
-}
-func (handler *JsonHttpHandler) returnSuccess(w http.ResponseWriter, data interface{}) {
-	rawOutput := &httpOutput{Data: data}
-	err := json.NewEncoder(w).Encode(rawOutput)
+func (handler *JsonHttpHandler) returnOutput(w http.ResponseWriter, output *httpOutput) {
+	err := json.NewEncoder(w).Encode(output)
 	if err != nil {
 		//TODO log error
 		panic(err)

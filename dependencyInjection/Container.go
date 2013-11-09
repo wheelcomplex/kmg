@@ -14,70 +14,72 @@ var ParentScopeNotExistError = errors.New("container can not leave current scope
 
 type Container struct {
 	definition_map map[string]*Definition //share inst between scope
-	service_map map[string]interface{}    //only current scope
-	scope_map map[string]*Container       //contain all scope
-	scope       string
-	parent      *Container
+	service_map    map[string]interface{} //only current scope
+	scope_map      map[string]*Container  //contain all scope
+	scope          string
+	parent         *Container
 }
-type Definition struct{
-	Id string
-	Scope string
-	Factory func(c *Container)(interface {},error)
+type Definition struct {
+	Id      string
+	Scope   string
+	Factory func(c *Container) (interface{}, error)
 }
+
 //a simple container implement,which can only set object in runtime.
 func NewContainer() *Container {
-	container:= &Container{
-		service_map: make(map[string]interface{}),
+	container := &Container{
+		service_map:    make(map[string]interface{}),
 		definition_map: make(map[string]*Definition),
-		scope_map: make(map[string]*Container),
-		scope:       ScopeSingleton,
+		scope_map:      make(map[string]*Container),
+		scope:          ScopeSingleton,
 	}
 	container.scope_map[ScopeSingleton] = container
 	container.scope_map[ScopePrototype] = container
 	return container
 }
 
-func (c *Container)Get(id string)(service interface {},err error) {
-	definition,ok:=c.definition_map[id]
-	if !ok{
+func (c *Container) Get(id string) (service interface{}, err error) {
+	definition, ok := c.definition_map[id]
+	if !ok {
 		return nil, ServiceIdNotExistError
 	}
-	if !c.IsScopeActive(definition.Scope){
+	if !c.IsScopeActive(definition.Scope) {
 		return nil, ScopeNotActiveError
 	}
-	container:=c.scope_map[definition.Scope]
+	container := c.scope_map[definition.Scope]
 	//TODO Concurrent safe
-	service,ok=container.service_map[id]
-	if ok{
-		return service,nil
+	service, ok = container.service_map[id]
+	if ok {
+		return service, nil
 	}
-	service,err = definition.Factory(c)
-	if err!=nil{
-		return nil,err
+	service, err = definition.Factory(c)
+	if err != nil {
+		return nil, err
 	}
 	container.service_map[id] = service
 	return
 }
-func (c *Container)MustGet(id string)interface {}{
-	service,err:=c.Get(id)
-	if err!=nil{
+func (c *Container) MustGet(id string) interface{} {
+	service, err := c.Get(id)
+	if err != nil {
 		panic(err)
 	}
 	return service
 }
+
 //TODO Concurrent safe
-func (c *Container)Set(id string,obj interface {},scope string)error{
+func (c *Container) Set(id string, obj interface{}, scope string) error {
 	if scope == "" {
 		scope = ScopeSingleton
 	}
-	if scope == ScopePrototype{
+	if scope == ScopePrototype {
 		return CanNotSetScopePrototypeByObjError
 	}
-	if !c.IsScopeActive(scope){
+	if !c.IsScopeActive(scope) {
 		return CanNotSetNotActiveScopeByObjError
 	}
-	definition,ok:=c.definition_map[id]
-	if !ok{
+	definition, ok := c.definition_map[id]
+	if !ok {
 		definition = &Definition{}
 		c.definition_map[id] = definition
 	}
@@ -87,14 +89,20 @@ func (c *Container)Set(id string,obj interface {},scope string)error{
 	c.scope_map[scope].service_map[id] = obj
 	return nil
 }
-func (c *Container)SetFactory(id string,factory func (c *Container)(interface {},error),scope string)error{
+func (c *Container) MustSet(id string, obj interface{}, scope string) {
+	err := c.Set(id, obj, scope)
+	if err != nil {
+		panic(err)
+	}
+}
+func (c *Container) SetFactory(id string, factory func(c *Container) (interface{}, error), scope string) error {
 	if scope == "" {
 		scope = ScopeSingleton
 	}
 	//remove old inst
 	c.removeInst(id)
-	definition,ok:=c.definition_map[id]
-	if !ok{
+	definition, ok := c.definition_map[id]
+	if !ok {
 		definition = &Definition{}
 		c.definition_map[id] = definition
 	}
@@ -103,50 +111,57 @@ func (c *Container)SetFactory(id string,factory func (c *Container)(interface {}
 	definition.Factory = factory
 	return nil
 }
+func (c *Container) MustSetFactory(id string, factory func(c *Container) (interface{}, error), scope string) {
+	err := c.SetFactory(id, factory, scope)
+	if err != nil {
+		panic(err)
+	}
+}
 
-func (c *Container)Has(id string)bool{
-	_,ok:=c.definition_map[id]
+func (c *Container) Has(id string) bool {
+	_, ok := c.definition_map[id]
 	return ok
 }
-func (c *Container)EnterScope(scope string)(*Container,error){
-	if c.IsScopeActive(scope){
-		return nil,errors.New(fmt.Sprintf("you enter %s scope twice", scope))
+func (c *Container) EnterScope(scope string) (*Container, error) {
+	if c.IsScopeActive(scope) {
+		return nil, errors.New(fmt.Sprintf("you enter %s scope twice", scope))
 	}
 	scope_map := make(map[string]*Container)
-	for k,v:=range c.scope_map{
-	    scope_map[k] = v
+	for k, v := range c.scope_map {
+		scope_map[k] = v
 	}
-	container :=&Container{
-		service_map: make(map[string]interface{}),
+	container := &Container{
+		service_map:    make(map[string]interface{}),
 		definition_map: c.definition_map,
-		scope:       scope,
-		parent:      c,
+		scope:          scope,
+		parent:         c,
 	}
 	scope_map[scope] = container
 	container.scope_map = scope_map
-	return container,nil
+	return container, nil
 }
-func (c *Container)LeaveScope()(*Container,error){
-	if c.parent!=nil{
-		return c.parent,nil
+func (c *Container) LeaveScope() (*Container, error) {
+	if c.parent != nil {
+		return c.parent, nil
 	}
 	return nil, ParentScopeNotExistError
 }
-func (c *Container)IsScopeActive(scope string)bool{
-	_,ok:=c.scope_map[scope]
+func (c *Container) IsScopeActive(scope string) bool {
+	_, ok := c.scope_map[scope]
 	return ok
 }
+
 //try to remove saved inst
-func (c *Container)removeInst(id string){
-	definition,ok:=c.definition_map[id]
-	if !ok{
+func (c *Container) removeInst(id string) {
+	definition, ok := c.definition_map[id]
+	if !ok {
 		return
 	}
-	container,ok:=c.scope_map[definition.Scope]
-	if !ok{
+	container, ok := c.scope_map[definition.Scope]
+	if !ok {
 		return
 	}
-	delete(container.service_map,id)
+	delete(container.service_map, id)
 }
 
 /*

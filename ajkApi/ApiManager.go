@@ -8,7 +8,7 @@ import (
 )
 
 type containerAwareApiManager struct {
-	c dependencyInjection.Container
+	c *dependencyInjection.Container
 }
 type ApiFuncArgumentError struct {
 	Reason  string
@@ -32,7 +32,7 @@ func (err *ApiFuncNotFoundError) Error() string {
  container service + method -> api
  the api name will be "serviceName.methodName"
 */
-func NewApiManagerFromContainer(c dependencyInjection.Container) ApiManagerInterface {
+func NewApiManagerFromContainer(c *dependencyInjection.Container) ApiManagerInterface {
 	return &containerAwareApiManager{c: c}
 }
 func (manager *containerAwareApiManager) RpcCall(
@@ -44,11 +44,21 @@ func (manager *containerAwareApiManager) RpcCall(
 	if dotP == -1 {
 		return &ApiFuncNotFoundError{Reason: "name not cantain .", ApiName: name}
 	}
+	c, err := manager.c.EnterScope(dependencyInjection.ScopeRequest)
+	if err != nil {
+		return err
+	}
+	err = c.Set("session", session, dependencyInjection.ScopeRequest)
+	if err != nil {
+		return err
+	}
+
+	defer c.LeaveScope()
 	serviceName := name[:dotP]
-	if !manager.c.Has(serviceName) {
+	if !c.Has(serviceName) {
 		return &ApiFuncNotFoundError{Reason: "service not exist", ApiName: name}
 	}
-	service, err := manager.c.Get(serviceName)
+	service, err := c.Get(serviceName)
 	if err != nil {
 		return err
 	}
@@ -57,12 +67,6 @@ func (manager *containerAwareApiManager) RpcCall(
 	method, ok := serviceType.MethodByName(methodName)
 	if ok == false {
 		return &ApiFuncNotFoundError{Reason: "method not on service", ApiName: name}
-	}
-	manager.c.EnterScope(dependencyInjection.ScopeRequest)
-	defer manager.c.LeaveScope()
-	err=manager.c.Set("session",session,dependencyInjection.ScopeRequest)
-	if err!=nil{
-		return err
 	}
 	return caller(&ApiFuncMeta{IsMethod: true, Func: method.Func, AttachObject: reflect.ValueOf(service)})
 }

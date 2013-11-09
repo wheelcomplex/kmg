@@ -21,7 +21,7 @@ func NewSession(guid string, storeManager *sessionStore.Manager) *Session {
 func (sess *Session) GetStore() (store *sessionStore.Store, err error) {
 	err = sess.ConfirmSessionStart()
 	if err != nil {
-		return
+		return nil, err
 	}
 	return sess.store, nil
 }

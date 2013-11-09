@@ -5,9 +5,14 @@ import (
 	"sync"
 )
 
+//do not use &MemoryProvider{} init
 type MemoryProvider struct {
 	stores map[string]*Store
 	lock   sync.RWMutex
+}
+
+func NewMemoryProvider() *MemoryProvider {
+	return &MemoryProvider{stores: make(map[string]*Store)}
 }
 
 var GuidNotExistErr = errors.New("guid not exist")
@@ -16,6 +21,7 @@ func (memoryProvider *MemoryProvider) NewByGuid(guid string) (store *Store, err 
 	memoryProvider.lock.Lock()
 	defer memoryProvider.lock.Unlock()
 	store = NewStore(guid, make(map[string]interface{}))
+	memoryProvider.stores[guid] = store
 	return store, nil
 }
 

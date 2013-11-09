@@ -10,7 +10,9 @@ type Manager struct {
 	Provider
 }
 
-func (manager *Manager) LoadStoreOrNewIfNotExist(guid string) (store *Store,err error) {
+// load a store with that guid
+// if that guid not exist will generate a new guid and a new store
+func (manager *Manager) LoadStoreOrNewIfNotExist(guid string) (store *Store, err error) {
 	// no need for lock manager,
 	// if a store not exist ,it will get a new store with new random guid
 	if manager.Exist(guid) {

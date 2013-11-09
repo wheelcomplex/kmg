@@ -4,7 +4,7 @@ import "testing"
 import "kmg/test"
 
 func TestContainer(ot *testing.T) {
-	t:=test.NewTestTools(ot)
+	t := test.NewTestTools(ot)
 	c := NewContainer()
 	err := c.Set("num", 1, "")
 	t.Equal(err, nil)
@@ -13,16 +13,16 @@ func TestContainer(ot *testing.T) {
 	t.Ok(err == nil)
 	t.Equal(num, 1)
 
-	err=c.SetFactory("factory1",func(c *Container)(interface {},error){
-		return 5,nil
-		},ScopeRequest)
-	t.Equal(err,nil)
+	err = c.SetFactory("factory1", func(c *Container) (interface{}, error) {
+		return 5, nil
+	}, ScopeRequest)
+	t.Equal(err, nil)
 
 	RequestContainer, err := c.EnterScope(ScopeRequest)
 	t.Ok(err == nil)
 
 	err = c.Set("s", "123", ScopeRequest)
-	t.Equal(err,CanNotSetNotActiveScopeByObjError)
+	t.Equal(err, CanNotSetNotActiveScopeByObjError)
 
 	err = RequestContainer.Set("s", "123", ScopeRequest)
 	t.Ok(err == nil)

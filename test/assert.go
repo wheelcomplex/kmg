@@ -37,13 +37,13 @@ func (tools *TestTools) Equal(get interface{}, expect interface{}) {
 	if isEqual(expect, get) {
 		return
 	}
-	tools.assertFail(fmt.Sprintf("expect:%#v\nget:%#v", expect, get), 2)
+	tools.assertFail(fmt.Sprintf("expect:%#v (%T)\nget:%#v (%T)", expect, expect, get, get), 2)
 }
 func (tools *TestTools) EqualMsg(get interface{}, expect interface{}, msg string) {
 	if isEqual(expect, get) {
 		return
 	}
-	tools.assertFail(fmt.Sprintf("%s\nexpect:%#v\nget:%#v", msg, expect, get), 2)
+	tools.assertFail(fmt.Sprintf("%s\nexpect:%#v (%T)\nget:%#v (%T)", msg, expect, expect, get, get), 2)
 }
 
 func (tools *TestTools) assertFail(msg string, skip int) {
