@@ -32,3 +32,15 @@ func AddCaller(err error) error {
 	_, errOut.File, errOut.Line, _ = runtime.Caller(1)
 	return errOut
 }
+
+type SprintfWrapError struct {
+	args   []interface{}
+	format string
+}
+
+func (err *SprintfWrapError) Error() string {
+	return fmt.Sprintf(err.format, err.args...)
+}
+func Sprintf(format string, args ...interface{}) error {
+	return &SprintfWrapError{format: format, args: args}
+}

@@ -3,19 +3,7 @@ package kernel
 import "github.com/bronze1man/kmg/dependencyInjection"
 
 type BundleInterface interface {
-	dependencyInjection.ContainerAwareInterface
-	//can use dic here
-	Boot() error
-	//use for functional testing
-	Shutdown() error
-	Build(container dependencyInjection.ContainerBuilder)
-	GetParent() string
-	GetName() string
-	//full file path of this bundle
-	//GetFilePath() string
-	//
-	RegisterCommands()
-	GetPackageName() string
+	dependencyInjection.ExtensionInterface
 }
 
 type KernelInterface interface {
