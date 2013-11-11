@@ -32,6 +32,7 @@ func (command *WatchCommand) GetNameConfig() *console.NameConfig {
 }
 
 //TODO trace all watched directory
+//TODO wrapper watch directory stuff
 func (command *WatchCommand) Execute(context *console.Context) error {
 	command.isDebug = false
 	command.context = context
@@ -68,9 +69,6 @@ func (command *WatchCommand) Execute(context *console.Context) error {
 				fmt.Println("command.restart() error: ", err)
 			}
 		}
-	}()
-	go func() {
-
 	}()
 	for {
 		select {
@@ -168,11 +166,9 @@ func (command *WatchCommand) restart() error {
 
 	command.debugPrintln("target file path: ", command.targetFilePath)
 
-	command.cmd = exec.Command("go", "build", "-o", command.targetFilePath, command.mainFilePath)
+	command.cmd = console.NewStdioCmd(command.context, "go", "build", "-o", command.targetFilePath, command.mainFilePath)
 	command.cmd.Env = append(os.Environ(), "GOPATH="+command.wd)
-	command.cmd.Stdin = command.context.Stdin
-	command.cmd.Stdout = command.context.Stdout
-	command.cmd.Stderr = command.context.Stderr
+
 	err = command.cmd.Run()
 	if err != nil {
 		return errors.Sprintf("rebuild error: %s", err.Error())
@@ -182,11 +178,8 @@ func (command *WatchCommand) restart() error {
 		return err
 	}
 	fmt.Println("restart app...")
-	command.cmd = exec.Command(command.targetFilePath)
+	command.cmd = console.NewStdioCmd(command.context, command.targetFilePath)
 	command.cmd.Env = append(os.Environ(), "GOPATH="+command.wd)
-	command.cmd.Stdin = command.context.Stdin
-	command.cmd.Stdout = command.context.Stdout
-	command.cmd.Stderr = command.context.Stderr
 	err = command.cmd.Start()
 	if err != nil {
 		return errors.Sprintf("restart error: %s", err.Error())

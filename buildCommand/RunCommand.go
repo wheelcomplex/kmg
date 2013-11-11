@@ -14,14 +14,11 @@ func (command *RunCommand) GetNameConfig() *console.NameConfig {
 }
 func (command *RunCommand) Execute(context *console.Context) error {
 	args := append([]string{"run"}, context.Args[2:]...)
-	cmd := exec.Command("go", args...)
+	cmd := console.NewStdioCmd(context, "go", args...)
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 	cmd.Env = append(cmd.Env, "GOPATH="+wd)
-	cmd.Stdin = context.Stdin
-	cmd.Stdout = context.Stdout
-	cmd.Stderr = context.Stderr
 	return cmd.Run()
 }

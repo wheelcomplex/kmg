@@ -19,25 +19,23 @@ type Container struct {
 	scope          string
 	parent         *Container
 }
-type Definition struct {
-	Id      string
-	Scope   string
-	Factory func(c *Container) (interface{}, error)
-}
 
 //a simple container implement,which can only set object in runtime.
 func NewContainer() *Container {
 	container := &Container{
-		service_map:    make(map[string]interface{}),
 		definition_map: make(map[string]*Definition),
-		scope_map:      make(map[string]*Container),
-		scope:          ScopeSingleton,
 	}
-	container.scope_map[ScopeSingleton] = container
-	container.scope_map[ScopePrototype] = container
+	container.init()
 	return container
 }
 
+func (c *Container) init() {
+	c.scope = ScopeSingleton
+	c.service_map = make(map[string]interface{})
+	c.scope_map = make(map[string]*Container)
+	c.scope_map[ScopeSingleton] = c
+	c.scope_map[ScopePrototype] = c
+}
 func (c *Container) Get(id string) (service interface{}, err error) {
 	definition, ok := c.definition_map[id]
 	if !ok {
@@ -52,11 +50,13 @@ func (c *Container) Get(id string) (service interface{}, err error) {
 	if ok {
 		return service, nil
 	}
-	service, err = definition.Factory(c)
+	service, err = definition.GetInst(c)
 	if err != nil {
 		return nil, err
 	}
-	container.service_map[id] = service
+	if definition.Scope != ScopePrototype {
+		container.service_map[id] = service
+	}
 	return
 }
 func (c *Container) MustGet(id string) interface{} {
@@ -109,6 +109,7 @@ func (c *Container) SetFactory(id string, factory func(c *Container) (interface{
 	definition.Scope = scope
 	definition.Id = id
 	definition.Factory = factory
+	definition.InitType = DefinitionFromFactory
 	return nil
 }
 func (c *Container) MustSetFactory(id string, factory func(c *Container) (interface{}, error), scope string) {

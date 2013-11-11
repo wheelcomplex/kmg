@@ -1,11 +1,9 @@
 package kernel
 
-import "github.com/bronze1man/kmg/dependencyInjection"
+/*
+type Kernel struct{
 
-type BundleInterface interface {
-	dependencyInjection.ExtensionInterface
 }
-
 type KernelInterface interface {
 	//register bundles to this kernel
 	//all register bundles name should be unique
@@ -34,3 +32,4 @@ type KernelInterface interface {
 	// Gets the current container.
 	GetContainer() dependencyInjection.ContainerInterface
 }
+*/

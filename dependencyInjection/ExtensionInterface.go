@@ -1,5 +1,6 @@
 package dependencyInjection
 
+//modular register some dependency
 type ExtensionInterface interface {
-	LoadDependencyInjection(c *Container) error
+	LoadDependencyInjection(c *ContainerBuilder) error
 }
