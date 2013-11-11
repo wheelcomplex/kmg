@@ -10,6 +10,7 @@ func main() {
 	manager.MustAdd(&buildCommand.FmtCommand{})
 	manager.MustAdd(&buildCommand.RunCommand{})
 	manager.MustAdd(&buildCommand.WatchCommand{})
+	manager.MustAdd(&buildCommand.WatchCmdCommand{})
 	manager.ExecuteGlobal()
 
 }

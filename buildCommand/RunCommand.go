@@ -3,7 +3,6 @@ package buildCommand
 import (
 	"github.com/bronze1man/kmg/console"
 	"os"
-	"os/exec"
 )
 
 type RunCommand struct {
@@ -19,6 +18,9 @@ func (command *RunCommand) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	cmd.Env = append(cmd.Env, "GOPATH="+wd)
+	err = console.SetCmdEnv(cmd, "GOPATH", wd)
+	if err != nil {
+		return err
+	}
 	return cmd.Run()
 }
