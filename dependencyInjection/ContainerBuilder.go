@@ -4,6 +4,7 @@ type ContainerBuilder struct {
 	definition_map map[string]*Definition
 	extensions     []ExtensionInterface
 	compliePasses  []CompilePassInterface
+	Parameters     map[string]string
 }
 
 func NewContainerBuilder() *ContainerBuilder {
@@ -11,6 +12,7 @@ func NewContainerBuilder() *ContainerBuilder {
 		definition_map: make(map[string]*Definition),
 		extensions:     make([]ExtensionInterface, 0),
 		compliePasses:  make([]CompilePassInterface, 0),
+		Parameters:     make(map[string]string),
 	}
 }
 func (builder *ContainerBuilder) AddExtension(extension ExtensionInterface) {
@@ -47,7 +49,7 @@ func (builder *ContainerBuilder) GetTaggedDefinition(tag string) []*Definition {
 	definitions := []*Definition{}
 	for _, v := range builder.definition_map {
 		if v.HasTag(tag) {
-			definitions = append(definitions)
+			definitions = append(definitions, v)
 		}
 	}
 	return definitions

@@ -3,6 +3,7 @@ package kmgBundle
 import (
 	"database/sql"
 	"github.com/bronze1man/kmg/ajkApi"
+	"github.com/bronze1man/kmg/buildCommand"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"github.com/bronze1man/kmg/kmgSql"
 	"github.com/bronze1man/kmg/sessionStore"
@@ -33,11 +34,13 @@ func (extension *KmgExtension) LoadDependencyInjection(
 		}, nil
 	}, "")
 
+	databaseDsn := c.Parameters["databaseDsn"]
+	databaseType := c.Parameters["databaseType"]
 	//kmgSql
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Id: "kmgSql.godb",
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
-			return sql.Open("mysql", "root:cd32d5e86e@tcp(git2.lqv.ca:3306)/monster_dev?charset=utf8")
+			return sql.Open(databaseType, databaseDsn)
 		},
 	})
 
@@ -49,5 +52,22 @@ func (extension *KmgExtension) LoadDependencyInjection(
 			}, nil
 		},
 	})
+
+	// build command
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Inst: &buildCommand.FmtCommand{},
+	}).AddTag("command")
+
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Inst: &buildCommand.RunCommand{},
+	}).AddTag("command")
+
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Inst: &buildCommand.WatchCmdCommand{},
+	}).AddTag("command")
+
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Inst: &buildCommand.WatchCommand{},
+	}).AddTag("command")
 	return nil
 }

@@ -10,10 +10,15 @@ type BeegoExtension struct {
 
 func (extension *BeegoExtension) LoadDependencyInjection(
 	c *dependencyInjection.ContainerBuilder) error {
+
+	orm.RegisterDataBase("default", c.Parameters["databaseType"],
+		c.Parameters["databaseDsn"])
+
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Id:   "beego.command.orm",
 		Inst: &OrmCommand{},
 	}).AddTag("command")
+
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Id: "beego.orm",
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {

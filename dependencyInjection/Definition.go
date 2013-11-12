@@ -2,6 +2,9 @@ package dependencyInjection
 
 import (
 	"github.com/bronze1man/kmg/errors"
+	"reflect"
+	//"fmt"
+	"github.com/bronze1man/kmg/kmgReflect"
 )
 
 type DefinitionInitType int
@@ -43,6 +46,7 @@ func (definition *Definition) Init() error {
 	if definition.Scope == "" {
 		definition.Scope = ScopeSingleton
 	}
+	definition.guessId()
 	if definition.Id == "" {
 		return errors.Sprintf("definition not has id", definition.Id)
 	}
@@ -68,4 +72,17 @@ func (definition *Definition) GetInst(c *Container) (interface{}, error) {
 		return nil, errors.Sprintf("invalid definition init type,id: %s", definition.Id)
 	}
 	return nil, errors.Sprintf("invalid definition init type,id: %s", definition.Id)
+}
+
+func (definition *Definition) guessId() {
+	if definition.Id != "" {
+		return
+	}
+	if definition.Inst == nil {
+		return
+	}
+	name, ok := kmgReflect.GetTypeFullName(reflect.TypeOf(definition.Inst))
+	if ok {
+		definition.Id = name
+	}
 }

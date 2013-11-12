@@ -5,5 +5,6 @@ import "github.com/bronze1man/kmg/kernel"
 func NewBundle() (bundle *kernel.Bundle) {
 	bundle = &kernel.Bundle{}
 	bundle.AddExtension(&KmgExtension{})
+	bundle.AddCompliePass(&CommandCompilePass{})
 	return bundle
 }
