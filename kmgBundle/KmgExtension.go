@@ -1,9 +1,12 @@
 package kmgBundle
 
 import (
+	"database/sql"
 	"github.com/bronze1man/kmg/ajkApi"
 	"github.com/bronze1man/kmg/dependencyInjection"
+	"github.com/bronze1man/kmg/kmgSql"
 	"github.com/bronze1man/kmg/sessionStore"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type KmgExtension struct {
@@ -29,5 +32,22 @@ func (extension *KmgExtension) LoadDependencyInjection(
 			c.MustGet("sessionStore.Provider").(sessionStore.Provider),
 		}, nil
 	}, "")
+
+	//kmgSql
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Id: "kmgSql.godb",
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			return sql.Open("mysql", "root:cd32d5e86e@tcp(git2.lqv.ca:3306)/monster_dev?charset=utf8")
+		},
+	})
+
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Id: "kmgSql.db",
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			return &kmgSql.Db{
+				c.MustGet("kmgSql.godb").(*sql.DB),
+			}, nil
+		},
+	})
 	return nil
 }
