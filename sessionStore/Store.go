@@ -12,6 +12,9 @@ type Store struct {
 func NewStore(guid string, values map[string]interface{}) *Store {
 	return &Store{guid: guid, values: values}
 }
+func NewEmptyStore(guid string) *Store {
+	return &Store{guid: guid, values: make(map[string]interface{})}
+}
 func (store *Store) Get(key string) (value interface{}, exist bool) {
 	store.lock.RLock()
 	defer store.lock.RUnlock()

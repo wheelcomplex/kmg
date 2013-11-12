@@ -24,8 +24,21 @@ func (builder *ContainerBuilder) GetDefinition(id string) (definition *Definitio
 	return
 }
 
-func (builder *ContainerBuilder) SetDefinition(definition *Definition) {
+func (builder *ContainerBuilder) SetDefinition(definition *Definition) error {
+	err := definition.Init()
+	if err != nil {
+		return err
+	}
 	builder.definition_map[definition.Id] = definition
+	return nil
+}
+
+func (builder *ContainerBuilder) MustSetDefinition(definition *Definition) *Definition {
+	err := builder.SetDefinition(definition)
+	if err != nil {
+		panic(err)
+	}
+	return definition
 }
 
 // will return a empty slice if tag not exist

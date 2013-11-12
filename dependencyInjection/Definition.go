@@ -1,7 +1,7 @@
 package dependencyInjection
 
 import (
-	"errors"
+	"github.com/bronze1man/kmg/errors"
 )
 
 type DefinitionInitType int
@@ -10,8 +10,6 @@ const (
 	DefinitionFromInst DefinitionInitType = iota
 	DefinitionFromFactory
 )
-
-var InvalidDefinitionInitTypeError = errors.New("invalid definition init type")
 
 type Definition struct {
 	Id       string
@@ -37,6 +35,29 @@ func (definition *Definition) HasTag(tag string) bool {
 	return false
 }
 
+func (definition *Definition) AddTag(tag string) *Definition {
+	definition.Tags = append(definition.Tags, tag)
+	return definition
+}
+func (definition *Definition) Init() error {
+	if definition.Scope == "" {
+		definition.Scope = ScopeSingleton
+	}
+	if definition.Id == "" {
+		return errors.Sprintf("definition not has id", definition.Id)
+	}
+	if definition.InitType == 0 {
+		switch {
+		case definition.Inst != nil:
+			definition.InitType = DefinitionFromInst
+		case definition.Factory != nil:
+			definition.InitType = DefinitionFromFactory
+		default:
+			return errors.Sprintf("definition not has init way, id: %s", definition.Id)
+		}
+	}
+	return nil
+}
 func (definition *Definition) GetInst(c *Container) (interface{}, error) {
 	switch definition.InitType {
 	case DefinitionFromInst:
@@ -44,7 +65,7 @@ func (definition *Definition) GetInst(c *Container) (interface{}, error) {
 	case DefinitionFromFactory:
 		return definition.Factory(c)
 	default:
-		return nil, InvalidDefinitionInitTypeError
+		return nil, errors.Sprintf("invalid definition init type,id: %s", definition.Id)
 	}
-	return nil, InvalidDefinitionInitTypeError
+	return nil, errors.Sprintf("invalid definition init type,id: %s", definition.Id)
 }

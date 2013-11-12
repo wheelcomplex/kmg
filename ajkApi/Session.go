@@ -25,6 +25,13 @@ func (sess *Session) GetStore() (store *sessionStore.Store, err error) {
 	}
 	return sess.store, nil
 }
+func (sess *Session) MustGetStore() *sessionStore.Store {
+	store, err := sess.GetStore()
+	if err != nil {
+		panic(err)
+	}
+	return store
+}
 func (sess *Session) GetGuid() string {
 	return sess.guid
 }

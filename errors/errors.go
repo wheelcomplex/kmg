@@ -44,3 +44,12 @@ func (err *SprintfWrapError) Error() string {
 func Sprintf(format string, args ...interface{}) error {
 	return &SprintfWrapError{format: format, args: args}
 }
+
+type stringWrapError string
+
+func (err stringWrapError) Error() string {
+	return string(err)
+}
+func New(s string) error {
+	return stringWrapError(s)
+}

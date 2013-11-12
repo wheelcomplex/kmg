@@ -1,9 +1,34 @@
 package kernel
 
-/*
-type Kernel struct{
+import "github.com/bronze1man/kmg/dependencyInjection"
 
+type Kernel struct {
+	Bundles   []*Bundle
+	Container *dependencyInjection.Container
 }
+
+func NewKernel() *Kernel {
+	return &Kernel{}
+}
+func (kernel *Kernel) Boot() (err error) {
+	builder := dependencyInjection.NewContainerBuilder()
+	for _, bundle := range kernel.Bundles {
+		bundle.Build(builder)
+	}
+	kernel.Container, err = builder.Compile()
+	return
+}
+func (kernel *Kernel) MustBoot() {
+	err := kernel.Boot()
+	if err != nil {
+		panic(err)
+	}
+}
+func (kernel *Kernel) AddBundle(bundle *Bundle) {
+	kernel.Bundles = append(kernel.Bundles, bundle)
+}
+
+/*
 type KernelInterface interface {
 	//register bundles to this kernel
 	//all register bundles name should be unique
