@@ -3,7 +3,7 @@ package kmgBundle
 import (
 	"database/sql"
 	"github.com/bronze1man/kmg/ajkApi"
-	"github.com/bronze1man/kmg/buildCommand"
+	"github.com/bronze1man/kmg/console/command"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"github.com/bronze1man/kmg/kmgSql"
 	"github.com/bronze1man/kmg/sessionStore"
@@ -55,19 +55,19 @@ func (extension *KmgExtension) LoadDependencyInjection(
 
 	// build command
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &buildCommand.FmtCommand{},
+		Inst: &command.Fmt{},
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &buildCommand.RunCommand{},
+		Inst: &command.Run{},
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &buildCommand.WatchCmdCommand{},
+		Inst: &command.WatchCmd{},
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &buildCommand.WatchCommand{},
+		Inst: &command.Watch{},
 	}).AddTag("command")
 	return nil
 }

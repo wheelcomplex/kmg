@@ -64,8 +64,8 @@ func (manager *Manager) Execute(context *Context) {
 	flagSet.Parse(args[2:])
 	err := command.Execute(context)
 	if err != nil {
-		fmt.Fprintf(context.Stderr, "error happend: %s\n", err.Error())
-		os.Exit(2)
+		fmt.Fprintln(context.Stderr, err.Error())
+		os.Exit(1)
 	}
 	os.Exit(0)
 }

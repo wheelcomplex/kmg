@@ -1,17 +1,17 @@
-package buildCommand
+package command
 
 import (
 	"github.com/bronze1man/kmg/console"
 	"os"
 )
 
-type FmtCommand struct {
+type Fmt struct {
 }
 
-func (command *FmtCommand) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "fmt", Short: "format all golang code in a dir"}
+func (command *Fmt) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "Fmt", Short: `format all golang code in a dir,same as "gofmt -w=true ."`}
 }
-func (command *FmtCommand) Execute(context *console.Context) error {
+func (command *Fmt) Execute(context *console.Context) error {
 	cmd := console.NewStdioCmd(context, "gofmt", "-w=true", ".")
 	wd, err := os.Getwd()
 	if err != nil {

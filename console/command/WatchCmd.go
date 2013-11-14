@@ -1,4 +1,4 @@
-package buildCommand
+package command
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type WatchCmdCommand struct {
+type WatchCmd struct {
 	context *console.Context
 	wd      string
 	watcher *fsnotify.Watcher
@@ -18,13 +18,13 @@ type WatchCmdCommand struct {
 	isDebug bool //more output
 }
 
-func (command *WatchCmdCommand) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "watchcmd",
+func (command *WatchCmd) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "WatchCmd",
 		Short: "watch current directory and kill and reexecute a command",
 	}
 }
 
-func (command *WatchCmdCommand) Execute(context *console.Context) error {
+func (command *WatchCmd) Execute(context *console.Context) error {
 	command.isDebug = false
 	command.context = context
 	if len(context.Args) <= 2 {
@@ -63,7 +63,7 @@ func (command *WatchCmdCommand) Execute(context *console.Context) error {
 	// wait forever
 	return nil
 }
-func (command *WatchCmdCommand) restart() error {
+func (command *WatchCmd) restart() error {
 	//kill old process
 	err := command.stop()
 	if err != nil {
@@ -87,7 +87,7 @@ func (command *WatchCmdCommand) restart() error {
 	return nil
 }
 
-func (command *WatchCmdCommand) stop() error {
+func (command *WatchCmd) stop() error {
 	if command.cmd == nil {
 		return nil
 	}
@@ -100,7 +100,7 @@ func (command *WatchCmdCommand) stop() error {
 	}
 	return nil
 }
-func (command *WatchCmdCommand) debugPrintln(o ...interface{}) {
+func (command *WatchCmd) debugPrintln(o ...interface{}) {
 	if command.isDebug {
 		fmt.Println(o...)
 	}

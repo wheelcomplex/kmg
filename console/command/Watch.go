@@ -1,4 +1,4 @@
-package buildCommand
+package command
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ import (
 //TODO cygwin ctrl+c not exit children processes
 //TODO wrap restart cmd stuff
 //TODO wrap lastHappendTime watch stuff
-type WatchCommand struct {
+type Watch struct {
 	context        *console.Context
 	wd             string
 	watcher        *fsnotify.Watcher
@@ -26,13 +26,13 @@ type WatchCommand struct {
 	isDebug        bool //more output
 }
 
-func (command *WatchCommand) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "watch",
+func (command *Watch) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "Watch",
 		Short: "watch current directory and rebuild and restart app when some file changed",
 	}
 }
 
-func (command *WatchCommand) Execute(context *console.Context) error {
+func (command *Watch) Execute(context *console.Context) error {
 	command.isDebug = false
 	command.context = context
 	if len(context.Args) != 3 {
@@ -85,7 +85,7 @@ func (command *WatchCommand) Execute(context *console.Context) error {
 	// wait forever
 	return nil
 }
-func (command *WatchCommand) restart() error {
+func (command *Watch) restart() error {
 	//kill old process
 	err := command.stop()
 	if err != nil {
@@ -137,7 +137,7 @@ func (command *WatchCommand) restart() error {
 	return nil
 }
 
-func (command *WatchCommand) stop() error {
+func (command *Watch) stop() error {
 	if command.cmd == nil {
 		return nil
 	}
@@ -150,13 +150,13 @@ func (command *WatchCommand) stop() error {
 	}
 	return nil
 }
-func (command *WatchCommand) debugPrintln(o ...interface{}) {
+func (command *Watch) debugPrintln(o ...interface{}) {
 	if command.isDebug {
 		fmt.Println(o...)
 	}
 }
 
-func (command *WatchCommand) setEnv() error {
+func (command *Watch) setEnv() error {
 	env, err := console.NewEnvFromArray(os.Environ())
 	if err != nil {
 		fmt.Printf("%#v", os.Environ())
