@@ -13,7 +13,8 @@ type Context struct {
 	Stderr        io.WriteCloser
 	ExecutionName string
 }
-func (c *Context)PrintUsage(msg string){
+
+func (c *Context) PrintUsage(msg string) {
 	c.Stderr.Write([]byte(msg))
 	c.FlagSet.PrintDefaults()
 }
