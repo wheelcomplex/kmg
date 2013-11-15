@@ -26,52 +26,54 @@ func (command *Xlsx2Yaml) ConfigFlagSet(f *flag.FlagSet) {
 }
 func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 	if *command.filePath == "" {
-		return errors.New("need input file")
+		if context.FlagSet.NArg()==1{
+			*command.filePath = context.FlagSet.Arg(0)
+		}else{
+			return errors.New("need input file")
+		}
 	}
 	rawArray, err := excel.XlsxFile2Array(*command.filePath)
 	if err != nil {
 		return err
 	}
-	var outByte []byte
-	switch *command.format {
-	case "raw":
-		if *command.isOutputAllSheet {
-			outByte, err = goyaml.Marshal(rawArray)
-			if err != nil {
-				return err
-			}
-		} else {
-			outByte, err = goyaml.Marshal(rawArray[0])
-			if err != nil {
-				return err
-			}
-		}
-	case "grid":
-		o := [][]map[string]string{}
-		for _, s := range rawArray {
-			o1, err := excel.TitleArrayToGrid(s)
-			if err != nil {
-				return err
-			}
-			o = append(o, o1)
-		}
-		if *command.isOutputAllSheet {
-			outByte, err = goyaml.Marshal(o)
-			if err != nil {
-				return err
-			}
-		} else {
-			outByte, err = goyaml.Marshal(o[0])
-			if err != nil {
-				return err
-			}
-		}
-	default:
-		return errors.Sprintf("not support output format: %s", command.format)
+	output,err:=command.formatOutput(rawArray)
+	if err!=nil{
+		return err
+	}
+	outByte,err := goyaml.Marshal(output)
+	if err!=nil{
+		return err
 	}
 	_, err = context.Stdout.Write(outByte)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (command *Xlsx2Yaml)formatOutput(rawArray [][][]string)(interface {},error){
+	switch *command.format {
+	case "raw":
+		if *command.isOutputAllSheet {
+			return rawArray,nil
+		} else {
+			return rawArray[0],nil
+		}
+	case "grid":
+		o := [][]map[string]string{}
+		for _, s := range rawArray {
+			o1, err := excel.TitleArrayToGrid(s)
+			if err != nil {
+				return nil,err
+			}
+			o = append(o, o1)
+		}
+		if *command.isOutputAllSheet {
+			return o,nil
+		} else {
+			return o[0],nil
+		}
+	default:
+		return nil,errors.Sprintf("not support output format: %s", command.format)
+	}
 }

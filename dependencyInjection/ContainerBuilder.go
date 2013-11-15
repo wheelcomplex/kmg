@@ -4,14 +4,13 @@ type ContainerBuilder struct {
 	definition_map map[string]*Definition
 	extensions     []ExtensionInterface
 	compliePasses  []CompilePassInterface
+	bootes         []BootInterface
 	Parameters     map[string]string
 }
 
 func NewContainerBuilder() *ContainerBuilder {
 	return &ContainerBuilder{
 		definition_map: make(map[string]*Definition),
-		extensions:     make([]ExtensionInterface, 0),
-		compliePasses:  make([]CompilePassInterface, 0),
 		Parameters:     make(map[string]string),
 	}
 }
@@ -20,6 +19,9 @@ func (builder *ContainerBuilder) AddExtension(extension ExtensionInterface) {
 }
 func (builder *ContainerBuilder) AddCompilePass(compliePass CompilePassInterface) {
 	builder.compliePasses = append(builder.compliePasses, compliePass)
+}
+func (builder *ContainerBuilder) AddBoot(boot BootInterface) {
+	builder.bootes = append(builder.bootes, boot)
 }
 func (builder *ContainerBuilder) GetDefinition(id string) (definition *Definition, exist bool) {
 	definition, exist = builder.definition_map[id]
@@ -92,6 +94,12 @@ func (builder *ContainerBuilder) MustSetFactory(id string, factory func(c *Conta
 }
 
 func (builder *ContainerBuilder) Compile() (c *Container, err error) {
+	for k,v:=range builder.Parameters{
+		err = builder.Set("parameter."+k,v,"")
+		if err!=nil{
+			return
+		}
+	}
 	for _, v := range builder.extensions {
 		err = v.LoadDependencyInjection(builder)
 		if err != nil {
@@ -109,6 +117,12 @@ func (builder *ContainerBuilder) Compile() (c *Container, err error) {
 		definition_map: builder.definition_map,
 	}
 	c.init()
+	for _,v:=range builder.bootes{
+		err = v.Boot(c)
+		if err!=nil{
+			return
+		}
+	}
 	return
 }
 func (builder *ContainerBuilder) MustCompile() (c *Container) {

@@ -62,6 +62,7 @@ func (manager *Manager) Execute(context *Context) {
 		command.ConfigFlagSet(flagSet)
 	}
 	flagSet.Parse(args[2:])
+	context.FlagSet = flagSet
 	err := command.Execute(context)
 	if err != nil {
 		fmt.Fprintln(context.Stderr, err.Error())
