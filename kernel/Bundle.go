@@ -29,4 +29,3 @@ func (bundle *Bundle) AddCompliePass(compliePass dependencyInjection.CompilePass
 func (bundle *Bundle) AddBoot(boot dependencyInjection.BootInterface) {
 	bundle.Bootes = append(bundle.Bootes, boot)
 }
-

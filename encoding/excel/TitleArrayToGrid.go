@@ -42,7 +42,7 @@ func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err er
 func trimLeftRowString(row []string) []string {
 	for i := len(row) - 1; i >= 0; i-- {
 		if strings.Trim(row[i], " ") != "" {
-			return row[:i]
+			return row[:i+1]
 		}
 	}
 	return []string{}

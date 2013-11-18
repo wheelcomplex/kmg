@@ -21,10 +21,10 @@ func NewManager() *Manager {
 	return &Manager{Map: make(map[string]Command)}
 }
 func (manager *Manager) Add(command Command) error {
-	name := getNameFromCommand(command)
+	name := strings.ToLower(getNameFromCommand(command))
 	_, ok := manager.Map[name]
 	if ok {
-		return errors.Sprintf("command %s already exist", name)
+		return errors.Sprintf("command %s already exist,command name is case insensitive.", name)
 	}
 	manager.Map[name] = command
 	return nil
@@ -51,7 +51,7 @@ func (manager *Manager) Execute(context *Context) {
 	if len(args) < 2 {
 		manager.usage(context.Stderr)
 	}
-	commandName := args[1]
+	commandName := strings.ToLower(args[1])
 	command, ok := manager.Map[commandName]
 	if !ok {
 		fmt.Fprintf(context.Stderr, "unknown subcommand %q\n", commandName)
@@ -92,7 +92,7 @@ var usageTemplate = `Usage:
 
 	{{.ExecuteName }} command [arguments]
 
-The commands are:
+The commands are: (command name is case insensitive)
 {{range .Commands}}
     {{.Name | printf "%-11s"}} {{.Short }}{{end}}
 `

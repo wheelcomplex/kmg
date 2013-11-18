@@ -6,6 +6,8 @@ import (
 	"github.com/bronze1man/kmg/encoding/excel"
 	"github.com/bronze1man/kmg/errors"
 	"launchpad.net/goyaml"
+	//"fmt"
+	//"fmt"
 )
 
 type Xlsx2Yaml struct {
@@ -26,9 +28,9 @@ func (command *Xlsx2Yaml) ConfigFlagSet(f *flag.FlagSet) {
 }
 func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 	if *command.filePath == "" {
-		if context.FlagSet.NArg()==1{
+		if context.FlagSet.NArg() == 1 {
 			*command.filePath = context.FlagSet.Arg(0)
-		}else{
+		} else {
 			return errors.New("need input file")
 		}
 	}
@@ -36,12 +38,12 @@ func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	output,err:=command.formatOutput(rawArray)
-	if err!=nil{
+	output, err := command.formatOutput(rawArray)
+	if err != nil {
 		return err
 	}
-	outByte,err := goyaml.Marshal(output)
-	if err!=nil{
+	outByte, err := goyaml.Marshal(output)
+	if err != nil {
 		return err
 	}
 	_, err = context.Stdout.Write(outByte)
@@ -51,29 +53,29 @@ func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 	return nil
 }
 
-func (command *Xlsx2Yaml)formatOutput(rawArray [][][]string)(interface {},error){
+func (command *Xlsx2Yaml) formatOutput(rawArray [][][]string) (interface{}, error) {
 	switch *command.format {
 	case "raw":
 		if *command.isOutputAllSheet {
-			return rawArray,nil
+			return rawArray, nil
 		} else {
-			return rawArray[0],nil
+			return rawArray[0], nil
 		}
 	case "grid":
 		o := [][]map[string]string{}
 		for _, s := range rawArray {
 			o1, err := excel.TitleArrayToGrid(s)
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			o = append(o, o1)
 		}
 		if *command.isOutputAllSheet {
-			return o,nil
+			return o, nil
 		} else {
-			return o[0],nil
+			return o[0], nil
 		}
 	default:
-		return nil,errors.Sprintf("not support output format: %s", command.format)
+		return nil, errors.Sprintf("not support output format: %s", command.format)
 	}
 }

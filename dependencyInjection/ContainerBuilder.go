@@ -94,9 +94,9 @@ func (builder *ContainerBuilder) MustSetFactory(id string, factory func(c *Conta
 }
 
 func (builder *ContainerBuilder) Compile() (c *Container, err error) {
-	for k,v:=range builder.Parameters{
-		err = builder.Set("parameter."+k,v,"")
-		if err!=nil{
+	for k, v := range builder.Parameters {
+		err = builder.Set("parameter."+k, v, "")
+		if err != nil {
 			return
 		}
 	}
@@ -117,9 +117,9 @@ func (builder *ContainerBuilder) Compile() (c *Container, err error) {
 		definition_map: builder.definition_map,
 	}
 	c.init()
-	for _,v:=range builder.bootes{
+	for _, v := range builder.bootes {
 		err = v.Boot(c)
-		if err!=nil{
+		if err != nil {
 			return
 		}
 	}

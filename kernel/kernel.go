@@ -29,7 +29,7 @@ func (kernel *Kernel) Boot() (err error) {
 		return err
 	}
 	kernel.Parameters["appPath"] = kernel.AppPath
-	kernel.Parameters["dataPath"] = filepath.Join(kernel.AppPath,"data")
+	kernel.Parameters["dataPath"] = filepath.Join(kernel.AppPath, "data")
 
 	builder := dependencyInjection.NewContainerBuilder()
 	builder.Parameters = kernel.Parameters
