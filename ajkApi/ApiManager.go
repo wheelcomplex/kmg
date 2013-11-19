@@ -68,5 +68,10 @@ func (manager *containerAwareApiManager) RpcCall(
 	if ok == false {
 		return &ApiFuncNotFoundError{Reason: "method not on service", ApiName: name}
 	}
-	return caller(&ApiFuncMeta{IsMethod: true, Func: method.Func, AttachObject: reflect.ValueOf(service)})
+	return caller(&ApiFuncMeta{
+		IsMethod:     true,
+		Func:         method.Func,
+		AttachObject: reflect.ValueOf(service),
+		MethodName:   methodName,
+	})
 }

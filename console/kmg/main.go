@@ -14,6 +14,7 @@ func main() {
 	manager.MustAdd(&command.CurrentDir{})
 	manager.MustAdd(&command.Yaml2Json{})
 	manager.MustAdd(&command.Xlsx2Yaml{})
+	manager.MustAdd(&command.ParpareReflect{})
 	manager.ExecuteGlobal()
 
 }

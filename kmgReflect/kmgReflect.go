@@ -24,3 +24,13 @@ func GetTypeFullName(t reflect.Type) (name string, ok bool) {
 	}
 	return t.PkgPath() + "." + t.Name(), true
 }
+
+func IndirectType(v reflect.Type) reflect.Type {
+	switch v.Kind() {
+	case reflect.Ptr:
+		return IndirectType(v.Elem())
+	default:
+		return v
+	}
+	return v
+}
