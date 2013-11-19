@@ -5,13 +5,13 @@ import (
 	"os"
 )
 
-type Fmt struct {
+type GoFmt struct {
 }
 
-func (command *Fmt) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "Fmt", Short: `format all golang code in a dir,same as "gofmt -w=true ."`}
+func (command *GoFmt) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "GoFmt", Short: `format all golang code in a dir,same as "gofmt -w=true ."`}
 }
-func (command *Fmt) Execute(context *console.Context) error {
+func (command *GoFmt) Execute(context *console.Context) error {
 	cmd := console.NewStdioCmd(context, "gofmt", "-w=true", ".")
 	wd, err := os.Getwd()
 	if err != nil {

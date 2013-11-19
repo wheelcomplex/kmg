@@ -5,13 +5,13 @@ import (
 	"os"
 )
 
-type Run struct {
+type GoRun struct {
 }
 
-func (command *Run) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "Run", Short: "run some golang code(auto set current dir as GOPATH)"}
+func (command *GoRun) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "GoRun", Short: "run some golang code(auto set current dir as GOPATH)"}
 }
-func (command *Run) Execute(context *console.Context) error {
+func (command *GoRun) Execute(context *console.Context) error {
 	args := append([]string{"run"}, context.Args[2:]...)
 	cmd := console.NewStdioCmd(context, "go", args...)
 	wd, err := os.Getwd()

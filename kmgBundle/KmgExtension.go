@@ -55,11 +55,11 @@ func (extension *KmgExtension) LoadDependencyInjection(
 
 	// build command
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.Fmt{},
+		Inst: &command.GoFmt{},
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.Run{},
+		Inst: &command.GoRun{},
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
@@ -67,7 +67,7 @@ func (extension *KmgExtension) LoadDependencyInjection(
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.Watch{},
+		Inst: &command.GoWatch{},
 	}).AddTag("command")
 	return nil
 }

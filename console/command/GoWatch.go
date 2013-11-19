@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"time"
 )
 
 //Warning!! do not use go run to build executes...
@@ -16,7 +15,7 @@ import (
 //TODO cygwin ctrl+c not exit children processes
 //TODO wrap restart cmd stuff
 //TODO wrap lastHappendTime watch stuff
-type Watch struct {
+type GoWatch struct {
 	context        *console.Context
 	wd             string
 	watcher        *fsnotify.Watcher
@@ -26,13 +25,13 @@ type Watch struct {
 	isDebug        bool //more output
 }
 
-func (command *Watch) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "Watch",
+func (command *GoWatch) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "GoWatch",
 		Short: "watch current directory and rebuild and restart app when some file changed",
 	}
 }
 
-func (command *Watch) Execute(context *console.Context) error {
+func (command *GoWatch) Execute(context *console.Context) error {
 	command.isDebug = false
 	command.context = context
 	if len(context.Args) != 3 {
@@ -44,14 +43,14 @@ func (command *Watch) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	command.watcher, err = fsnotify.NewWatcher(10000)
+	runner, err := fsnotify.NewRunner(10000)
 	if err != nil {
 		return err
 	}
-	command.watcher.ErrorHandler = func(err error) {
+	runner.Watcher.ErrorHandler = func(err error) {
 		fmt.Println("watcher.Error error: ", err)
 	}
-	command.watcher.IsIgnorePath = func(path string) bool {
+	runner.Watcher.IsIgnorePath = func(path string) bool {
 		if fsnotify.DefaultIsIgnorePath(path) {
 			return true
 		}
@@ -60,32 +59,17 @@ func (command *Watch) Execute(context *console.Context) error {
 		}
 		return false
 	}
-	command.watcher.WatchRecursion(command.wd)
-	lastHappendTime := time.Now()
-	//start app when command start
-	err = command.restart()
-	if err != nil {
-		fmt.Println("command.restart() error: ", err)
-	}
-	for {
-		event := <-command.watcher.Event
-		command.debugPrintln("event: ", event)
-		if event.Time.Before(lastHappendTime) {
-			continue
-		}
-		//wait 200ms to prevent multiple restart in short time
-		time.Sleep(time.Duration(0.2 * float64(time.Second)))
-		lastHappendTime = time.Now()
+	runner.Watcher.WatchRecursion(command.wd)
+	// wait forever
+	runner.Run(func() {
 		err := command.restart()
 		if err != nil {
 			fmt.Println("command.restart() error: ", err)
 		}
-	}
-
-	// wait forever
+	})
 	return nil
 }
-func (command *Watch) restart() error {
+func (command *GoWatch) restart() error {
 	//kill old process
 	err := command.stop()
 	if err != nil {
@@ -137,7 +121,7 @@ func (command *Watch) restart() error {
 	return nil
 }
 
-func (command *Watch) stop() error {
+func (command *GoWatch) stop() error {
 	if command.cmd == nil {
 		return nil
 	}
@@ -150,13 +134,13 @@ func (command *Watch) stop() error {
 	}
 	return nil
 }
-func (command *Watch) debugPrintln(o ...interface{}) {
+func (command *GoWatch) debugPrintln(o ...interface{}) {
 	if command.isDebug {
 		fmt.Println(o...)
 	}
 }
 
-func (command *Watch) setEnv() error {
+func (command *GoWatch) setEnv() error {
 	env, err := console.NewEnvFromArray(os.Environ())
 	if err != nil {
 		fmt.Printf("%#v", os.Environ())

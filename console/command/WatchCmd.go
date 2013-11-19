@@ -7,7 +7,6 @@ import (
 	"github.com/bronze1man/kmg/fsnotify"
 	"os"
 	"os/exec"
-	"time"
 )
 
 type WatchCmd struct {
@@ -35,32 +34,21 @@ func (command *WatchCmd) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	command.watcher, err = fsnotify.NewWatcher(10000)
+	runner, err := fsnotify.NewRunner(10000)
 	if err != nil {
 		return err
 	}
-	command.watcher.ErrorHandler = func(err error) {
+	runner.Watcher.ErrorHandler = func(err error) {
 		fmt.Println("watcher.Error error: ", err)
 	}
-	command.watcher.WatchRecursion(command.wd)
-	lastHappendTime := time.Now()
-	//start app when command start
-	command.restart()
-	for {
-		event := <-command.watcher.Event
-		command.debugPrintln("event: ", event)
-		if event.Time.Before(lastHappendTime) {
-			continue
-		}
-		//wait 200ms to prevent multiple restart in short time
-		time.Sleep(time.Duration(0.2 * float64(time.Second)))
-		lastHappendTime = time.Now()
+	runner.Watcher.WatchRecursion(command.wd)
+	// wait forever
+	runner.Run(func() {
 		err := command.restart()
 		if err != nil {
 			fmt.Println("command.restart() error: ", err)
 		}
-	}
-	// wait forever
+	})
 	return nil
 }
 func (command *WatchCmd) restart() error {

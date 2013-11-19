@@ -7,9 +7,9 @@ import (
 
 func main() {
 	manager := console.NewManager()
-	manager.MustAdd(&command.Fmt{})
-	manager.MustAdd(&command.Run{})
-	manager.MustAdd(&command.Watch{})
+	manager.MustAdd(&command.GoFmt{})
+	manager.MustAdd(&command.GoRun{})
+	manager.MustAdd(&command.GoWatch{})
 	manager.MustAdd(&command.WatchCmd{})
 	manager.MustAdd(&command.CurrentDir{})
 	manager.MustAdd(&command.Yaml2Json{})
