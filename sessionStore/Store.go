@@ -15,6 +15,19 @@ func NewStore(guid string, values map[string]interface{}) *Store {
 func NewEmptyStore(guid string) *Store {
 	return &Store{guid: guid, values: make(map[string]interface{})}
 }
+
+//get int from store,if it do not exist or it is not int type return 0
+func (store *Store) GetIntOrZero(key string) int {
+	v, ok := store.Get(key)
+	if !ok {
+		return 0
+	}
+	i, ok := v.(int)
+	if !ok {
+		return 0
+	}
+	return i
+}
 func (store *Store) Get(key string) (value interface{}, exist bool) {
 	store.lock.RLock()
 	defer store.lock.RUnlock()
