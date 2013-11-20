@@ -22,7 +22,7 @@ type httpOutput struct {
 type JsonHttpHandler struct {
 	ApiManager          ApiManagerInterface
 	SessionStoreManager *sessionStore.Manager
-	ReflectDecl         *kmgReflect.ContextDecl
+	//	ReflectDecl         *kmgReflect.ContextDecl
 }
 
 func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
