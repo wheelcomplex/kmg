@@ -13,6 +13,8 @@ import (
 	"testing"
 )
 
+var globalTestVar = 0
+
 type TestHttpHandlerService struct {
 	session *Session
 }
@@ -44,6 +46,10 @@ func (this *TestHttpHandlerService) TestFunc2(
 	apiOutput.D = apiInput.C + a.(int)
 	return nil
 }
+func (this *TestHttpHandlerService) TestFunc3() {
+	globalTestVar = 1
+	return
+}
 
 func TestHttpHandler(ot *testing.T) {
 	t := test.NewTestTools(ot)
@@ -70,6 +76,10 @@ func TestHttpHandler(ot *testing.T) {
 		output["Guid"].(string)+`"}`)
 	t.Equal(output["Err"].(string), "")
 	t.Equal(output["Data"].(map[string]interface{})["D"].(float64), 10.0)
+
+	globalTestVar = 2
+	apiCall(h, t, `{"Name":"TestService.TestFunc3","Data":null,"Guid":""}`)
+	t.Equal(globalTestVar, 1)
 
 }
 

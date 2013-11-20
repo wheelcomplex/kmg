@@ -2,6 +2,8 @@ package ajkApi
 
 import (
 	"errors"
+	"github.com/bronze1man/kmg/dependencyInjection"
+	"github.com/bronze1man/kmg/test"
 	"testing"
 )
 
@@ -26,31 +28,20 @@ func (this *TestService) TestFunc4(apiInput *struct{ a int }) error {
 	return nil
 }
 func TestContainerAwareApiManager(ot *testing.T) {
-	/*
-		var err error
-		t := &test.TestTools{T: ot}
-		container := dependencyInjection.NewContainer()
-		apiManager := NewApiManagerFromContainer(container)
-		output:=&struct{b int}{}
+	var err error
+	t := &test.TestTools{T: ot}
+	container := dependencyInjection.NewContainer()
+	apiManager := NewApiManagerFromContainer(container)
 
-		testService :=  &TestService{}
-		err = container.Set("TestService",testService , "")
-		t.Equal(err, nil)
+	testService := &TestService{}
+	err = container.Set("a/b.TestService", testService, "")
+	t.Equal(err, nil)
 
-		err = apiManager.RpcCall(
-			nil, "TestService.TestFunc1", struct{}{}, output)
-		t.Equal(err, nil)
-		t.Equal(testService.TestFunc1Num,10)
-
-		err = apiManager.RpcCall(nil, "TestService1.TestFunc1", struct{}{}, output)
-		t.Equal(err.(*ApiFuncNotFoundError).Reason, "service not exist")
-
-		err = apiManager.RpcCall(nil, "TestService.TestFunc3", &struct{a int}{a:1}, output)
-		t.Equal(err,nil)
-		t.Equal(output.b,2)
-
-		err = apiManager.RpcCall(nil, "TestService.TestFunc4", &struct{a int}{a:5}, output)
-		t.Equal(err,nil)
-		t.Equal(testService.TestFunc4A,6)
-	*/
+	err = apiManager.RpcCall(
+		nil, "a/b.TestService.TestFunc1", func(meta *ApiFuncMeta) error {
+			t.Equal(meta.MethodName, "TestFunc1")
+			t.Equal(meta.AttachObject.Interface(), testService)
+			return nil
+		})
+	t.Equal(err, nil)
 }

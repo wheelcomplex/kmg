@@ -98,10 +98,13 @@ func structRpcCall(funcMeta *ApiFuncMeta, rawInput *httpInput) (interface{}, err
 		return nil, &ApiFuncArgumentError{Reason: "only accept function output argument num 0,1", ApiName: rawInput.Name}
 	}
 	outValues := funcMeta.Func.Call(inValues)
-
+	var output interface{}
+	if apiOutputValue.IsValid() && apiOutputValue.CanInterface() {
+		output = apiOutputValue.Interface()
+	}
 	if len(outValues) == 1 {
 		if outValues[0].IsNil() {
-			return apiOutputValue.Interface(), nil
+			return output, nil
 		}
 		err, ok := outValues[0].Interface().(error)
 		if ok == false {
@@ -112,7 +115,7 @@ func structRpcCall(funcMeta *ApiFuncMeta, rawInput *httpInput) (interface{}, err
 		}
 		return nil, err
 	}
-	return apiOutputValue.Interface(), nil
+	return output, nil
 }
 
 func jsonUnmarshalFromPtrReflectType(inputType reflect.Type, data []byte) (reflect.Value, error) {

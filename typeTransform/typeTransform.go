@@ -1,4 +1,4 @@
-package typeConversion
+package typeTransform
 
 import (
 	"reflect"
