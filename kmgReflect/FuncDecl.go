@@ -3,6 +3,7 @@ package kmgReflect
 import (
 	"go/ast"
 	"go/doc"
+	"reflect"
 )
 
 //golang missing function decl of parameter name
@@ -12,6 +13,9 @@ type FuncDecl struct {
 	ResultName []string //resultNames
 }
 
+func (funcDecl *FuncDecl) GetReflectFuncDecl(rfun reflect.Type, isMethod bool) (*ReflectFuncDecl, error) {
+	return NewReflectFuncDecl(funcDecl, rfun, isMethod)
+}
 func NewFuncDeclFromDocFunc(docfunc *doc.Func) *FuncDecl {
 	decl := &FuncDecl{}
 	funcType := docfunc.Decl.Type

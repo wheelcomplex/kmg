@@ -2,11 +2,12 @@ package ajkApi
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/bronze1man/kmg/kmgReflect"
 	"github.com/bronze1man/kmg/sessionStore"
 	"net/http"
 	"reflect"
-	//"github.com/bronze1man/kmg/kmgReflect"
-	//"fmt"
 )
 
 type httpInput struct {
@@ -22,7 +23,7 @@ type httpOutput struct {
 type JsonHttpHandler struct {
 	ApiManager          ApiManagerInterface
 	SessionStoreManager *sessionStore.Manager
-	//	ReflectDecl         *kmgReflect.ContextDecl
+	ReflectDecl         *kmgReflect.ContextDecl
 }
 
 func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -49,17 +50,52 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 
 //TODO finish rpcCall by function param name
 func (handler *JsonHttpHandler) rpcCall(funcMeta *ApiFuncMeta, rawInput *httpInput) (interface{}, error) {
-	return structRpcCall(funcMeta, rawInput)
-	/*
-		if handler.ReflectDecl==nil{
-			 return structRpcCall(funcMeta,rawInput)
+	if handler.ReflectDecl == nil {
+		return structRpcCall(funcMeta, rawInput)
+	}
+	objectReflectType := funcMeta.AttachObject.Type()
+	f, ok := handler.ReflectDecl.GetMethodDeclByReflectType(objectReflectType, funcMeta.MethodName)
+	if !ok {
+		return nil, fmt.Errorf("not found method in ReflectDecl %s.%s", objectReflectType.Name(), funcMeta.MethodName)
+	}
+	reflectFuncDecl, err := f.GetReflectFuncDecl(funcMeta.Func.Type(), funcMeta.IsMethod)
+	if err != nil {
+		return nil, fmt.Errorf("func %s.%s FuncDecl not match reflect err:%s", objectReflectType.Name(), funcMeta.MethodName, err.Error())
+	}
+	if len(reflectFuncDecl.Results) > 0 && !reflectFuncDecl.ResultHasNames {
+		return nil, fmt.Errorf("func %s.%s need have result name to become a api func", objectReflectType.Name(), funcMeta.MethodName)
+	}
+	inValues := make([]reflect.Value, funcMeta.Func.Type().NumIn())
+	if funcMeta.IsMethod {
+		inValues[0] = funcMeta.AttachObject
+	}
+	if len(reflectFuncDecl.Params) > 0 {
+		inRaw := map[string]json.RawMessage{}
+		err := json.Unmarshal([]byte(rawInput.Data), inRaw)
+		if err != nil {
+			return nil, fmt.Errorf("api input shuold be a map :%s", err.Error())
 		}
-		objectReflectType:=funcMeta.AttachObject.Type()
-		f,ok:=handler.ReflectDecl.GetMethodDeclByReflectType(objectReflectType,funcMeta.MethodName)
-		if !ok{
-			return nil,fmt.Errorf("not found method in ReflectDecl %s.%s",objectReflectType.Name(),funcMeta.MethodName)
+		for key, rawData := range inRaw {
+			field, ok := reflectFuncDecl.ParamMap[key]
+			if !ok {
+				continue
+			}
+			thisValuePtr := reflect.New(field.Type)
+			err := json.Unmarshal([]byte(rawData), thisValuePtr.Interface())
+			if err != nil {
+				return nil, fmt.Errorf("api input key: %s, type not match: %s", key, err.Error())
+			}
+			inValues[field.Index] = thisValuePtr.Elem()
 		}
-	*/
+		//zero value input for key not in ParamMap
+		for i, value := range inValues {
+			if value.IsValid() {
+				continue
+			}
+			inValues[i] = reflect.Zero(funcMeta.Func.Type().In(i))
+		}
+	}
+	return nil, errors.New("not implement rpcCall by function param name")
 }
 func structRpcCall(funcMeta *ApiFuncMeta, rawInput *httpInput) (interface{}, error) {
 	funcType := funcMeta.Func.Type()
