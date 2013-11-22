@@ -66,6 +66,7 @@ func (w *Watcher) eventHandle() {
 					continue
 				}
 				w.errorHandle(err)
+				continue
 			}
 			if fi.IsDir() {
 				w.WatchRecursion(originEvent.Name)
