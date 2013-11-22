@@ -24,8 +24,8 @@ func (db *Db) SetTablesDataYaml(yaml string) (err error) {
 }
 
 // Set some tables data in this database.
-// It will delete all data in that table,and insert new data.
 // mostly for test
+// not guarantee next increment id will be!!
 func (db *Db) SetTablesData(data map[string][]map[string]string) (err error) {
 	if err != nil {
 		return err

@@ -1,5 +1,7 @@
 package kmgSql
 
+import "database/sql"
+
 func (db *Db) QueryGrid(query string, args ...interface{}) (output []map[string]string, error error) {
 	rows, err := db.DB.Query(query, args...)
 	if err != nil {
@@ -13,9 +15,9 @@ func (db *Db) QueryGrid(query string, args ...interface{}) (output []map[string]
 	lenColumn := len(columns)
 	for rows.Next() {
 		rowArray := make([]interface{}, lenColumn)
-		//box value with *string, TODO use RawByte?
+		//box value with *RawByte
 		for k1, _ := range rowArray {
-			var s string
+			var s sql.RawBytes
 			rowArray[k1] = &s
 		}
 		if err := rows.Scan(rowArray...); err != nil {
@@ -24,7 +26,7 @@ func (db *Db) QueryGrid(query string, args ...interface{}) (output []map[string]
 		rowMap := make(map[string]string)
 		for rowIndex, rowName := range columns {
 			//unbox value with *string
-			rowMap[rowName] = *(rowArray[rowIndex].(*string))
+			rowMap[rowName] = string(*(rowArray[rowIndex].(*sql.RawBytes)))
 		}
 		output = append(output, rowMap)
 	}
