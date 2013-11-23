@@ -5,14 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/bronze1man/kmg/console"
+	"github.com/bronze1man/kmg/kmgFile"
 	"io"
 	"io/ioutil"
 	"launchpad.net/goyaml"
 	"strconv"
-	//"path/filepath"
-	//"os"
-	"github.com/bronze1man/kmg/kmgFile"
-	//"errors"
 )
 
 type Yaml2Json struct {
