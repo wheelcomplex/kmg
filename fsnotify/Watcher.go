@@ -2,6 +2,7 @@
 package fsnotify
 
 import (
+	"github.com/bronze1man/kmg/kmgFile"
 	originFsnotify "github.com/howeyc/fsnotify"
 	"os"
 	"path/filepath"
@@ -120,15 +121,5 @@ func (w *Watcher) getSubFolders(path string) (paths []string, err error) {
 	return paths, err
 }
 func DefaultIsIgnorePath(path string) bool {
-	base := filepath.Base(path)
-	if filepath.HasPrefix(base, ".") {
-		return true
-	}
-	if base == "." {
-		return true
-	}
-	if base == ".." {
-		return true
-	}
-	return false
+	return kmgFile.IsDotFile(path)
 }

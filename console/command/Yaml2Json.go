@@ -2,15 +2,22 @@ package command
 
 import (
 	"encoding/json"
-	"errors"
+	"flag"
 	"fmt"
 	"github.com/bronze1man/kmg/console"
+	"io"
 	"io/ioutil"
 	"launchpad.net/goyaml"
 	"strconv"
+	//"path/filepath"
+	//"os"
+	"github.com/bronze1man/kmg/kmgFile"
+	//"errors"
 )
 
 type Yaml2Json struct {
+	inputPath  *string
+	outputPath *string
 }
 
 func (command *Yaml2Json) GetNameConfig() *console.NameConfig {
@@ -19,29 +26,48 @@ func (command *Yaml2Json) GetNameConfig() *console.NameConfig {
 	}
 }
 
+func (command *Yaml2Json) ConfigFlagSet(flag *flag.FlagSet) {
+	command.inputPath = flag.String("i", "", "input file path")
+	command.outputPath = flag.String("o", "", "output file path")
+}
 func (command *Yaml2Json) Execute(context *console.Context) error {
-	var data interface{}
-	input, err := ioutil.ReadAll(context.Stdin)
+	inputPath := *command.inputPath
+	outputPath := *command.outputPath
+	if inputPath == "" || outputPath == "" {
+		return yaml2JsonIo(context.Stdin, context.Stdout)
+	}
+	transform := &kmgFile.DirectoryFileTransform{
+		InputExt:  "yml",
+		OuputExt:  "json",
+		Transform: yaml2JsonIo,
+	}
+	return transform.Run(inputPath, outputPath)
+}
+
+func yaml2JsonIo(r io.Reader, w io.Writer) error {
+	input, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
-	err = goyaml.Unmarshal(input, &data)
+	output, err := yaml2JsonBytes(input)
 	if err != nil {
 		return err
+	}
+	_, err = w.Write(output)
+	return err
+}
+func yaml2JsonBytes(input []byte) (output []byte, err error) {
+	var data interface{}
+	err = goyaml.Unmarshal(input, &data)
+	if err != nil {
+		return nil, err
 	}
 	data, err = yaml2JsonTransformData(data)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	output, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	_, err = context.Stdout.Write([]byte(output))
-	return err
+	return json.Marshal(data)
 }
-
 func yaml2JsonTransformData(in interface{}) (out interface{}, err error) {
 	switch in.(type) {
 	case map[interface{}]interface{}:
@@ -54,8 +80,7 @@ func yaml2JsonTransformData(in interface{}) (out interface{}, err error) {
 			case int:
 				sk = strconv.Itoa(k.(int))
 			default:
-				return nil, errors.New(
-					fmt.Sprintf("type not match: expect map key string or int get: %T", k))
+				return nil, fmt.Errorf("type not match: expect map key string or int get: %T", k)
 			}
 			v, err = yaml2JsonTransformData(v)
 			if err != nil {
