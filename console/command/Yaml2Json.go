@@ -1,15 +1,12 @@
 package command
 
 import (
-	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/bronze1man/kmg/console"
+	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/kmgFile"
 	"io"
 	"io/ioutil"
-	"launchpad.net/goyaml"
-	"strconv"
 )
 
 type Yaml2Json struct {
@@ -46,59 +43,10 @@ func yaml2JsonIo(r io.Reader, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	output, err := yaml2JsonBytes(input)
+	output, err := kmgYaml.Yaml2JsonBytes(input)
 	if err != nil {
 		return err
 	}
 	_, err = w.Write(output)
 	return err
-}
-func yaml2JsonBytes(input []byte) (output []byte, err error) {
-	var data interface{}
-	err = goyaml.Unmarshal(input, &data)
-	if err != nil {
-		return nil, err
-	}
-	data, err = yaml2JsonTransformData(data)
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(data)
-}
-func yaml2JsonTransformData(in interface{}) (out interface{}, err error) {
-	switch in.(type) {
-	case map[interface{}]interface{}:
-		o := make(map[string]interface{})
-		for k, v := range in.(map[interface{}]interface{}) {
-			sk := ""
-			switch k.(type) {
-			case string:
-				sk = k.(string)
-			case int:
-				sk = strconv.Itoa(k.(int))
-			default:
-				return nil, fmt.Errorf("type not match: expect map key string or int get: %T", k)
-			}
-			v, err = yaml2JsonTransformData(v)
-			if err != nil {
-				return nil, err
-			}
-			o[sk] = v
-		}
-		return o, nil
-	case []interface{}:
-		in1 := in.([]interface{})
-		len1 := len(in1)
-		o := make([]interface{}, len1)
-		for i := 0; i < len1; i++ {
-			o[i], err = yaml2JsonTransformData(in1[i])
-			if err != nil {
-				return nil, err
-			}
-		}
-		return o, nil
-	default:
-		return in, nil
-	}
-	return in, nil
 }

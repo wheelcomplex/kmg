@@ -3,9 +3,12 @@ package dependencyInjection
 import (
 	"errors"
 	"fmt"
+	"github.com/bronze1man/kmg/kmgReflect"
+	"reflect"
 )
 
 var ServiceIdNotExistError = errors.New("service id not exist")
+var ServiceTypeNotExistError = errors.New("service type not exist")
 var ScopeNotExistError = errors.New("scope not exist")
 var ScopeNotActiveError = errors.New("scope not active")
 var CanNotSetScopePrototypeByObjError = errors.New("can not set service in scope prototype by obj")
@@ -61,6 +64,27 @@ func (c *Container) Get(id string) (service interface{}, err error) {
 }
 func (c *Container) MustGet(id string) interface{} {
 	service, err := c.Get(id)
+	if err != nil {
+		panic(err)
+	}
+	return service
+}
+func (c *Container) GetByType(ti interface{}) (service interface{}, err error) {
+	var t reflect.Type
+	switch ti.(type) {
+	case reflect.Type:
+		t = ti.(reflect.Type)
+	default:
+		t = reflect.TypeOf(ti)
+	}
+	typeName, ok := kmgReflect.GetTypeFullName(t)
+	if !ok {
+		return nil, ServiceTypeNotExistError
+	}
+	return c.Get(typeName)
+}
+func (c *Container) MustGetByType(ti interface{}) (service interface{}) {
+	service, err := c.GetByType(ti)
 	if err != nil {
 		panic(err)
 	}
