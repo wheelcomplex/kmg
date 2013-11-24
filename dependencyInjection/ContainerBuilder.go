@@ -1,5 +1,9 @@
 package dependencyInjection
 
+import (
+	"fmt"
+)
+
 type ContainerBuilder struct {
 	definition_map map[string]*Definition
 	extensions     []ExtensionInterface
@@ -22,6 +26,10 @@ func (builder *ContainerBuilder) AddCompilePass(compliePass CompilePassInterface
 }
 func (builder *ContainerBuilder) AddBoot(boot BootInterface) {
 	builder.bootes = append(builder.bootes, boot)
+}
+func (builder *ContainerBuilder) HasDefinition(id string) (exist bool) {
+	_, exist = builder.definition_map[id]
+	return
 }
 func (builder *ContainerBuilder) GetDefinition(id string) (definition *Definition, exist bool) {
 	definition, exist = builder.definition_map[id]
@@ -57,16 +65,17 @@ func (builder *ContainerBuilder) GetTaggedDefinition(tag string) []*Definition {
 	return definitions
 }
 func (builder *ContainerBuilder) Set(id string, obj interface{}, scope string) error {
-	if scope == "" {
-		scope = ScopeSingleton
-	}
 	if scope == ScopePrototype {
 		return CanNotSetScopePrototypeByObjError
 	}
-	definition := NewDefinitionFromInst(obj)
+	definition := &Definition{}
 	definition.Scope = scope
+	definition.Inst = obj
 	definition.Id = id
-
+	err := definition.Init()
+	if err != nil {
+		return err
+	}
 	builder.definition_map[id] = definition
 	return nil
 }
@@ -77,12 +86,14 @@ func (builder *ContainerBuilder) MustSet(id string, obj interface{}, scope strin
 	}
 }
 func (builder *ContainerBuilder) SetFactory(id string, factory func(c *Container) (interface{}, error), scope string) error {
-	if scope == "" {
-		scope = ScopeSingleton
-	}
-	definition := NewDefinitionFromFactory(factory)
+	definition := &Definition{}
 	definition.Scope = scope
 	definition.Id = id
+	definition.Factory = factory
+	err := definition.Init()
+	if err != nil {
+		return err
+	}
 	builder.definition_map[id] = definition
 	return nil
 }
@@ -95,7 +106,10 @@ func (builder *ContainerBuilder) MustSetFactory(id string, factory func(c *Conta
 
 func (builder *ContainerBuilder) Compile() (c *Container, err error) {
 	for k, v := range builder.Parameters {
-		err = builder.Set("parameter."+k, v, "")
+		if builder.HasDefinition(k) {
+			return nil, fmt.Errorf("[ContainerBuilder.Compile]a definition name same with a parameter,name: %s", k)
+		}
+		err = builder.Set(k, v, "")
 		if err != nil {
 			return
 		}

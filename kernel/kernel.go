@@ -28,9 +28,9 @@ func (kernel *Kernel) Boot() (err error) {
 	if err != nil {
 		return err
 	}
-	kernel.Parameters["appPath"] = kernel.AppPath
-	kernel.Parameters["dataPath"] = filepath.Join(kernel.AppPath, "data")
-	kernel.Parameters["tmpPath"] = filepath.Join(kernel.AppPath, "tmp")
+	kernel.Parameters["AppPath"] = kernel.AppPath
+	kernel.Parameters["DataPath"] = filepath.Join(kernel.AppPath, "data")
+	kernel.Parameters["TmpPath"] = filepath.Join(kernel.AppPath, "tmp")
 
 	builder := dependencyInjection.NewContainerBuilder()
 	builder.Parameters = kernel.Parameters

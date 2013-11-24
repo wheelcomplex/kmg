@@ -78,14 +78,15 @@ func (c *Container) Set(id string, obj interface{}, scope string) error {
 	if !c.IsScopeActive(scope) {
 		return CanNotSetNotActiveScopeByObjError
 	}
-	definition, ok := c.definition_map[id]
-	if !ok {
-		definition = &Definition{}
-		c.definition_map[id] = definition
-	}
+	definition := &Definition{}
 	definition.Scope = scope
 	definition.Id = id
-
+	definition.Inst = obj
+	err := definition.Init()
+	if err != nil {
+		return err
+	}
+	c.definition_map[id] = definition
 	c.scope_map[scope].service_map[id] = obj
 	return nil
 }
@@ -119,9 +120,22 @@ func (c *Container) MustSetFactory(id string, factory func(c *Container) (interf
 	}
 }
 
+//has this service, maybe not active
 func (c *Container) Has(id string) bool {
 	_, ok := c.definition_map[id]
 	return ok
+}
+
+// has this service, and active
+func (c *Container) IsActiveService(id string) bool {
+	def, ok := c.definition_map[id]
+	if !ok {
+		return false
+	}
+	if !c.IsScopeActive(def.Scope) {
+		return false
+	}
+	return true
 }
 func (c *Container) EnterScope(scope string) (*Container, error) {
 	if c.IsScopeActive(scope) {

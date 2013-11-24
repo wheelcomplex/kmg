@@ -8,6 +8,7 @@ import (
 	"github.com/bronze1man/kmg/kmgSql"
 	"github.com/bronze1man/kmg/sessionStore"
 	_ "github.com/go-sql-driver/mysql"
+	"reflect"
 )
 
 type KmgExtension struct {
@@ -16,23 +17,47 @@ type KmgExtension struct {
 func (extension *KmgExtension) LoadDependencyInjection(
 	c *dependencyInjection.ContainerBuilder) error {
 	//ajkapi
-	c.MustSetFactory("ajkApi.ApiManager", func(c *dependencyInjection.Container) (interface{}, error) {
-		return ajkApi.NewApiManagerFromContainer(c), nil
-	}, "")
-	c.MustSetFactory("ajkApi.JsonHttpHandler", func(c *dependencyInjection.Container) (interface{}, error) {
-		return &ajkApi.JsonHttpHandler{
-			ApiManager:          c.MustGet("ajkApi.ApiManager").(ajkApi.ApiManagerInterface),
-			SessionStoreManager: c.MustGet("sessionStore.Manager").(*sessionStore.Manager),
-		}, nil
-	}, "")
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		TypeReflect: reflect.TypeOf((*ajkApi.ApiManagerInterface)(nil)).Elem(),
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			return ajkApi.NewApiManagerFromContainer(c), nil
+		},
+	})
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Id:    "SessionGuid",
+		Type:  "",
+		Scope: dependencyInjection.ScopeRequest,
+	})
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Type: (*ajkApi.Session)(nil),
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			return ajkApi.NewSession(
+				c.MustGet("SessionGuid").(string),
+				c.MustGet("github.com/bronze1man/kmg/sessionStore.Manager").(*sessionStore.Manager),
+			), nil
+		},
+		Scope: dependencyInjection.ScopeRequest,
+	})
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Type: (*sessionStore.Store)(nil),
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			session := c.MustGet("github.com/bronze1man/kmg/ajkApi.Session").(*ajkApi.Session)
+			return session.MustGetStore(), nil
+		},
+		Scope: dependencyInjection.ScopeRequest,
+	})
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Type: (*ajkApi.JsonHttpHandler)(nil),
+	})
 
 	//sessionStore
-	c.MustSet("sessionStore.Provider", sessionStore.NewMemoryProvider(), "")
-	c.MustSetFactory("sessionStore.Manager", func(c *dependencyInjection.Container) (interface{}, error) {
-		return &sessionStore.Manager{
-			c.MustGet("sessionStore.Provider").(sessionStore.Provider),
-		}, nil
-	}, "")
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		TypeReflect: reflect.TypeOf((*sessionStore.Provider)(nil)).Elem(),
+		Inst:        sessionStore.NewMemoryProvider(),
+	})
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Type: (*sessionStore.Manager)(nil),
+	})
 
 	databaseDsn := c.Parameters["databaseDsn"]
 	databaseType := c.Parameters["databaseType"]
@@ -52,7 +77,24 @@ func (extension *KmgExtension) LoadDependencyInjection(
 			}, nil
 		},
 	})
+	/*
+		//ok
+		c.MustSetFactory("ajkApi.JsonHttpHandler", func(c *dependencyInjection.Container) (interface{}, error) {
+			return &ajkApi.JsonHttpHandler{
+				ApiManager:          c.MustGet("ajkApi.ApiManager").(ajkApi.ApiManagerInterface),
+				SessionStoreManager: c.MustGet("sessionStore.Manager").(*sessionStore.Manager),
+			}, nil
+		}, "")
 
+		//sessionStore
+		c.MustSet("sessionStore.Provider", sessionStore.NewMemoryProvider(), "") //ok
+		c.MustSetFactory("sessionStore.Manager", func(c *dependencyInjection.Container) (interface{}, error) {
+			return &sessionStore.Manager{
+				c.MustGet("sessionStore.Provider").(sessionStore.Provider),
+			}, nil
+		}, "")
+
+	*/
 	// build command
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Inst: &command.GoFmt{},

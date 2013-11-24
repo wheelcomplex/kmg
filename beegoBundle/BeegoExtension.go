@@ -3,6 +3,7 @@ package beegoBundle
 import (
 	"github.com/astaxie/beego/orm"
 	"github.com/bronze1man/kmg/dependencyInjection"
+	"reflect"
 )
 
 type BeegoExtension struct {
@@ -20,11 +21,11 @@ func (extension *BeegoExtension) LoadDependencyInjection(
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Id: "beego.orm",
+		TypeReflect: reflect.TypeOf((*orm.Ormer)(nil)).Elem(),
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
 			return orm.NewOrm(), nil
 		},
-		Scope: dependencyInjection.ScopePrototype,
+		Scope: dependencyInjection.ScopeRequest,
 	})
 	return nil
 }
