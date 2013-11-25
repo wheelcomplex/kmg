@@ -17,7 +17,7 @@ func (extension *CommandCompilePass) CompilePass(
 	}
 	//ajkapi
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Id: "kmg.command.manager",
+		Type: (*console.Manager)(nil),
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
 			manager := console.NewManager()
 			for _, id := range ids {

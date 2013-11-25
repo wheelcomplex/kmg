@@ -13,10 +13,20 @@ type ContainerBuilder struct {
 }
 
 func NewContainerBuilder() *ContainerBuilder {
-	return &ContainerBuilder{
+	cb := &ContainerBuilder{
 		definition_map: make(map[string]*Definition),
 		Parameters:     make(map[string]string),
 	}
+	cb.init()
+	return cb
+}
+func (builder *ContainerBuilder) init() {
+	builder.MustSetDefinition(&Definition{
+		Type: (*Container)(nil),
+		Factory: func(c *Container) (interface{}, error) {
+			return c, nil
+		},
+	})
 }
 func (builder *ContainerBuilder) AddExtension(extension ExtensionInterface) {
 	builder.extensions = append(builder.extensions, extension)

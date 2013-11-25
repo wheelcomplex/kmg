@@ -5,7 +5,3 @@ const (
 	ScopePrototype = "prototype"
 	ScopeRequest   = "request"
 )
-
-type ContainerAwareInterface interface {
-	SetContainer(container *Container)
-}

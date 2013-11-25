@@ -28,8 +28,8 @@ func (command *Xlsx2Yaml) ConfigFlagSet(f *flag.FlagSet) {
 }
 func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 	if *command.filePath == "" {
-		if context.FlagSet.NArg() == 1 {
-			*command.filePath = context.FlagSet.Arg(0)
+		if context.FlagSet().NArg() == 1 {
+			*command.filePath = context.FlagSet().Arg(0)
 		} else {
 			return errors.New("need input file")
 		}

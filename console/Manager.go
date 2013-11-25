@@ -37,38 +37,65 @@ func (manager *Manager) MustAdd(command Command) {
 }
 
 func (manager *Manager) ExecuteGlobal() {
-	manager.Execute(&Context{Args: os.Args,
+	context := &Context{Args: os.Args,
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
-	},
-	)
+	}
+	manager.Execute(context)
+	os.Exit(context.exitCode)
+}
+func (manager *Manager) ExecuteGlobalByName(name string) {
+	context := &Context{Args: os.Args,
+		Stdin:       os.Stdin,
+		Stdout:      os.Stdout,
+		Stderr:      os.Stderr,
+		CommandName: name,
+	}
+	manager.Execute(context)
+	os.Exit(context.exitCode)
 }
 func (manager *Manager) Execute(context *Context) {
 	args := context.Args
-	manager.Name = filepath.Base(args[0])
-	context.ExecutionName = manager.Name
-	if len(args) < 2 {
-		manager.usage(context.Stderr)
+	if context.ExecutionName == "" {
+		context.ExecutionName = filepath.Base(args[0])
 	}
-	commandName := strings.ToLower(args[1])
-	command, ok := manager.Map[commandName]
+	var command Command
+	//arguments
+	var actualArgs []string
+	if context.CommandName == "" {
+		if len(args) < 2 {
+			manager.usage(context.Stderr)
+		}
+		context.CommandName = strings.ToLower(args[1])
+		actualArgs = args[2:]
+
+	} else {
+		context.CommandName = strings.ToLower(context.CommandName)
+		actualArgs = args[1:]
+	}
+
+	//exec command
+	var ok bool
+	command, ok = manager.Map[context.CommandName]
 	if !ok {
-		fmt.Fprintf(context.Stderr, "unknown subcommand %q\n", commandName)
-		os.Exit(2)
+		fmt.Fprintf(context.Stderr, "unknown subcommand %q\n", context.CommandName)
+		context.exitCode = 2
+		return
 	}
-	flagSet := flag.NewFlagSet(manager.Name+" "+commandName, flag.ExitOnError)
+	context.flagSet = flag.NewFlagSet(context.ExecutionName+" "+context.CommandName, flag.ExitOnError)
 	if command, ok := command.(FlagSetAwareInterface); ok {
-		command.ConfigFlagSet(flagSet)
+		command.ConfigFlagSet(context.flagSet)
 	}
-	flagSet.Parse(args[2:])
-	context.FlagSet = flagSet
+	context.flagSet.Parse(actualArgs)
+
 	err := command.Execute(context)
 	if err != nil {
 		fmt.Fprintln(context.Stderr, err.Error())
-		os.Exit(1)
+		context.exitCode = 1
+		return
 	}
-	os.Exit(0)
+	return
 }
 
 func (manager *Manager) usage(w io.Writer) {

@@ -33,7 +33,7 @@ func (extension *KmgExtension) LoadDependencyInjection(
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
 			return ajkApi.NewSession(
 				c.MustGet("SessionGuid").(string),
-				c.MustGet("github.com/bronze1man/kmg/sessionStore.Manager").(*sessionStore.Manager),
+				c.MustGetByType((*sessionStore.Manager)(nil)).(*sessionStore.Manager),
 			), nil
 		},
 		Scope: dependencyInjection.ScopeRequest,
@@ -41,7 +41,7 @@ func (extension *KmgExtension) LoadDependencyInjection(
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Type: (*sessionStore.Store)(nil),
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
-			session := c.MustGet("github.com/bronze1man/kmg/ajkApi.Session").(*ajkApi.Session)
+			session := c.MustGetByType((*ajkApi.Session)(nil)).(*ajkApi.Session)
 			return session.MustGetStore(), nil
 		},
 		Scope: dependencyInjection.ScopeRequest,
@@ -97,19 +97,23 @@ func (extension *KmgExtension) LoadDependencyInjection(
 	*/
 	// build command
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.GoFmt{},
+		Type: (*command.GoFmt)(nil),
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.GoRun{},
+		Type: (*command.GoRun)(nil),
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.WatchCmd{},
+		Type: (*command.WatchCmd)(nil),
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &command.GoWatch{},
+		Type: (*command.GoWatch)(nil),
+	}).AddTag("command")
+
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Type: (*ajkApi.GoHttpApiServerCommand)(nil),
 	}).AddTag("command")
 	return nil
 }
