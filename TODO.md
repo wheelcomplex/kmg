@@ -1,5 +1,5 @@
 ### bug
-* dependencyInjection scope prototype and request problem.(beego.orm,mysqlDao.Dao)
+* ajkapi.JsonHttpHandler over complex!! ajkapi.Session over complex!!!(kiss!!)
 
 ### feature
 * ajkapi use function parameter name from kmgReflect

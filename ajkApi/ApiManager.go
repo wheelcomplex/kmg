@@ -48,7 +48,13 @@ func (manager *containerAwareApiManager) RpcCall(
 	if err != nil {
 		return err
 	}
-	err = c.Set("session", session, dependencyInjection.ScopeRequest)
+	var guid string
+	if session != nil {
+		guid = session.GetGuid()
+	} else {
+		guid = ""
+	}
+	err = c.Set("SessionGuid", guid, dependencyInjection.ScopeRequest)
 	if err != nil {
 		return err
 	}
