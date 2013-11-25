@@ -15,21 +15,23 @@ func (l *logFatalfer) getCallNum() int {
 	return l.call_num
 }
 
-func TestAssert(T *testing.T) {
+func TestEqual(ot *testing.T) {
 	l := &logFatalfer{}
-	Assert(l, true, false)
+	t := NewTestTools(l)
+	t.Equal(true, false)
 	if l.getCallNum() != 1 {
-		T.Fatal("fail!")
+		ot.Fatal("fail!")
 	}
-	Assert(l, true, true)
+	t.Equal(true, true)
 	if l.getCallNum() != 1 {
-		T.Fatal("fail!")
+		ot.Fatal("fail!")
 	}
-	Assert(l, false, false)
+	t.Equal(false, false)
 	if l.getCallNum() != 1 {
-		T.Fatal("fail!")
+		ot.Fatal("fail!")
 	}
 }
-func TestIsEqual(T *testing.T) {
-	Assert(T, true, isEqual(map[string]interface{}{"a": 1}, map[string]interface{}{"a": 1}))
+func TestIsEqual(ot *testing.T) {
+	t := NewTestTools(ot)
+	t.Equal(true, isEqual(map[string]interface{}{"a": 1}, map[string]interface{}{"a": 1}))
 }

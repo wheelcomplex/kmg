@@ -1,7 +1,7 @@
 package kmgHttp
 
 import (
-	"github.com/bronze1man/kmg/kmpTest"
+	"github.com/bronze1man/kmg/test"
 	"net/http"
 	"net/url"
 	"testing"
@@ -19,9 +19,10 @@ func TestGetStringFromGet(T *testing.T) {
 	}
 }
 
-func TestGetGetStringMap(T *testing.T) {
-	kmpTest.Assert(T, map[string]string{"a": "b", "c": "e"}, getMockRequest().GetGetStringMap())
-	kmpTest.Assert(T, map[string]string{}, getEmptyQueryRequest().GetGetStringMap())
+func TestGetGetStringMap(ot *testing.T) {
+	t := test.NewTestTools(ot)
+	t.Equal(map[string]string{"a": "b", "c": "e"}, getMockRequest().GetGetStringMap())
+	t.Equal(map[string]string{}, getEmptyQueryRequest().GetGetStringMap())
 }
 
 func getMockRequest() *Request {

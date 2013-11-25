@@ -9,16 +9,6 @@ type Fatalfer interface {
 	Fatalf(s string, v ...interface{})
 }
 
-func Ok(T Fatalfer, expectTrue bool) {
-	(&TestTools{T: T}).Ok(expectTrue)
-}
-func Assert(T Fatalfer, get interface{}, expect interface{}) {
-	(&TestTools{T: T}).Equal(get, expect)
-}
-func AssertMsg(T Fatalfer, get interface{}, expect interface{}, msg string) {
-	(&TestTools{T: T}).EqualMsg(get, expect, msg)
-}
-
 type TestTools struct {
 	T Fatalfer
 }
