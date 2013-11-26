@@ -8,3 +8,7 @@
     * easy to call a api from another api (less code).
 * put all session stuff in dependencyInjection.(no need to init session for enterScope Request,except )
 * finish ProcessManager, apply it to dependencyInjection.
+
+### refactor
+* test -> kmgTest
+* use test.TestWarpper

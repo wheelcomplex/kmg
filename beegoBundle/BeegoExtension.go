@@ -9,11 +9,15 @@ import (
 type BeegoExtension struct {
 }
 
+var HasRegisterDb bool
+
 func (extension *BeegoExtension) LoadDependencyInjection(
 	c *dependencyInjection.ContainerBuilder) error {
-
-	orm.RegisterDataBase("default", c.Parameters["databaseType"],
-		c.Parameters["databaseDsn"])
+	if !HasRegisterDb {
+		orm.RegisterDataBase("default", c.Parameters["databaseType"],
+			c.Parameters["databaseDsn"])
+	}
+	HasRegisterDb = true
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Id:   "beego.command.orm",

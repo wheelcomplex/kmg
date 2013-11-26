@@ -41,11 +41,12 @@ func (kernel *Kernel) Boot() (err error) {
 	return
 }
 
-func (kernel *Kernel) MustBoot() {
+func (kernel *Kernel) MustBoot() *Kernel {
 	err := kernel.Boot()
 	if err != nil {
 		panic(err)
 	}
+	return kernel
 }
 
 func (kernel *Kernel) AddBundle(bundle *Bundle) {

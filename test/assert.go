@@ -9,6 +9,10 @@ type Fatalfer interface {
 	Fatalf(s string, v ...interface{})
 }
 
+type FatalferAware interface {
+	SetFatalfer(T Fatalfer)
+}
+
 type TestTools struct {
 	T Fatalfer
 }
@@ -16,7 +20,9 @@ type TestTools struct {
 func NewTestTools(T Fatalfer) *TestTools {
 	return &TestTools{T: T}
 }
-
+func (tools *TestTools) SetFatalfer(T Fatalfer) {
+	tools.T = T
+}
 func (tools *TestTools) Ok(expectTrue bool) {
 	if !expectTrue {
 		tools.assertFail("ok fail", 2)
@@ -27,7 +33,11 @@ func (tools *TestTools) Equal(get interface{}, expect interface{}) {
 	if isEqual(expect, get) {
 		return
 	}
-	tools.assertFail(fmt.Sprintf("expect:%#v (%T)\nget:%#v (%T)", expect, expect, get, get), 2)
+	msg := fmt.Sprintf("expect: %#v (%T)\nget: %#v (%T)", expect, expect, get, get)
+	if eGet, ok := get.(error); ok {
+		msg += "\ngetError: " + eGet.Error()
+	}
+	tools.assertFail(msg, 2)
 }
 func (tools *TestTools) EqualMsg(get interface{}, expect interface{}, msg string) {
 	if isEqual(expect, get) {

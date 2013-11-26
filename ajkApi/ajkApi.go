@@ -1,7 +1,5 @@
 package ajkApi
 
-import "reflect"
-
 /*
 
  ApiFunc must be something like(follow golang rpc protocol)(can not reflect parameter name)
@@ -12,16 +10,10 @@ import "reflect"
 */
 type ApiManagerInterface interface {
 	/*
+		must pass a session object
 		input and output can be
 		*struct{xxx}
 		map[string]interface
 	*/
 	RpcCall(session *Session, name string, caller func(*ApiFuncMeta) error) error
-}
-
-type ApiFuncMeta struct {
-	IsMethod     bool
-	Func         reflect.Value
-	AttachObject reflect.Value // the object method attached
-	MethodName   string
 }

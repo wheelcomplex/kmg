@@ -48,13 +48,8 @@ func (manager *containerAwareApiManager) RpcCall(
 	if err != nil {
 		return err
 	}
-	var guid string
-	if session != nil {
-		guid = session.GetGuid()
-	} else {
-		guid = ""
-	}
-	err = c.Set("SessionGuid", guid, dependencyInjection.ScopeRequest)
+
+	err = c.Set("github.com/bronze1man/kmg/ajkApi.Session", session, dependencyInjection.ScopeRequest)
 	if err != nil {
 		return err
 	}
