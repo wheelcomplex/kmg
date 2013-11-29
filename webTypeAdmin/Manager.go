@@ -10,20 +10,22 @@ import (
 )
 
 type Manager struct {
-	rootType  typeInterface
-	rootValue reflect.Value
+	ctx *context
 }
 
 func NewManagerFromPtr(ptr interface{}) (*Manager, error) {
+	ctx := &context{}
 	rt := reflect.TypeOf(ptr)
 	if rt.Kind() != reflect.Ptr {
 		return nil, fmt.Errorf("NewManagerFromPtr need a ptr,but get %T", ptr)
 	}
-	t, err := newTypeFromReflect(rt)
+	ctx.rootValue = reflect.ValueOf(ptr)
+	t, err := ctx.newTypeFromReflect(rt)
 	if err != nil {
 		return nil, err
 	}
-	m := &Manager{rootType: t, rootValue: reflect.ValueOf(ptr)}
+	ctx.rootType = t
+	m := &Manager{ctx: ctx}
 	return m, nil
 }
 
@@ -75,7 +77,7 @@ func (manager *Manager) page(path Path) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	t, err := newTypeFromReflect(v.Type())
+	t, err := manager.ctx.newTypeFromReflect(v.Type())
 	if err != nil {
 		return "", err
 	}
@@ -90,14 +92,14 @@ func (manager *Manager) page(path Path) (string, error) {
 }
 
 func (manager *Manager) getValueByPath(p Path) (v reflect.Value, err error) {
-	t := manager.rootType
-	v = manager.rootValue
+	t := manager.ctx.rootType
+	v = manager.ctx.rootValue
 	for _, ps := range p {
 		v, err = t.getSubValueByString(v, ps)
 		if err != nil {
 			return reflect.Value{}, err
 		}
-		t, err = newTypeFromReflect(v.Type())
+		t, err = manager.ctx.newTypeFromReflect(v.Type())
 		if err != nil {
 			return reflect.Value{}, err
 		}
@@ -113,7 +115,7 @@ func (manager *Manager) create(path Path) error {
 	if err != nil {
 		return err
 	}
-	t, err := newTypeFromReflect(v.Type())
+	t, err := manager.ctx.newTypeFromReflect(v.Type())
 	if err != nil {
 		return err
 	}
@@ -121,16 +123,61 @@ func (manager *Manager) create(path Path) error {
 }
 
 //set a value in some where in the whole type tree
+//a workaround of MapIndex not addressable problem,
+//if the reverse path come map first , it need reset data at map level
+//if the reverse path come ptr first , it is ok
 func (manager *Manager) save(path Path, value string) error {
-	v, err := manager.getValueByPath(path)
-	if err != nil {
-		return err
+	t := manager.ctx.rootType
+	v := manager.ctx.rootValue
+	var lastCanSetV reflect.Value
+	var lastCanSetT typeInterface
+	var lastCanSetI int
+	var err error
+	for i, ps := range path {
+		v, err = t.getSubValueByString(v, ps)
+		if err != nil {
+			return err
+		}
+		t, err = manager.ctx.newTypeFromReflect(v.Type())
+		if err != nil {
+			return err
+		}
+		if v.CanSet() {
+			lastCanSetV = v
+			lastCanSetT = t
+			lastCanSetI = i
+		}
 	}
-	t, err := newTypeFromReflect(v.Type())
-	if err != nil {
-		return err
+	if lastCanSetV == v {
+		return t.save(v, value)
 	}
-	return t.save(v, value)
+	if mt, ok := lastCanSetT.(*mapType); ok {
+		return mt.mapSave(v, path[lastCanSetI+1:len(path)-1], value)
+	}
+	return fmt.Errorf("[manager.save] impossable code path")
+	/*
+		parentPath := path[:len(path)-1]
+		v, err := manager.getValueByPath(parentPath)
+		if err != nil {
+			return err
+		}
+		t, err := manager.ctx.newTypeFromReflect(v.Type())
+		if err != nil {
+			return err
+		}
+		if mt,ok:=t.(*mapType);ok{
+			return mt.mapSave(v,path[len(path)-1],value)
+		}
+		v,err=t.getSubValueByString(v,path[len(path)-1])
+		if err != nil {
+			return err
+		}
+		t, err = manager.ctx.newTypeFromReflect(v.Type())
+		if err != nil {
+			return err
+		}
+		return t.save(v, value)
+	*/
 }
 
 //delete an object in some where in the whole type tree
@@ -141,7 +188,7 @@ func (manager *Manager) delete(path Path) (err error) {
 	if err != nil {
 		return err
 	}
-	t, err := newTypeFromReflect(v.Type())
+	t, err := manager.ctx.newTypeFromReflect(v.Type())
 	if err != nil {
 		return err
 	}

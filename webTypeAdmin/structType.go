@@ -25,7 +25,7 @@ func (t *structType) init() {
 	for _, v := range kmgReflect.StructGetAllField(t.getReflectType()) {
 		sf := structField{
 			Name:        v.Name,
-			Type:        mustNewTypeFromReflect(v.Type),
+			Type:        t.ctx.mustNewTypeFromReflect(v.Type),
 			StructField: v,
 		}
 		t.fields = append(t.fields, sf)

@@ -11,15 +11,9 @@ type boolType struct {
 }
 
 func (t *boolType) Html(v reflect.Value) template.HTML {
-	var valueS string
-	if v.Bool() {
-		valueS = "true"
-	} else {
-		valueS = "false"
-	}
 	return theTemplate.MustExecuteNameToHtml("Select", selectTemplateData{
 		List:  []string{"false", "true"},
-		Value: valueS,
+		Value: t.toString(v),
 	})
 }
 func (t *boolType) save(v reflect.Value, value string) error {
@@ -29,4 +23,17 @@ func (t *boolType) save(v reflect.Value, value string) error {
 	}
 	v.SetBool(valueT)
 	return nil
+}
+
+func (t *boolType) fromString(s string) (reflect.Value, error) {
+	valueT, err := strconv.ParseBool(s)
+	if err != nil {
+		return reflect.Value{}, err
+	}
+	rv := reflect.New(t.getReflectType()).Elem()
+	rv.SetBool(valueT)
+	return rv, nil
+}
+func (t *boolType) toString(v reflect.Value) string {
+	return strconv.FormatBool(v.Bool())
 }

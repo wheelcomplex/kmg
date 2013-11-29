@@ -17,7 +17,7 @@ func (t *arrayType) init() {
 	if t.elemType != nil {
 		return
 	}
-	t.elemType = mustNewTypeFromReflect(t.getReflectType().Elem())
+	t.elemType = t.ctx.mustNewTypeFromReflect(t.getReflectType().Elem())
 }
 func (t *arrayType) Html(v reflect.Value) template.HTML {
 	t.init()
@@ -38,25 +38,26 @@ func (t *arrayType) Html(v reflect.Value) template.HTML {
 	return theTemplate.MustExecuteNameToHtml("Array", templateData)
 }
 
-//与slice重复
 func (t *arrayType) getSubValueByString(v reflect.Value, k string) (reflect.Value, error) {
 	t.init()
-	i, err := t.parseKey(v, k)
+	return arrayGetSubValueByString(v, k)
+}
+
+func arrayGetSubValueByString(v reflect.Value, k string) (reflect.Value, error) {
+	i, err := arrayParseKey(v, k)
 	if err != nil {
 		return reflect.Value{}, nil
 	}
 	return v.Index(i), nil
 }
-
-//与slice重复
-func (t *arrayType) parseKey(v reflect.Value, k string) (int, error) {
+func arrayParseKey(v reflect.Value, k string) (int, error) {
 	i64, err := strconv.ParseInt(k, 10, 64)
 	if err != nil {
-		return 0, fmt.Errorf("[sliceType.parseKey] index is not int k:%s", k)
+		return 0, fmt.Errorf("[arrayParseKey] index is not int k:%s", k)
 	}
 	i := int(i64)
 	if i >= v.Len() || i < 0 {
-		return 0, fmt.Errorf("[sliceType.parseKey] index is not of range k:%s,len:%d", k, v.Len())
+		return 0, fmt.Errorf("[arrayParseKey] index is not of range k:%s,len:%d", k, v.Len())
 	}
 	return i, nil
 }

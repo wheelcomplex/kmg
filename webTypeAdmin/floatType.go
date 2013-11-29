@@ -15,10 +15,23 @@ func (t *floatType) Html(v reflect.Value) template.HTML {
 }
 
 func (t *floatType) save(v reflect.Value, value string) error {
-	f, err := strconv.ParseFloat(value, 64)
+	f, err := strconv.ParseFloat(value, t.getReflectType().Bits())
 	if err != nil {
 		return err
 	}
-	v.Set(reflect.ValueOf(f))
+	v.SetFloat(f)
 	return nil
+}
+
+func (t *floatType) fromString(s string) (reflect.Value, error) {
+	valueT, err := strconv.ParseFloat(s, t.getReflectType().Bits())
+	if err != nil {
+		return reflect.Value{}, err
+	}
+	rv := reflect.New(t.getReflectType()).Elem()
+	rv.SetFloat(valueT)
+	return rv, nil
+}
+func (t *floatType) toString(v reflect.Value) string {
+	return strconv.FormatFloat(v.Float(), 'g', -1, t.getReflectType().Bits())
 }

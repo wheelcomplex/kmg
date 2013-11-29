@@ -22,3 +22,16 @@ func (t *intType) save(v reflect.Value, value string) error {
 	v.SetInt(i)
 	return nil
 }
+
+func (t *intType) fromString(s string) (reflect.Value, error) {
+	valueT, err := strconv.ParseInt(s, 10, t.getReflectType().Bits())
+	if err != nil {
+		return reflect.Value{}, err
+	}
+	rv := reflect.New(t.getReflectType()).Elem()
+	rv.SetInt(valueT)
+	return rv, nil
+}
+func (t *intType) toString(v reflect.Value) string {
+	return strconv.FormatInt(v.Int(), t.getReflectType().Bits())
+}

@@ -45,13 +45,15 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
 
 {{ define "Slice" }}
 <table class="table-bordered slice" ><tbody>
-	<tr>
+	<tr data-path="0">
+		<td><button type="button" class="btn btn-primary kmg-create-action">Create</button></td>
 		<td></td>
-		<td data-path="0"><button type="button" class="btn btn-primary kmg-create-action">Create</button></td>
+		<td></td>
 	</tr>
 	{{range .}}
 	<tr data-path="{{.Path}}">
 		<td><button type="button" class="btn btn-danger kmg-delete-action">Delete</button></td>
+		<td>{{.Index}}</td>
 		<td>{{.Html}}</td>
 	</tr>
 	{{end}}
@@ -85,7 +87,7 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
 
 {{ define "NilPtr" }}
 <div data-path="0">
-<button type="button" class="btn btn-primary kmg-create-action">New(nilPtr)</button>
+<button type="button" class="btn btn-primary kmg-create-action">New</button>
 </div>
 {{ end }}
 
@@ -96,5 +98,23 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
     <option {{if eq . $.Value}}selected="selected"{{end}}>{{.}}</option>
   {{end}}
 </select>
+{{ end }}
+
+
+{{ define "Map" }}
+<table class="table-bordered slice" ><tbody>
+	<tr class="kmg-map-create-parent" data-path="">
+		<td><button type="button" class="btn btn-primary kmg-create-action">Create</button></td>
+		<td></td>
+		<td><input type="text" class="form-control kmg-map-create-key"/></td>
+	</tr>
+	{{range .}}
+	<tr data-path="{{.Path}}">
+		<td><button type="button" class="btn btn-danger kmg-delete-action">Delete</button></td>
+		<td>{{.Key}}</td>
+		<td>{{.Html}}</td>
+	</tr>
+	{{end}}
+</tbody></table>
 {{ end }}
 `)

@@ -17,7 +17,7 @@ func (t *ptrType) init() {
 	if t.elemType != nil {
 		return
 	}
-	t.elemType = mustNewTypeFromReflect(t.getReflectType().Elem())
+	t.elemType = t.ctx.mustNewTypeFromReflect(t.getReflectType().Elem())
 }
 func (t *ptrType) Html(v reflect.Value) template.HTML {
 	t.init()

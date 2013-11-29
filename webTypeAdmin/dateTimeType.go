@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+var dateTimeReflectType = reflect.TypeOf((*time.Time)(nil)).Elem()
+
 type dateTimeType struct {
 	commonType
 }

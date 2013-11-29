@@ -5,7 +5,6 @@ import (
 	//"github.com/bronze1man/kmg/kmgReflect"
 	"fmt"
 	"html/template"
-	"time"
 )
 
 type typeInterface interface {
@@ -17,49 +16,13 @@ type typeInterface interface {
 	save(v reflect.Value, value string) error
 }
 
-func newTypeFromReflect(rt reflect.Type) (t typeInterface, err error) {
-	switch reflect.Zero(rt).Interface().(type) {
-	case time.Time:
-		t = &dateTimeType{commonType: commonType{rt}}
-	default:
-		switch rt.Kind() {
-		case reflect.Ptr:
-			t = &ptrType{commonType: commonType{rt}}
-		case reflect.Bool:
-			t = &boolType{commonType: commonType{rt}}
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			t = &intType{commonType: commonType{rt}}
-		case reflect.Float32, reflect.Float64:
-			t = &floatType{commonType: commonType{rt}}
-		case reflect.String:
-			t = &stringType{commonType: commonType{rt}}
-		case reflect.Array:
-			t = &arrayType{commonType: commonType{rt}}
-		case reflect.Slice:
-			t = &sliceType{commonType: commonType{rt}}
-		case reflect.Map:
-			t = &mapType{commonType: commonType{rt}}
-		case reflect.Struct:
-			t = &structType{commonType: commonType{rt}}
-		default:
-			return nil, fmt.Errorf("not support type kind: %s", rt.Kind().String())
-		}
-	}
-	//TODO Recursion checkout type
-	return t, nil
+type stringConverterType interface {
+	fromString(s string) (reflect.Value, error)
+	toString(v reflect.Value) string //is caller responsibility to ensure v is callee Type
 }
-
-func mustNewTypeFromReflect(rt reflect.Type) typeInterface {
-	t, err := newTypeFromReflect(rt)
-	if err != nil {
-		panic(err)
-	}
-	return t
-}
-
 type commonType struct {
 	reflect reflect.Type
+	ctx     *context
 }
 
 func (t *commonType) getReflectType() reflect.Type {
@@ -82,13 +45,4 @@ func (t *commonType) create(v reflect.Value, k string) error {
 }
 func (t *commonType) save(v reflect.Value, value string) error {
 	return fmt.Errorf("[commonType.save] type %s can not save while value:%s", t.getReflectType().Kind().String(), value)
-}
-
-//xxId refer to another object
-//path -> pass to RefType
-type fkRefType struct {
-	commonType
-}
-type enumType struct {
-	commonType
 }
