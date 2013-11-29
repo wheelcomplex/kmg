@@ -2,6 +2,7 @@ package kmgFile
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -58,7 +59,11 @@ func (transform *DirectoryFileTransform) Run(inputPath string, outputPath string
 		oFilePath := filepath.Join(outputPath, relPath)
 		oFilePath = strings.TrimSuffix(oFilePath, "."+transform.InputExt)
 		oFilePath = oFilePath + "." + transform.OuputExt
-		return transform.transformOneFile(path, oFilePath)
+		err = transform.transformOneFile(path, oFilePath)
+		if err != nil {
+			return fmt.Errorf("error at file %s,err: %s", relPath, err.Error())
+		}
+		return nil
 	})
 }
 

@@ -12,8 +12,9 @@ import (
 //start a golang http api server
 type GoHttpApiServerCommand struct {
 	Container *dependencyInjection.Container
-	http      *string
-	randPort  *bool
+	http      string
+	https     string
+	randPort  bool
 }
 
 func (command *GoHttpApiServerCommand) SetContainer(Container *dependencyInjection.Container) {
@@ -23,8 +24,9 @@ func (command *GoHttpApiServerCommand) GetNameConfig() *console.NameConfig {
 	return &console.NameConfig{Name: "GoHttpApiServer", Short: `start a golang http api server `}
 }
 func (command *GoHttpApiServerCommand) ConfigFlagSet(f *flag.FlagSet) {
-	command.http = f.String("http", ":18080", "listen port of the server")
-	command.randPort = f.Bool("randPort", false, "if can not listen on default port ,will listen on random port")
+	f.StringVar(&command.http, "http", ":18080", "listen http port of the server")
+	f.StringVar(&command.https, "https", "", "listen https port of the server")
+	f.BoolVar(&command.randPort, "randPort", false, "if can not listen on default port ,will listen on random port")
 }
 
 func (command *GoHttpApiServerCommand) Execute(context *console.Context) error {
