@@ -25,6 +25,8 @@ func CreateTlsConfig() (*tls.Config, error) {
 	}
 	return &tls.Config{Certificates: []tls.Certificate{*cert}}, nil
 }
+
+//unity 3d can use ncat cert,but can not use this!!! openssl verify fail!!!
 func CreateSelfCert() (*tls.Certificate, error) {
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -44,9 +46,8 @@ func CreateSelfCert() (*tls.Certificate, error) {
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
 
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
+		KeyUsage:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 	}
 	/*
 		hosts := strings.Split(*host, ",")
