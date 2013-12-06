@@ -26,7 +26,7 @@ func CreateTlsConfig() (*tls.Config, error) {
 	return &tls.Config{Certificates: []tls.Certificate{*cert}}, nil
 }
 func CreateSelfCert() (*tls.Certificate, error) {
-	priv, err := rsa.GenerateKey(rand.Reader, 512)
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate private key: %s", err)
 	}
@@ -38,7 +38,8 @@ func CreateSelfCert() (*tls.Certificate, error) {
 
 		SerialNumber: new(big.Int).SetInt64(0),
 		Subject: pkix.Name{
-			Organization: []string{"Acme Co"},
+			Organization: []string{"localhost"},
+			CommonName:   "localhost",
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
