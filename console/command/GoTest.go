@@ -2,13 +2,10 @@ package command
 
 import (
 	"github.com/bronze1man/kmg/console"
-	//"github.com/bronze1man/kmg/kmgReflect"
-	//"launchpad.net/goyaml"
 	"github.com/bronze1man/kmg/kmgFile"
 	"go/build"
 	"os"
 	"path/filepath"
-	//"fmt"
 )
 
 type GoTest struct {
@@ -34,6 +31,9 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 		Compiler: build.Default.Compiler,
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if !info.IsDir() {
 			return nil
 		}

@@ -1,12 +1,14 @@
 package kmgHttp
 
-import "net/http"
-import "net/http/httputil"
-import "bytes"
-import "bufio"
+import (
+	"bufio"
+	"bytes"
+	"net/http"
+	"net/http/httputil"
+)
 
 func NewRequestFromByte(r []byte) (req *http.Request, err error) {
-	return http.ReadRequest(bytes.NewReader(r))
+	return http.ReadRequest(bufio.NewReader(bytes.NewReader(r)))
 }
 
 //sometimes it is hard to remember how to get response from bytes ...

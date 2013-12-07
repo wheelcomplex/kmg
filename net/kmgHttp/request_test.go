@@ -25,8 +25,8 @@ func TestGetGetStringMap(ot *testing.T) {
 	t.Equal(map[string]string{}, getEmptyQueryRequest().GetGetStringMap())
 }
 
-func getMockRequest() *Request {
-	return &Request{&http.Request{
+func getMockRequest() *KmgRequest {
+	return &KmgRequest{&http.Request{
 		URL: &url.URL{
 			RawQuery: url.Values{
 				"a": []string{"b", "c"},
@@ -35,8 +35,8 @@ func getMockRequest() *Request {
 	}
 }
 
-func getEmptyQueryRequest() *Request {
-	return &Request{&http.Request{
+func getEmptyQueryRequest() *KmgRequest {
+	return &KmgRequest{&http.Request{
 		URL: &url.URL{
 			RawQuery: url.Values{}.Encode()}},
 	}
