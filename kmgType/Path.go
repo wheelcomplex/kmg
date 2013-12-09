@@ -10,7 +10,7 @@ type Path []string
 func (p Path) String() string {
 	return strings.Join(p, ",")
 }
-func parsePath(ps string) Path {
+func ParsePath(ps string) Path {
 	psa := strings.Split(ps, ",")
 	pso := []string{}
 	for _, v := range psa {

@@ -9,10 +9,22 @@ import (
 
 //fkRefType need this stuff to get rootValue dependency
 type context struct {
-	rootType  adminType
-	rootValue reflect.Value
+	kmgType.Context
+	RootType adminType
 }
 
+func newContext(ptr interface{}) (ctx *context, err error) {
+	kmgTypeCtx, err := kmgType.NewContext(ptr)
+	if err != nil {
+		return
+	}
+	ctx = &context{Context: *kmgTypeCtx}
+	ctx.RootType, err = ctx.typeOfFromKmgType(ctx.Context.RootType)
+	if err != nil {
+		return
+	}
+	return
+}
 func (ctx *context) typeOfFromReflect(rt reflect.Type) (t adminType, err error) {
 	kt, err := kmgType.TypeOf(rt)
 	if err != nil {
@@ -21,28 +33,42 @@ func (ctx *context) typeOfFromReflect(rt reflect.Type) (t adminType, err error) 
 	return ctx.typeOfFromKmgType(kt)
 }
 func (ctx *context) typeOfFromKmgType(kt kmgType.KmgType) (t adminType, err error) {
-	switch kt.(type) {
-	case kmgType.DateTimeType, kmgType.FloatType,
-		kmgType.IntType, kmgType.StringType:
+	switch ckt := kt.(type) {
+	case *kmgType.DateTimeType, *kmgType.FloatType,
+		*kmgType.IntType, *kmgType.StringType:
 		return &toStringTextHtmlView{kt.(kmgType.KmgTypeAndToStringInterface)}, nil
 
-	case kmgType.BoolType:
+	case *kmgType.BoolType:
 		return &selectTextHtmlView{
 			List: []string{"false", "true"},
 			KmgTypeAndToStringInterface: kt.(kmgType.KmgTypeAndToStringInterface),
 		}, nil
 
-	case kmgType.ArrayType:
-		return &arrayType{ArrayType: kt, ctx: ctx}, nil
-	case kmgType.MapType:
-		return &mapType{MapType: kt, ctx: ctx}, nil
-	case kmgType.PtrType:
-		return &ptrType{PtrType: kt, ctx: ctx}, nil
-	case kmgType.SliceType:
-		return &sliceType{SliceType: kt, ctx: ctx}, nil
-	case kmgType.StructType:
-		return &structType{StructType: kt, ctx: ctx}, nil
+	case *kmgType.ArrayType:
+		return &arrayType{ArrayType: *ckt, ctx: ctx}, nil
+	case *kmgType.MapType:
+		return &mapType{MapType: *ckt, ctx: ctx}, nil
+	case *kmgType.PtrType:
+		return &ptrType{PtrType: *ckt, ctx: ctx}, nil
+	case *kmgType.SliceType:
+		return &sliceType{SliceType: *ckt, ctx: ctx}, nil
+	case *kmgType.StructType:
+		return &structType{StructType: *ckt, ctx: ctx}, nil
 	}
+	err = fmt.Errorf("not support type kind: %s", kt.GetReflectType().Kind().String())
+	return
+}
+
+func (ctx *context) GetElemByPath(p kmgType.Path) (v reflect.Value, t adminType, err error) {
+	v, kt, err := ctx.Context.GetElemByPath(p)
+	if err != nil {
+		return
+	}
+	t, err = ctx.typeOfFromKmgType(kt)
+	if err != nil {
+		return
+	}
+	return
 }
 
 /*

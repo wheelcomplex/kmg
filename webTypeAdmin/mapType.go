@@ -1,7 +1,6 @@
 package webTypeAdmin
 
 import (
-	"fmt"
 	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
@@ -42,10 +41,13 @@ func (t *mapType) HtmlView(v reflect.Value) (html template.HTML, err error) {
 	for _, key := range v.MapKeys() {
 		keyS := t.KeyStringConverter.ToString(key)
 		val := v.MapIndex(key)
+		if html, err = t.elemAdminType.HtmlView(val); err != nil {
+			return
+		}
 		templateData = append(templateData, templateRow{
 			Path: keyS,
 			Key:  keyS,
-			Html: t.elemAdminType.Html(val),
+			Html: html,
 		})
 	}
 	return theTemplate.ExecuteNameToHtml("Map", templateData)

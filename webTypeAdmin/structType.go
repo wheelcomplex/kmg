@@ -25,7 +25,7 @@ func (t *structType) init() (err error) {
 		return
 	}
 	//t.fieldsMap = map[string]*structField{}
-	for _, v := range kmgReflect.StructGetAllField(t.getReflectType()) {
+	for _, v := range kmgReflect.StructGetAllField(t.GetReflectType()) {
 		at, err := t.ctx.typeOfFromReflect(v.Type)
 		if err != nil {
 			return err

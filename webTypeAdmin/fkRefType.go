@@ -30,8 +30,10 @@ func (t *fkRefType) init() (err error) {
 	}
 	var ok bool
 	rrt := reflect.Zero(t.GetReflectType()).Interface().(FkRef).GetReferenceType()
-	t.referenceType = t.ctx.typeOfFromReflect(rrt)
-	rc, ok := getFkRefContainerValue(t.ctx.rootValue, rrt)
+	if t.referenceType, err = t.ctx.typeOfFromReflect(rrt); err != nil {
+		return
+	}
+	rc, ok := getFkRefContainerValue(t.ctx.RootValue, rrt)
 	if !ok {
 		return fmt.Errorf("[fkRefType.init] not found referenceContainer")
 	}
@@ -39,6 +41,7 @@ func (t *fkRefType) init() (err error) {
 	if rc.Type().Key() != t.GetReflectType() {
 		return fmt.Errorf("[fkRefType.init] Container key type is not same with self type")
 	}
+	return nil
 }
 
 func getFkRefContainerValue(v reflect.Value, rrt reflect.Type) (reflect.Value, bool) {
@@ -89,10 +92,10 @@ func (t *fkRefType) HtmlView(v reflect.Value) (html template.HTML, err error) {
 }
 
 func (t *fkRefType) SaveByPath(v *reflect.Value, path kmgType.Path, value string) (err error) {
-	if err = t.KmgType.SaveByPath(v, path, value); err != nil {
+	err = t.init()
+	if err != nil {
 		return
 	}
-	t.init()
 	vk, err := t.keyStringConverter.FromString(value)
 	if err != nil {
 		return err
@@ -101,5 +104,5 @@ func (t *fkRefType) SaveByPath(v *reflect.Value, path kmgType.Path, value string
 	if !vv.IsValid() {
 		return fmt.Errorf("[fkRefType.save] save value not in container map:%s", value)
 	}
-	return t.underlyingType.save(v, value)
+	return t.KmgType.SaveByPath(v, path, value)
 }

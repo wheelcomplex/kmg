@@ -3,14 +3,14 @@ package webTypeAdmin
 import (
 	"reflect"
 	//"github.com/bronze1man/kmg/kmgReflect"
-	"fmt"
+	//"fmt"
 	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 )
 
 type adminType interface {
 	kmgType.KmgType
-	HtmlView(v reflect.Value) template.HTML // component html
+	HtmlView(v reflect.Value) (html template.HTML, err error) // component html
 }
 
 //int float datatime string

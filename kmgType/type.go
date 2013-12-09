@@ -16,7 +16,7 @@ type StringConverterInterface interface {
 	ToStringInterface
 }
 
-//array slice struct
+//array slice struct map
 type GetElemByStringInterface interface {
 	GetElemByString(v reflect.Value, k string) (reflect.Value, KmgType, error)
 }

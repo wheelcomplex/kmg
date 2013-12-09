@@ -41,12 +41,11 @@ func (t *stringEnumType) init() (err error) {
 	return
 }
 func (t *stringEnumType) HtmlView(v reflect.Value) (html template.HTML, err error) {
-	err = t.init()
-	if err != nil {
+	if err = t.init(); err != nil {
 		return
 	}
 	valueS := v.String()
-	return theTemplate.ExecuteNameToTemplate("Select", selectTemplateData{
+	return theTemplate.ExecuteNameToHtml("Select", selectTemplateData{
 		List:  t.enumList,
 		Value: valueS,
 	})

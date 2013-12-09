@@ -13,11 +13,12 @@ type sliceType struct {
 	ctx      *context
 }
 
-func (t *sliceType) init() {
+func (t *sliceType) init() (err error) {
 	if t.elemType != nil {
 		return
 	}
-	t.elemType = t.ctx.typeOfFromReflect(t.GetReflectType().Elem())
+	t.elemType, err = t.ctx.typeOfFromReflect(t.GetReflectType().Elem())
+	return
 }
 func (t *sliceType) HtmlView(v reflect.Value) (html template.HTML, err error) {
 	if err = t.init(); err != nil {
@@ -31,11 +32,14 @@ func (t *sliceType) HtmlView(v reflect.Value) (html template.HTML, err error) {
 	var templateData []templateRow
 	len := v.Len()
 	for i := 0; i < len; i++ {
+		if html, err = t.elemType.HtmlView(v.Index(i)); err != nil {
+			return
+		}
 		templateData = append(templateData, templateRow{
 			Path:  i,
 			Index: i,
-			Html:  t.elemType.Html(v.Index(i)),
+			Html:  html,
 		})
 	}
-	return theTemplate.ExecuteNameToTemplate("Slice", templateData)
+	return theTemplate.ExecuteNameToHtml("Slice", templateData)
 }

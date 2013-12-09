@@ -33,10 +33,11 @@ func (t *arrayType) HtmlView(v reflect.Value) (html template.HTML, err error) {
 	var templateData []templateRow
 	len := v.Len()
 	for i := 0; i < len; i++ {
+		html, err = t.elemType.HtmlView(v.Index(i))
 		templateData = append(templateData, templateRow{
 			Path:  i,
 			Index: i,
-			Html:  t.elemType.HtmlView(v.Index(i)),
+			Html:  html,
 		})
 	}
 	return theTemplate.ExecuteNameToHtml("Array", templateData)

@@ -1,7 +1,6 @@
 package webTypeAdmin
 
 import (
-	"fmt"
 	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
@@ -29,7 +28,7 @@ func (t *ptrType) HtmlView(v reflect.Value) (html template.HTML, err error) {
 	if v.IsNil() {
 		return theTemplate.ExecuteNameToHtml("NilPtr", nil)
 	}
-	elemHtml, err := t.elemType.Html(v.Elem())
+	elemHtml, err := t.elemType.HtmlView(v.Elem())
 	if err != nil {
 		return
 	}
