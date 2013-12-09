@@ -73,7 +73,7 @@ type getElemByStringEditorabler struct {
 
 func (t getElemByStringEditorabler) SaveByPath(v *reflect.Value, path Path, value string) (err error) {
 	if len(path) == 0 {
-		return fmt.Errorf("[getElemByStringEditorabler.Save] no path,type:%s", v.Type().Kind())
+		return nil
 	}
 	ev, et, err := t.GetElemByString(*v, path[0])
 	if err != nil {

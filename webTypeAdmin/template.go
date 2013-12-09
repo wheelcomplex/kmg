@@ -45,7 +45,7 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
 
 {{ define "Slice" }}
 <table class="table-bordered slice" ><tbody>
-	<tr data-path="0">
+	<tr data-path="">
 		<td><button type="button" class="btn btn-primary kmg-create-action">Create</button></td>
 		<td></td>
 		<td></td>

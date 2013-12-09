@@ -14,6 +14,7 @@ type T struct {
 	Map5    map[string][]string
 	Slice1  []string
 	Ptr1    *string
+	Ptr2    *T2
 	Array1  [5]string
 }
 type T2 struct {
@@ -165,6 +166,10 @@ func TestType(ot *testing.T) {
 	err = m.SaveByPath(Path{"ptr", "Ptr1", "ptr"}, "12345")
 	t.Equal(err, nil)
 	t.Equal(*data.Ptr1, "12345")
+
+	err = m.SaveByPath(Path{"ptr", "Ptr2", "ptr"}, "")
+	t.Equal(err, nil)
+	t.Equal(data.Ptr2.A, "")
 
 	err = m.SaveByPath(Path{"ptr", "Array1", "1"}, "12345")
 	t.Equal(err, nil)
