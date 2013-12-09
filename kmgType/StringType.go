@@ -11,7 +11,7 @@ type StringType struct {
 }
 
 func (t *StringType) ToString(v reflect.Value) string {
-	return t.GetReflectType().String()
+	return v.String()
 }
 func (t *StringType) SaveScale(v reflect.Value, value string) error {
 	v.SetString(value)

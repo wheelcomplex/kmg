@@ -33,7 +33,10 @@ func (t *PtrType) SaveByPath(inV *reflect.Value, path Path, value string) error 
 	}
 	//a elem of a ptr CanSet must be true.
 	elemV := inV.Elem()
-	return t.elemType.SaveByPath(&elemV, path[1:], value)
+	if len(path) > 1 {
+		return t.elemType.SaveByPath(&elemV, path[1:], value)
+	}
+	return nil
 }
 func (t *PtrType) GetElemByString(v reflect.Value, k string) (ev reflect.Value, et KmgType, err error) {
 	err = t.init()

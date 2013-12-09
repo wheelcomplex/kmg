@@ -3,6 +3,7 @@ package kmgType
 import (
 	"reflect"
 	"strconv"
+	//"fmt"
 )
 
 type IntType struct {
@@ -12,7 +13,8 @@ type IntType struct {
 }
 
 func (t *IntType) ToString(v reflect.Value) string {
-	return strconv.FormatInt(v.Int(), t.GetReflectType().Bits())
+	s := strconv.FormatInt(v.Int(), 10)
+	return s
 }
 func (t *IntType) SaveScale(v reflect.Value, value string) error {
 	i, err := strconv.ParseInt(value, 10, t.GetReflectType().Bits())

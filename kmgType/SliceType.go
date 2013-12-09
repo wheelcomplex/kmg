@@ -44,6 +44,9 @@ func (t *SliceType) SaveByPath(v *reflect.Value, path Path, value string) (err e
 			*v = reflect.Append(*v, reflect.New(t.elemType.GetReflectType()).Elem())
 		}
 		path[0] = strconv.Itoa(v.Len() - 1)
+		if value == "" {
+			return
+		}
 	}
 	return t.getElemByStringEditorabler.SaveByPath(v, path, value)
 }
