@@ -104,3 +104,47 @@ func (t *mapType) mapSave(m reflect.Value, k string, v string) error {
 	m.SetMapIndex(vk, ev)
 	return nil
 }
+
+func (t *mapType) Save(v *reflect.Value, path Path, value string) error {
+	if len(path) == 0 {
+		return fmt.Errorf("[mapType.save] get map with no path, value:%s", value)
+	}
+	t.init()
+	OriginCanSet := v.CanSet()
+	if v.IsNil() {
+		if OriginCanSet {
+			v.Set(reflect.MakeMap(t.getReflectType()))
+		} else {
+			*v = reflect.MakeMap(t.getReflectType())
+		}
+	} else {
+		//copy all exist data,if this value can not set
+		if !OriginCanSet {
+			output := reflect.MakeMap(t.getReflectType())
+			output.Set(*v)
+			*v = output
+		}
+	}
+	vk, err := t.keyStringConverter.fromString(path[0])
+	if err != nil {
+		return err
+	}
+	saveElemV := v.MapIndex(vk)
+	KeyNotExist := false
+	if !saveElemV.IsValid() {
+		saveElemV = reflect.New(t.elemType.getReflectType()).Elem()
+		KeyNotExist = true
+	}
+	elemV := &saveElemV
+	err = t.elemType.Save(elemV, path[1:], value)
+	if err != nil {
+		return err
+	}
+	if KeyNotExist {
+		v.SetMapIndex(vk, saveElemV)
+	}
+	if elemV != &saveElemV {
+		v.SetMapIndex(vk, *elemV)
+	}
+	return nil
+}

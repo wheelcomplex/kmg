@@ -1,12 +1,12 @@
 package webTypeAdmin
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
-	"html/template"
+	//"html/template"
 	"net/http"
 	"reflect"
-	"strings"
+	//"strings"
 )
 
 type Manager struct {
@@ -30,67 +30,73 @@ func NewManagerFromPtr(ptr interface{}) (*Manager, error) {
 }
 
 func (manager *Manager) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	//var err error
-	pathS := req.FormValue("p")
-	path := parsePath(pathS)
-	switch req.Method {
-	case "GET":
-		s, err := manager.page(path)
-		if err != nil {
-			w.Write([]byte(err.Error()))
+	/*
+		//var err error
+		pathS := req.FormValue("p")
+		path := parsePath(pathS)
+		switch req.Method {
+		case "GET":
+			s, err := manager.page(path)
+			if err != nil {
+				w.Write([]byte(err.Error()))
+				return
+			}
+			w.Write([]byte(s))
+		case "POST":
+			f := strings.ToLower(req.FormValue("f"))
+			var err error
+			switch f {
+			case "create":
+				err = manager.create(path)
+			case "save":
+				value := req.FormValue("v")
+				err = manager.save(path, value)
+			case "delete":
+				err = manager.delete(path)
+			default:
+				err = fmt.Errorf("not support request function %s", f)
+			}
+			var errS string
+			if err != nil {
+				errS = err.Error()
+			}
+			out, err := json.Marshal(struct{ Err string }{Err: errS})
+			if err != nil {
+				panic(err)
+			}
+			w.Write(out)
 			return
-		}
-		w.Write([]byte(s))
-	case "POST":
-		f := strings.ToLower(req.FormValue("f"))
-		var err error
-		switch f {
-		case "create":
-			err = manager.create(path)
-		case "save":
-			value := req.FormValue("v")
-			err = manager.save(path, value)
-		case "delete":
-			err = manager.delete(path)
 		default:
-			err = fmt.Errorf("not support request function %s", f)
+			w.Write([]byte(fmt.Sprintf("not support request method %s", req.Method)))
 		}
-		var errS string
-		if err != nil {
-			errS = err.Error()
-		}
-		out, err := json.Marshal(struct{ Err string }{Err: errS})
-		if err != nil {
-			panic(err)
-		}
-		w.Write(out)
-		return
-	default:
-		w.Write([]byte(fmt.Sprintf("not support request method %s", req.Method)))
-	}
+	*/
 	return
 }
 
 //show a page on some path
 func (manager *Manager) page(path Path) (string, error) {
-	v, err := manager.getValueByPath(path)
-	if err != nil {
-		return "", err
-	}
-	t, err := manager.ctx.newTypeFromReflect(v.Type())
-	if err != nil {
-		return "", err
-	}
-	b, err := theTemplate.ExecuteNameToByte("Main", struct {
-		Path string
-		Html template.HTML
-	}{
-		Path: path.String(),
-		Html: t.Html(v),
-	})
-	return string(b), err
+	/*
+		v, err := manager.getValueByPath(path)
+		if err != nil {
+			return "", err
+		}
+		t, err := manager.ctx.newTypeFromReflect(v.Type())
+		if err != nil {
+			return "", err
+		}
+		b, err := theTemplate.ExecuteNameToByte("Main", struct {
+			Path string
+			Html template.HTML
+		}{
+			Path: path.String(),
+			Html: t.Html(v),
+		})
+		return string(b), err
+	*/
+	return "", nil
 }
 
+/*
 func (manager *Manager) getValueByPath(p Path) (v reflect.Value, err error) {
 	t := manager.ctx.rootType
 	v = manager.ctx.rootValue
@@ -155,7 +161,7 @@ func (manager *Manager) save(path Path, value string) error {
 		return mt.mapSave(v, path[lastCanSetI+1:len(path)-1], value)
 	}
 	return fmt.Errorf("[manager.save] impossable code path")
-	/*
+
 		parentPath := path[:len(path)-1]
 		v, err := manager.getValueByPath(parentPath)
 		if err != nil {
@@ -177,20 +183,36 @@ func (manager *Manager) save(path Path, value string) error {
 			return err
 		}
 		return t.save(v, value)
-	*/
+
+}
+*/
+
+func (manager *Manager) save(path Path, value string) (err error) {
+	pRootValue := &manager.ctx.rootValue
+	err = manager.ctx.rootType.Save(pRootValue, path, value)
+	if err != nil {
+		return err
+	}
+	if pRootValue != &manager.ctx.rootValue {
+		return fmt.Errorf("[manager.save] can not save")
+	}
+	return nil
 }
 
 //delete an object in some where in the whole type tree
 //can delete a slice elem or map elem
 func (manager *Manager) delete(path Path) (err error) {
-	parentPath := path[:len(path)-1]
-	v, err := manager.getValueByPath(parentPath)
-	if err != nil {
-		return err
-	}
-	t, err := manager.ctx.newTypeFromReflect(v.Type())
-	if err != nil {
-		return err
-	}
-	return t.delete(v, path[len(path)-1])
+	return nil
+	/*
+		parentPath := path[:len(path)-1]
+		v, err := manager.getValueByPath(parentPath)
+		if err != nil {
+			return err
+		}
+		t, err := manager.ctx.newTypeFromReflect(v.Type())
+		if err != nil {
+			return err
+		}
+		return t.delete(v, path[len(path)-1])
+	*/
 }

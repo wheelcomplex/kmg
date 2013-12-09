@@ -25,3 +25,15 @@ func (t *dateTimeType) save(v reflect.Value, value string) error {
 	v.Set(reflect.ValueOf(valueT))
 	return nil
 }
+
+func (t *dateTimeType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	valueT, err := time.Parse(kmgTime.FormatMysql, value)
+	if err != nil {
+		return err
+	}
+	v.Set(reflect.ValueOf(valueT))
+	return nil
+}

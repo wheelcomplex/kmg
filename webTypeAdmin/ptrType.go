@@ -33,6 +33,22 @@ func (t *ptrType) getSubValueByString(v reflect.Value, k string) (reflect.Value,
 	}
 	return t.elemType.getSubValueByString(v.Elem(), k)
 }
+func (t *ptrType) Save(inV *reflect.Value, path Path, value string) error {
+	t.init()
+	//create
+	if inV.IsNil() {
+		if inV.CanSet() {
+			inV.Set(reflect.New(t.getReflectType().Elem()))
+		} else {
+			*inV = reflect.New(t.getReflectType().Elem())
+		}
+	}
+	//a elem of a ptr CanSet must be true.
+	elemV := inV.Elem()
+	return t.elemType.Save(&elemV, path[1:], value)
+}
+
+/*
 func (t *ptrType) delete(v reflect.Value, k string) error {
 	t.init()
 	if v.IsNil() {
@@ -55,3 +71,4 @@ func (t *ptrType) save(v reflect.Value, value string) error {
 	}
 	return t.elemType.save(v.Elem(), value)
 }
+*/

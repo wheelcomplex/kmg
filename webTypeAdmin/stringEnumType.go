@@ -61,3 +61,15 @@ func isInStringSlice(arr []string, target string) bool {
 	}
 	return false
 }
+
+func (t *stringEnumType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	t.init()
+	if !isInStringSlice(t.enumList, value) {
+		return fmt.Errorf("[stringEnumType.save] save value not in enum list value:%s", value)
+	}
+	v.SetString(value)
+	return nil
+}

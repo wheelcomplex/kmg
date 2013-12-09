@@ -1,7 +1,7 @@
 package webTypeAdmin
 
 import (
-	//"fmt"
+	"fmt"
 	"html/template"
 	"reflect"
 	//"strconv"
@@ -58,5 +58,37 @@ func (t *sliceType) create(v reflect.Value, k string) error {
 	v.Set(
 		reflect.Append(v, reflect.New(t.elemType.getReflectType()).Elem()),
 	)
+	return nil
+}
+
+func (t *sliceType) Save(v *reflect.Value, path Path, value string) error {
+	t.init()
+	if len(path) == 0 {
+		return fmt.Errorf("[sliceType.save] get struct with no path,value:%s", path, value)
+	}
+
+	i, err := arrayParseKey(v, path[0])
+	if err != nil {
+		return err
+	}
+	ev := v.Index(i)
+	pEv := &ev
+	err := t.elemType.Save(pEv, path[1:], value)
+	if err != nil {
+		return err
+	}
+
+	//not change this struct
+	if pEv == &ev {
+		return nil
+	}
+	if v.CanSet() {
+		return nil
+	}
+	output := reflect.New(t.getReflectType()).Elem()
+	output.Set(*v)
+	*v = output
+	ev = v.Index(i)
+	ev.Set(*pEv)
 	return nil
 }

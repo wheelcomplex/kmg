@@ -35,3 +35,15 @@ func (t *floatType) fromString(s string) (reflect.Value, error) {
 func (t *floatType) toString(v reflect.Value) string {
 	return strconv.FormatFloat(v.Float(), 'g', -1, t.getReflectType().Bits())
 }
+
+func (t *floatType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	f, err := strconv.ParseFloat(value, t.getReflectType().Bits())
+	if err != nil {
+		return err
+	}
+	v.SetFloat(f)
+	return nil
+}

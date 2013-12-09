@@ -102,3 +102,19 @@ func (t *fkRefType) save(v reflect.Value, value string) error {
 	}
 	return t.underlyingType.save(v, value)
 }
+
+func (t *fkRefType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	t.init()
+	vk, err := t.stringConverterType.fromString(value)
+	if err != nil {
+		return err
+	}
+	vv := t.referenceContainer.MapIndex(vk)
+	if !vv.IsValid() {
+		return fmt.Errorf("[fkRefType.save] save value not in container map:%s", value)
+	}
+	return t.underlyingType.save(v, value)
+}

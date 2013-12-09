@@ -37,3 +37,15 @@ func (t *boolType) fromString(s string) (reflect.Value, error) {
 func (t *boolType) toString(v reflect.Value) string {
 	return strconv.FormatBool(v.Bool())
 }
+
+func (t *boolType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	valueT, err := strconv.ParseBool(value)
+	if err != nil {
+		return err
+	}
+	v.SetBool(valueT)
+	return nil
+}

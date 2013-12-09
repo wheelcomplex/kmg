@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"reflect"
 	//"fmt"
+	"fmt"
 )
 
 type stringType struct {
@@ -26,4 +27,12 @@ func (t *stringType) fromString(s string) (reflect.Value, error) {
 }
 func (t *stringType) toString(v reflect.Value) string {
 	return v.String()
+}
+
+func (t *stringType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	v.SetString(value)
+	return nil
 }

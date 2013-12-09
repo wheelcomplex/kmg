@@ -61,3 +61,34 @@ func arrayParseKey(v reflect.Value, k string) (int, error) {
 	}
 	return i, nil
 }
+func (t *arrayType) Save(v *reflect.Value, path Path, value string) error {
+	t.init()
+	if len(path) == 0 {
+		return fmt.Errorf("[arrayType.save] get struct with no path,value:%s", path, value)
+	}
+
+	i, err := arrayParseKey(v, path[0])
+	if err != nil {
+		return err
+	}
+	ev := v.Index(i)
+	pEv := &ev
+	err := t.elemType.Save(pEv, path[1:], value)
+	if err != nil {
+		return err
+	}
+
+	//not change this struct
+	if pEv == &ev {
+		return nil
+	}
+	if v.CanSet() {
+		return nil
+	}
+	output := reflect.New(t.getReflectType()).Elem()
+	output.Set(*v)
+	*v = output
+	ev = v.Index(i)
+	ev.Set(*pEv)
+	return nil
+}

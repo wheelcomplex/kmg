@@ -35,3 +35,15 @@ func (t *intType) fromString(s string) (reflect.Value, error) {
 func (t *intType) toString(v reflect.Value) string {
 	return strconv.FormatInt(v.Int(), t.getReflectType().Bits())
 }
+
+func (t *intType) Save(v *reflect.Value, path Path, value string) error {
+	if err := scaleValueSaveHandle(t, &v, path); err != nil {
+		return err
+	}
+	i, err := strconv.ParseInt(value, 10, t.getReflectType().Bits())
+	if err != nil {
+		return err
+	}
+	v.SetInt(i)
+	return nil
+}
