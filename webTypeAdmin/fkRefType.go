@@ -2,19 +2,13 @@ package webTypeAdmin
 
 import (
 	"fmt"
+	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
 )
 
 var fkRefReflectType = reflect.TypeOf((*FkRef)(nil)).Elem()
 
-/*
-define a FkRef like this
-type UserId int
-func (user_id UserId)GetReferenceType()reflect.Type{
-	return reflect.TypeOf((*User)(nil)).Elem()
-}
-*/
 type FkRef interface {
 	GetReferenceType() reflect.Type
 }
@@ -22,27 +16,28 @@ type FkRef interface {
 //xxId refer to another object
 //path -> pass to RefType
 type fkRefType struct {
-	commonType
-	underlyingType     typeInterface
-	referenceType      typeInterface
+	kmgType.KmgType
+	underlyingType     adminType
+	referenceType      adminType
 	referenceContainer reflect.Value
-	stringConverterType
+	keyStringConverter kmgType.StringConverterInterface
+	ctx                *context
 }
 
-func (t *fkRefType) init() {
+func (t *fkRefType) init() (err error) {
 	if t.referenceType != nil {
 		return
 	}
 	var ok bool
-	rrt := reflect.Zero(t.getReflectType()).Interface().(FkRef).GetReferenceType()
-	t.referenceType = t.ctx.mustNewTypeFromReflect(rrt)
+	rrt := reflect.Zero(t.GetReflectType()).Interface().(FkRef).GetReferenceType()
+	t.referenceType = t.ctx.typeOfFromReflect(rrt)
 	rc, ok := getFkRefContainerValue(t.ctx.rootValue, rrt)
 	if !ok {
-		panic("[fkRefType.init] not found referenceContainer")
+		return fmt.Errorf("[fkRefType.init] not found referenceContainer")
 	}
 	t.referenceContainer = rc
-	if rc.Type().Key() != t.getReflectType() {
-		panic("[fkRefType.init] Container key type is not same with self type")
+	if rc.Type().Key() != t.GetReflectType() {
+		return fmt.Errorf("[fkRefType.init] Container key type is not same with self type")
 	}
 }
 
@@ -80,35 +75,25 @@ func getFkRefContainerValue(v reflect.Value, rrt reflect.Type) (reflect.Value, b
 	}
 	return reflect.Value{}, false
 }
-func (t *fkRefType) Html(v reflect.Value) template.HTML {
-	t.init()
+func (t *fkRefType) HtmlView(v reflect.Value) (html template.HTML, err error) {
+	if err = t.init(); err != nil {
+		return
+	}
 	var templateData selectTemplateData
-	templateData.Value = t.stringConverterType.toString(v)
+	templateData.Value = t.keyStringConverter.ToString(v)
 	for _, vk := range t.referenceContainer.MapKeys() {
-		sk := t.stringConverterType.toString(vk)
+		sk := t.keyStringConverter.ToString(vk)
 		templateData.List = append(templateData.List, sk)
 	}
-	return theTemplate.MustExecuteNameToHtml("Select", templateData)
-}
-func (t *fkRefType) save(v reflect.Value, value string) error {
-	t.init()
-	vk, err := t.stringConverterType.fromString(value)
-	if err != nil {
-		return err
-	}
-	vv := t.referenceContainer.MapIndex(vk)
-	if !vv.IsValid() {
-		return fmt.Errorf("[fkRefType.save] save value not in container map:%s", value)
-	}
-	return t.underlyingType.save(v, value)
+	return theTemplate.ExecuteNameToHtml("Select", templateData)
 }
 
-func (t *fkRefType) Save(v *reflect.Value, path Path, value string) error {
-	if err := scaleValueSaveHandle(t, &v, path); err != nil {
-		return err
+func (t *fkRefType) SaveByPath(v *reflect.Value, path kmgType.Path, value string) (err error) {
+	if err = t.KmgType.SaveByPath(v, path, value); err != nil {
+		return
 	}
 	t.init()
-	vk, err := t.stringConverterType.fromString(value)
+	vk, err := t.keyStringConverter.FromString(value)
 	if err != nil {
 		return err
 	}

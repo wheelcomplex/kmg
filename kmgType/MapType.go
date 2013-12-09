@@ -7,83 +7,130 @@ import (
 
 //path -> key(Key type)
 //key can be bool,string,stringEnum,int,float,
+//map elem CanSet() will be false
+//even if map CanSet false , SetMapIndex will success
+//if elem change(can not set),map must use SetMapIndex to set it..
 type MapType struct {
 	reflectTypeGetterImp
-	keyStringConverter StringConverterInterface
-	keyType            KmgType
-	elemType           KmgType
+	KeyStringConverter StringConverterInterface
+	KeyType            KmgType
+	ElemType           KmgType
 }
 
-func (t *MapType) init() (err error) {
-	if t.keyStringConverter != nil {
+func (t *MapType) Init() (err error) {
+	if t.KeyStringConverter != nil {
 		return
 	}
-	t.keyType, err = TypeOf(t.GetReflectType().Key())
+	t.KeyType, err = TypeOf(t.GetReflectType().Key())
 	if err != nil {
 		return err
 	}
 	var ok bool
-	t.keyStringConverter, ok = t.keyType.(StringConverterInterface)
+	t.KeyStringConverter, ok = t.KeyType.(StringConverterInterface)
 	if !ok {
 		return fmt.Errorf(
 			"mapType key type not implement stringConverterType,key: %s",
-			t.keyType.GetReflectType().Kind().String(),
+			t.KeyType.GetReflectType().Kind().String(),
 		)
 	}
-	t.elemType, err = TypeOf(t.GetReflectType().Elem())
+	t.ElemType, err = TypeOf(t.GetReflectType().Elem())
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
+func (t *MapType) GetElemByString(v reflect.Value, k string) (ev reflect.Value, et KmgType, err error) {
+	err = t.Init()
+	if err != nil {
+		return
+	}
+	vk, err := t.KeyStringConverter.FromString(k)
+	if err != nil {
+		return
+	}
+	if err != nil {
+		return
+	}
+	ev = v.MapIndex(vk)
+	if !ev.IsValid() {
+		err = fmt.Errorf("[mapType.getSubValueByString] map key not found k:%s", k)
+		return
+	}
+	et = t.ElemType
+	return
+}
+
 func (t *MapType) SaveByPath(v *reflect.Value, path Path, value string) (err error) {
-	err = t.init()
+	err = t.Init()
 	if err != nil {
 		return
 	}
 	if len(path) == 0 {
 		return fmt.Errorf("[mapType.save] get map with no path, value:%s", value)
 	}
-	OriginCanSet := v.CanSet()
+	//OriginCanSet := v.CanSet()
 	if v.IsNil() {
-		if OriginCanSet {
+		if v.CanSet() {
 			v.Set(reflect.MakeMap(t.GetReflectType()))
 		} else {
 			*v = reflect.MakeMap(t.GetReflectType())
 		}
-	} else {
-		//copy all exist data,if this value can not set
-		//this is not need some place
-		if !OriginCanSet {
-			output := reflect.MakeMap(t.GetReflectType())
-			output.Set(*v)
-			*v = output
-		}
 	}
-	vk, err := t.keyStringConverter.FromString(path[0])
+	vk, err := t.KeyStringConverter.FromString(path[0])
 	if err != nil {
 		return err
 	}
 	saveElemV := v.MapIndex(vk)
 	KeyNotExist := false
 	if !saveElemV.IsValid() {
-		saveElemV = reflect.New(t.elemType.GetReflectType()).Elem()
+		saveElemV = reflect.New(t.ElemType.GetReflectType()).Elem()
 		KeyNotExist = true
 	}
-	elemV := &saveElemV
-	err = t.elemType.SaveByPath(elemV, path[1:], value)
+	oElemV := saveElemV
+	err = t.ElemType.SaveByPath(&saveElemV, path[1:], value)
 	if err != nil {
 		return err
 	}
 	if KeyNotExist {
 		v.SetMapIndex(vk, saveElemV)
 	}
-	if elemV != &saveElemV {
-		v.SetMapIndex(vk, *elemV)
+	if oElemV != saveElemV {
+		v.SetMapIndex(vk, saveElemV)
 	}
 	return nil
 }
 
 func (t *MapType) DeleteByPath(v *reflect.Value, path Path) (err error) {
-	return fmt.Errorf("[MapType.Delete] not implement,path:%s type:%s", path, v.Type().Kind())
+	err = t.Init()
+	if err != nil {
+		return
+	}
+	if len(path) > 1 {
+		vk, err := t.KeyStringConverter.FromString(path[0])
+		if err != nil {
+			return err
+		}
+		ev := v.MapIndex(vk)
+		et := t.ElemType
+		oEv := ev
+		err = et.DeleteByPath(&ev, path[1:])
+		if err != nil {
+			return err
+		}
+		if oEv == ev {
+			return nil
+		}
+		v.SetMapIndex(vk, ev)
+		return nil
+	} else if len(path) == 0 {
+		return fmt.Errorf("[MapType.DeleteByPath] delete map with no path.")
+	}
+	//Addressable?
+	vk, err := t.KeyStringConverter.FromString(path[0])
+	if err != nil {
+		return err
+	}
+	v.SetMapIndex(vk, reflect.Value{})
+	return nil
 }

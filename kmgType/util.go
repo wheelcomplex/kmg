@@ -102,6 +102,36 @@ func (t getElemByStringEditorabler) SaveByPath(v *reflect.Value, path Path, valu
 	ev.Set(*pEv)
 	return nil
 }
+
+/*
 func (t getElemByStringEditorabler) DeleteByPath(v *reflect.Value, path Path) (err error) {
-	return fmt.Errorf("[getElemByStringEditorabler.Delete] scale type can not delete,path:%s type:%s", path, v.Type().Kind())
+
+}
+*/
+//can not pass through map
+func passThougthDeleteByPath(t GetElemByStringAndReflectTypeGetterInterface, v *reflect.Value, path Path) (err error) {
+	ev, et, err := t.GetElemByString(*v, path[0])
+	if err != nil {
+		return err
+	}
+	pEv := &ev
+	err = et.DeleteByPath(pEv, path[1:])
+	if err != nil {
+		return err
+	}
+	if pEv == &ev {
+		return
+	}
+	if v.CanSet() {
+		return
+	}
+	output := reflect.New(t.GetReflectType()).Elem()
+	output.Set(*v)
+	*v = output
+	ev, _, err = t.GetElemByString(*v, path[0])
+	if err != nil {
+		return err
+	}
+	ev.Set(*pEv)
+	return nil
 }

@@ -40,12 +40,29 @@ type KmgType interface {
 	EditableByPathInterface
 	ReflectTypeGetter
 }
+type KmgTypeAndToStringInterface interface {
+	KmgType
+	ToStringInterface
+}
 
 type ReflectTypeGetter interface {
 	GetReflectType() reflect.Type
 }
 
+type GetElemByStringAndReflectTypeGetterInterface interface {
+	GetElemByStringInterface
+	ReflectTypeGetter
+}
+
 func TypeOf(rt reflect.Type) (KmgType, error) {
+	switch rt {
+	case dateTimeReflectType:
+		t := &DateTimeType{reflectTypeGetterImp: reflectTypeGetterImp{rt}}
+		t.saveScaleFromStringer = saveScaleFromStringer{t, t}
+		t.saveScaleEditabler = saveScaleEditabler{t, t}
+		return t, nil
+	}
+
 	switch rt.Kind() {
 	case reflect.Ptr:
 		t := &PtrType{reflectTypeGetterImp: reflectTypeGetterImp{rt}}

@@ -2,6 +2,7 @@ package webTypeAdmin
 
 import (
 	"fmt"
+	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
 )
@@ -9,66 +10,28 @@ import (
 //just for same with golang reflect system
 //path -> pass to RefType
 type ptrType struct {
-	commonType
-	elemType typeInterface
+	kmgType.PtrType
+	elemType adminType
+	ctx      *context
 }
 
-func (t *ptrType) init() {
+func (t *ptrType) init() (err error) {
 	if t.elemType != nil {
 		return
 	}
-	t.elemType = t.ctx.mustNewTypeFromReflect(t.getReflectType().Elem())
+	t.elemType, err = t.ctx.typeOfFromReflect(t.GetReflectType().Elem())
+	return
 }
-func (t *ptrType) Html(v reflect.Value) template.HTML {
-	t.init()
+func (t *ptrType) HtmlView(v reflect.Value) (html template.HTML, err error) {
+	if err = t.init(); err != nil {
+		return
+	}
 	if v.IsNil() {
-		return theTemplate.MustExecuteNameToHtml("NilPtr", nil)
+		return theTemplate.ExecuteNameToHtml("NilPtr", nil)
 	}
-	return t.elemType.Html(v.Elem())
-}
-func (t *ptrType) getSubValueByString(v reflect.Value, k string) (reflect.Value, error) {
-	t.init()
-	if v.IsNil() {
-		return reflect.Value{}, fmt.Errorf("[getSubValueByString] nil pointer while k:%s", k)
+	elemHtml, err := t.elemType.Html(v.Elem())
+	if err != nil {
+		return
 	}
-	return t.elemType.getSubValueByString(v.Elem(), k)
+	return theTemplate.ExecuteNameToHtml("Ptr", elemHtml)
 }
-func (t *ptrType) Save(inV *reflect.Value, path Path, value string) error {
-	t.init()
-	//create
-	if inV.IsNil() {
-		if inV.CanSet() {
-			inV.Set(reflect.New(t.getReflectType().Elem()))
-		} else {
-			*inV = reflect.New(t.getReflectType().Elem())
-		}
-	}
-	//a elem of a ptr CanSet must be true.
-	elemV := inV.Elem()
-	return t.elemType.Save(&elemV, path[1:], value)
-}
-
-/*
-func (t *ptrType) delete(v reflect.Value, k string) error {
-	t.init()
-	if v.IsNil() {
-		return fmt.Errorf("[ptrType.delete] nil pointer while k:%s", k)
-	}
-	return t.elemType.delete(v.Elem(), k)
-}
-func (t *ptrType) create(v reflect.Value, k string) error {
-	t.init()
-	if v.IsNil() {
-		v.Set(reflect.New(t.getReflectType().Elem()))
-		return nil
-	}
-	return t.elemType.create(v.Elem(), k)
-}
-func (t *ptrType) save(v reflect.Value, value string) error {
-	t.init()
-	if v.IsNil() {
-		return fmt.Errorf("[ptrType.save] nil pointer while value:%s", value)
-	}
-	return t.elemType.save(v.Elem(), value)
-}
-*/

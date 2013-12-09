@@ -26,6 +26,14 @@ func (templ *Template) MustExecuteNameToHtml(name string, data interface{}) temp
 	return template.HTML(b)
 }
 
+func (templ *Template) ExecuteNameToHtml(name string, data interface{}) (html template.HTML, err error) {
+	b, err := templ.ExecuteNameToByte(name, data)
+	if err != nil {
+		return
+	}
+	return template.HTML(b), nil
+}
+
 func (templ *Template) MustExecuteToHtml(data interface{}) template.HTML {
 	h, err := templ.ExecuteToByte(data)
 	if err != nil {

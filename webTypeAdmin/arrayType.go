@@ -1,18 +1,48 @@
 package webTypeAdmin
 
 import (
-	"fmt"
+	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
-	"strconv"
 )
 
 //path -> array index(number)
 type arrayType struct {
-	commonType
-	elemType typeInterface
+	kmgType.ArrayType
+	elemType adminType
+	ctx      *context
 }
 
+func (t *arrayType) init() (err error) {
+	if t.elemType != nil {
+		return nil
+	}
+	t.elemType, err = t.ctx.typeOfFromReflect(t.GetReflectType().Elem())
+	return
+}
+func (t *arrayType) HtmlView(v reflect.Value) (html template.HTML, err error) {
+	err = t.init()
+	if err != nil {
+		return
+	}
+	type templateRow struct {
+		Path  int
+		Index int
+		Html  template.HTML
+	}
+	var templateData []templateRow
+	len := v.Len()
+	for i := 0; i < len; i++ {
+		templateData = append(templateData, templateRow{
+			Path:  i,
+			Index: i,
+			Html:  t.elemType.HtmlView(v.Index(i)),
+		})
+	}
+	return theTemplate.ExecuteNameToHtml("Array", templateData)
+}
+
+/*
 func (t *arrayType) init() {
 	if t.elemType != nil {
 		return
@@ -92,3 +122,4 @@ func (t *arrayType) Save(v *reflect.Value, path Path, value string) error {
 	ev.Set(*pEv)
 	return nil
 }
+*/

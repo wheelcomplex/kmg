@@ -2,6 +2,7 @@ package webTypeAdmin
 
 import (
 	"fmt"
+	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
 )
@@ -24,52 +25,29 @@ type StringEnum interface {
 }
 
 type stringEnumType struct {
-	commonType
+	kmgType.StringType
+	ctx      *context
 	enumList []string
 }
 
-func (t *stringEnumType) init() {
+func (t *stringEnumType) init() (err error) {
 	if t.enumList != nil {
 		return
 	}
-	t.enumList = reflect.Zero(t.getReflectType()).Interface().(StringEnum).GetEnumList()
+	t.enumList = reflect.Zero(t.GetReflectType()).Interface().(StringEnum).GetEnumList()
 	if len(t.enumList) == 0 {
-		panic("stringEnum.GetEnumList() return an array with 0 element")
+		return fmt.Errorf("stringEnum.GetEnumList() return an array with 0 element")
 	}
+	return
 }
-func (t *stringEnumType) Html(v reflect.Value) template.HTML {
-	t.init()
+func (t *stringEnumType) HtmlView(v reflect.Value) (html template.HTML, err error) {
+	err = t.init()
+	if err != nil {
+		return
+	}
 	valueS := v.String()
-	return theTemplate.MustExecuteNameToHtml("Select", selectTemplateData{
+	return theTemplate.ExecuteNameToTemplate("Select", selectTemplateData{
 		List:  t.enumList,
 		Value: valueS,
 	})
-}
-func (t *stringEnumType) save(v reflect.Value, value string) error {
-	t.init()
-	if !isInStringSlice(t.enumList, value) {
-		return fmt.Errorf("[stringEnumType.save] save value not in enum list value:%s", value)
-	}
-	v.SetString(value)
-	return nil
-}
-func isInStringSlice(arr []string, target string) bool {
-	for _, k := range arr {
-		if target == k {
-			return true
-		}
-	}
-	return false
-}
-
-func (t *stringEnumType) Save(v *reflect.Value, path Path, value string) error {
-	if err := scaleValueSaveHandle(t, &v, path); err != nil {
-		return err
-	}
-	t.init()
-	if !isInStringSlice(t.enumList, value) {
-		return fmt.Errorf("[stringEnumType.save] save value not in enum list value:%s", value)
-	}
-	v.SetString(value)
-	return nil
 }

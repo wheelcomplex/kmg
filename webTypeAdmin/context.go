@@ -4,14 +4,48 @@ import (
 	"reflect"
 	//"time"
 	"fmt"
+	"github.com/bronze1man/kmg/kmgType"
 )
 
 //fkRefType need this stuff to get rootValue dependency
 type context struct {
-	rootType  typeInterface
+	rootType  adminType
 	rootValue reflect.Value
 }
 
+func (ctx *context) typeOfFromReflect(rt reflect.Type) (t adminType, err error) {
+	kt, err := kmgType.TypeOf(rt)
+	if err != nil {
+		return
+	}
+	return ctx.typeOfFromKmgType(kt)
+}
+func (ctx *context) typeOfFromKmgType(kt kmgType.KmgType) (t adminType, err error) {
+	switch kt.(type) {
+	case kmgType.DateTimeType, kmgType.FloatType,
+		kmgType.IntType, kmgType.StringType:
+		return &toStringTextHtmlView{kt.(kmgType.KmgTypeAndToStringInterface)}, nil
+
+	case kmgType.BoolType:
+		return &selectTextHtmlView{
+			List: []string{"false", "true"},
+			KmgTypeAndToStringInterface: kt.(kmgType.KmgTypeAndToStringInterface),
+		}, nil
+
+	case kmgType.ArrayType:
+		return &arrayType{ArrayType: kt, ctx: ctx}, nil
+	case kmgType.MapType:
+		return &mapType{MapType: kt, ctx: ctx}, nil
+	case kmgType.PtrType:
+		return &ptrType{PtrType: kt, ctx: ctx}, nil
+	case kmgType.SliceType:
+		return &sliceType{SliceType: kt, ctx: ctx}, nil
+	case kmgType.StructType:
+		return &structType{StructType: kt, ctx: ctx}, nil
+	}
+}
+
+/*
 func (ctx *context) newTypeFromReflect(rt reflect.Type) (t typeInterface, err error) {
 	t, err = ctx.newBasicTypeFromReflect(rt)
 	if err != nil {
@@ -76,3 +110,4 @@ func (ctx *context) mustNewTypeFromReflect(rt reflect.Type) typeInterface {
 	}
 	return t
 }
+*/

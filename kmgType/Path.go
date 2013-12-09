@@ -15,9 +15,6 @@ func parsePath(ps string) Path {
 	pso := []string{}
 	for _, v := range psa {
 		v = strings.TrimSpace(v)
-		if v == "" {
-			continue
-		}
 		pso = append(pso, v)
 	}
 	return Path(pso)

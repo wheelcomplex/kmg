@@ -4,9 +4,38 @@ import (
 	"reflect"
 	//"github.com/bronze1man/kmg/kmgReflect"
 	"fmt"
+	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 )
 
+type adminType interface {
+	kmgType.KmgType
+	HtmlView(v reflect.Value) template.HTML // component html
+}
+
+//int float datatime string
+type toStringTextHtmlView struct {
+	kmgType.KmgTypeAndToStringInterface
+}
+
+func (t toStringTextHtmlView) HtmlView(v reflect.Value) (html template.HTML, err error) {
+	return theTemplate.ExecuteNameToHtml("TextInput", t.ToString(v))
+}
+
+//bool fkRef map
+type selectTextHtmlView struct {
+	List []string
+	kmgType.KmgTypeAndToStringInterface
+}
+
+func (t selectTextHtmlView) HtmlView(v reflect.Value) (html template.HTML, err error) {
+	return theTemplate.ExecuteNameToHtml("Select", selectTemplateData{
+		List:  t.List,
+		Value: t.ToString(v),
+	})
+}
+
+/*
 type typeInterface interface {
 	getReflectType() reflect.Type
 	Html(v reflect.Value) template.HTML // component html
@@ -94,3 +123,4 @@ type AdminType struct {
 	StringConverterType
 	EditAbleType
 }
+*/

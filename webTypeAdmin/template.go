@@ -86,11 +86,16 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
 
 
 {{ define "NilPtr" }}
-<div data-path="0">
+<div data-path="ptr">
 <button type="button" class="btn btn-primary kmg-create-action">New</button>
 </div>
 {{ end }}
 
+{{ define "Ptr" }}
+<div data-path="ptr">
+{{.}}
+</div>
+{{ end }}
 
 {{ define "Select" }}
 <select class="form-control kmg-single-input">

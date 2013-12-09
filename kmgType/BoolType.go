@@ -22,11 +22,3 @@ func (t *BoolType) SaveScale(v reflect.Value, value string) error {
 	v.SetBool(normV)
 	return nil
 }
-
-func NewBoolType(rt reflect.Type) *BoolType {
-	t := &BoolType{
-		reflectTypeGetterImp: reflectTypeGetterImp{rt},
-	}
-	t.saveScaleFromStringer = saveScaleFromStringer{t, t}
-	return t
-}
