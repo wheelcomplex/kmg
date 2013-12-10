@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"launchpad.net/goyaml"
+	"os"
 	"strconv"
 )
 
@@ -27,6 +28,14 @@ func ReadFileGoyaml(path string, obj interface{}) error {
 		return err
 	}
 	return goyaml.Unmarshal(b, obj)
+}
+
+func WriteFileGoyaml(path string, obj interface{}) error {
+	out, err := goyaml.Marshal(obj)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(path, out, os.FileMode(0777))
 }
 
 func Yaml2JsonBytes(input []byte) (output []byte, err error) {

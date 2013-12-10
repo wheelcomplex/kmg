@@ -27,6 +27,10 @@ func (t *structType) init() (err error) {
 	}
 	//t.fieldsMap = map[string]*structField{}
 	for _, v := range kmgReflect.StructGetAllField(t.GetReflectType()) {
+		s := v.Tag.Get("kmgAdmin")
+		if s == "-" {
+			continue
+		}
 		at, err := t.ctx.typeOfFromReflect(v.Type)
 		if err != nil {
 			return err
