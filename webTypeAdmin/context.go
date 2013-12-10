@@ -33,11 +33,32 @@ func (ctx *context) typeOfFromReflect(rt reflect.Type) (t adminType, err error) 
 	return ctx.typeOfFromKmgType(kt)
 }
 func (ctx *context) typeOfFromKmgType(kt kmgType.KmgType) (t adminType, err error) {
+	return ctx.basicTypeOfFromKmgType(kt)
+}
+func (ctx *context) basicTypeOfFromKmgType(kt kmgType.KmgType) (t adminType, err error) {
+	if kt.GetReflectType().Implements(fkRefReflectType) {
+		st, ok := kt.(kmgType.StringConverterInterface)
+		if !ok {
+			err = fmt.Errorf("[fkRefType.new] underlyiny type is not stringConverterType")
+			return
+		}
+		t = &fkRefType{
+			KmgType:            kt,
+			keyStringConverter: st,
+			ctx:                ctx,
+		}
+		return
+	}
 	switch ckt := kt.(type) {
 	case *kmgType.DateTimeType, *kmgType.FloatType,
-		*kmgType.IntType, *kmgType.StringType:
+		*kmgType.IntType:
 		return &toStringTextHtmlView{kt.(kmgType.KmgTypeAndToStringInterface)}, nil
-
+	case *kmgType.StringType:
+		if kt.GetReflectType().Implements(stringEnumReflectType) {
+			return &stringEnumType{StringType: *ckt, ctx: ctx}, nil
+		} else {
+			return &toStringTextHtmlView{kt.(kmgType.KmgTypeAndToStringInterface)}, nil
+		}
 	case *kmgType.BoolType:
 		return &selectTextHtmlView{
 			List: []string{"false", "true"},

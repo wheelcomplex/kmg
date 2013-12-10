@@ -5,6 +5,7 @@ import (
 	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"reflect"
+	//"runtime/debug"
 )
 
 var stringEnumReflectType = reflect.TypeOf((*StringEnum)(nil)).Elem()

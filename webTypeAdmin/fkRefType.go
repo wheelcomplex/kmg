@@ -17,7 +17,6 @@ type FkRef interface {
 //path -> pass to RefType
 type fkRefType struct {
 	kmgType.KmgType
-	underlyingType     adminType
 	referenceType      adminType
 	referenceContainer reflect.Value
 	keyStringConverter kmgType.StringConverterInterface
@@ -35,7 +34,7 @@ func (t *fkRefType) init() (err error) {
 	}
 	rc, ok := getFkRefContainerValue(t.ctx.RootValue, rrt)
 	if !ok {
-		return fmt.Errorf("[fkRefType.init] not found referenceContainer")
+		return fmt.Errorf("[fkRefType.init] not found referenceContainer name:%s", t.GetReflectType().Name())
 	}
 	t.referenceContainer = rc
 	if rc.Type().Key() != t.GetReflectType() {
@@ -50,14 +49,11 @@ func getFkRefContainerValue(v reflect.Value, rrt reflect.Type) (reflect.Value, b
 		if v.Type().Elem() == rrt {
 			return v, true
 		}
+		if v.Type().Elem().Kind() == reflect.Ptr && v.Type().Elem().Elem() == rrt {
+			return v, true
+		}
 		return reflect.Value{}, false
 	case reflect.Ptr:
-		if v.IsNil() {
-			return reflect.Value{}, false
-		}
-		return getFkRefContainerValue(v.Elem(), rrt)
-	case reflect.Array:
-		//TODO check mutli container
 		if v.IsNil() {
 			return reflect.Value{}, false
 		}
@@ -73,6 +69,7 @@ func getFkRefContainerValue(v reflect.Value, rrt reflect.Type) (reflect.Value, b
 		}
 		return reflect.Value{}, false
 	//not enter slice
+	//no need to check array
 	default:
 		return reflect.Value{}, false
 	}

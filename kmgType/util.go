@@ -79,14 +79,14 @@ func (t getElemByStringEditorabler) SaveByPath(v *reflect.Value, path Path, valu
 	if err != nil {
 		return err
 	}
-	pEv := &ev
-	err = et.SaveByPath(pEv, path[1:], value)
+	oEv := ev
+	err = et.SaveByPath(&oEv, path[1:], value)
 	if err != nil {
 		return err
 	}
 
 	//not change this type
-	if pEv == &ev {
+	if oEv == ev {
 		return nil
 	}
 	if v.CanSet() {
@@ -99,7 +99,7 @@ func (t getElemByStringEditorabler) SaveByPath(v *reflect.Value, path Path, valu
 	if err != nil {
 		return err
 	}
-	ev.Set(*pEv)
+	ev.Set(oEv)
 	return nil
 }
 
@@ -114,12 +114,12 @@ func passThougthDeleteByPath(t GetElemByStringAndReflectTypeGetterInterface, v *
 	if err != nil {
 		return err
 	}
-	pEv := &ev
-	err = et.DeleteByPath(pEv, path[1:])
+	oEv := ev
+	err = et.DeleteByPath(&oEv, path[1:])
 	if err != nil {
 		return err
 	}
-	if pEv == &ev {
+	if oEv == ev {
 		return
 	}
 	if v.CanSet() {
@@ -132,6 +132,6 @@ func passThougthDeleteByPath(t GetElemByStringAndReflectTypeGetterInterface, v *
 	if err != nil {
 		return err
 	}
-	ev.Set(*pEv)
+	ev.Set(oEv)
 	return nil
 }

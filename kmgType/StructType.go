@@ -26,5 +26,5 @@ func (t *StructType) DeleteByPath(v *reflect.Value, path Path) (err error) {
 	if len(path) > 1 {
 		return passThougthDeleteByPath(t, v, path)
 	}
-	return fmt.Errorf("[MapType.DeleteByPath] can not delete from struct")
+	return fmt.Errorf("[StructType.DeleteByPath] can not delete from struct")
 }

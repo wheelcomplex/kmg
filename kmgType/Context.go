@@ -25,12 +25,12 @@ func NewContext(ptr interface{}) (*Context, error) {
 	return context, nil
 }
 func (m *Context) SaveByPath(path Path, value string) (err error) {
-	pEv := &m.RootValue
-	err = m.RootType.SaveByPath(pEv, path, value)
+	oEv := m.RootValue
+	err = m.RootType.SaveByPath(&oEv, path, value)
 	if err != nil {
 		return
 	}
-	if pEv != &m.RootValue {
+	if oEv != m.RootValue {
 		err = fmt.Errorf("[context.SaveByPath] can not save")
 		return
 	}
@@ -38,12 +38,12 @@ func (m *Context) SaveByPath(path Path, value string) (err error) {
 }
 
 func (m *Context) DeleteByPath(path Path) (err error) {
-	pEv := &m.RootValue
-	err = m.RootType.DeleteByPath(pEv, path)
+	oEv := m.RootValue
+	err = m.RootType.DeleteByPath(&oEv, path)
 	if err != nil {
 		return
 	}
-	if pEv != &m.RootValue {
+	if oEv != m.RootValue {
 		err = fmt.Errorf("[context.DeleteByPath] can not save")
 		return
 	}

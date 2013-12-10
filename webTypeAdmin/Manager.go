@@ -6,12 +6,12 @@ import (
 	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
 	"net/http"
-	//"reflect"
 	"strings"
 )
 
 type Manager struct {
 	context
+	InjectHtml template.HTML
 }
 
 func NewManager(ptr interface{}) (manager *Manager, err error) {
@@ -24,6 +24,9 @@ func NewManager(ptr interface{}) (manager *Manager, err error) {
 }
 
 func (manager *Manager) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if req.URL.Path == "/favicon.ico" {
+		return
+	}
 	//var err error
 	pathS := req.FormValue("p")
 	path := kmgType.ParsePath(pathS)
@@ -66,19 +69,24 @@ func (manager *Manager) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 //show a page on some path
 func (manager *Manager) page(path kmgType.Path) (html template.HTML, err error) {
+	//fmt.Printf("%#v\n",t.enumList)
+	fmt.Println(path)
 	v, t, err := manager.GetElemByPath(path)
 	if err != nil {
 		return
 	}
+	//fmt.Println(t.GetReflectType().Kind())
 	html, err = t.HtmlView(v)
 	if err != nil {
 		return
 	}
 	return theTemplate.ExecuteNameToHtml("Main", struct {
-		Path string
-		Html template.HTML
+		Path       string
+		Html       template.HTML
+		InjectHtml template.HTML
 	}{
-		Path: path.String(),
-		Html: html,
+		Path:       path.String(),
+		Html:       html,
+		InjectHtml: manager.InjectHtml,
 	})
 }
