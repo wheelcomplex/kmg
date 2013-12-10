@@ -12,7 +12,7 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Kmg Web Type Admin</title>
+	<title>{{.Title}}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- Bootstrap -->
 	<link href="public/css/bootstrap.min.css" rel="stylesheet">
@@ -26,7 +26,11 @@ var theTemplate = kmgHtmlTemplate.MustNewSingle(`
 </style>
 </head>
 <body>
-	<h1>Kmg Web Type Admin</h1>
+	<h1>{{.Title}}</h1>
+	<div style="display:none" class="alert alert-danger" id="errors-msg-container">
+		<button type="button" class="close" data-dismiss="alert" aria-hidden="true" id="errors-msg-close-btn">&times;</button>
+		<div id="errors-msg"></div>
+	</div>
 	{{.InjectHtml}}
 	<div class="kmg-type-admin-root" {{if .Path}}data-path="{{.Path}}"{{end}} >
 		{{.Html}}

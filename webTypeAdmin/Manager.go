@@ -12,6 +12,7 @@ import (
 type Manager struct {
 	context
 	InjectHtml template.HTML
+	Title      string
 }
 
 func NewManager(ptr interface{}) (manager *Manager, err error) {
@@ -19,7 +20,7 @@ func NewManager(ptr interface{}) (manager *Manager, err error) {
 	if err != nil {
 		return
 	}
-	manager = &Manager{context: *ctx}
+	manager = &Manager{context: *ctx, Title: "Kmg web type admin"}
 	return
 }
 
@@ -84,9 +85,11 @@ func (manager *Manager) page(path kmgType.Path) (html template.HTML, err error) 
 		Path       string
 		Html       template.HTML
 		InjectHtml template.HTML
+		Title      string
 	}{
 		Path:       path.String(),
 		Html:       html,
 		InjectHtml: manager.InjectHtml,
+		Title:      manager.Title,
 	})
 }
