@@ -33,7 +33,7 @@ func (tools *TestTools) Equal(get interface{}, expect interface{}) {
 	if isEqual(expect, get) {
 		return
 	}
-	msg := fmt.Sprintf("expect: %#v (%T)\nget: %#v (%T)", expect, expect, get, get)
+	msg := fmt.Sprintf("expect: %#v (%s) (%T)\nget: %#v (%s) (%T)", expect, expect, expect, get, get, get)
 	if eGet, ok := get.(error); ok {
 		msg += "\ngetError: " + eGet.Error()
 	}
