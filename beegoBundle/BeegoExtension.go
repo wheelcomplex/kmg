@@ -4,6 +4,8 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"reflect"
+	//"fmt"
+	"time"
 )
 
 type BeegoExtension struct {
@@ -16,6 +18,7 @@ func (extension *BeegoExtension) LoadDependencyInjection(
 	if !HasRegisterDb {
 		orm.RegisterDataBase("default", c.Parameters["databaseType"],
 			c.Parameters["databaseDsn"])
+		orm.SetDataBaseTZ("default", time.UTC)
 	}
 	HasRegisterDb = true
 

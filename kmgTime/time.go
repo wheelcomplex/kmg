@@ -51,3 +51,7 @@ func MustFromLocalMysqlFormat(timeString string) time.Time {
 	}
 	return t
 }
+
+func ToLocal(t time.Time) time.Time {
+	return t.In(time.Local)
+}
