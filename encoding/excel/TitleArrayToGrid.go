@@ -13,7 +13,7 @@ func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err er
 	}
 	output = make([]map[string]string, lenTitleArray-1)
 	titles := titleArray[0]
-	//titles = trimRightRowString(titles)
+	//titles = TrimRightRowString(titles)
 	lenTitles := len(titles)
 	for rowIndex := 1; rowIndex < lenTitleArray; rowIndex++ {
 		row := titleArray[rowIndex]
@@ -34,7 +34,7 @@ func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err er
 	return output, nil
 }
 
-func trimRightRowString(row []string) []string {
+func TrimRightRowString(row []string) []string {
 	for i := len(row) - 1; i >= 0; i-- {
 		if strings.Trim(row[i], " ") != "" {
 			return row[:i+1]

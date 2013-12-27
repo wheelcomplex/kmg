@@ -83,5 +83,10 @@ func (transform *DirectoryFileTransform) transformOneFile(inputPath string, outp
 		return err
 	}
 	defer oFile.Close()
+	//in case it will remain some content
+	err = oFile.Truncate(0)
+	if err != nil {
+		return err
+	}
 	return transform.Transform(iFile, oFile)
 }

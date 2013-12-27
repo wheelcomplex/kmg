@@ -7,10 +7,10 @@ func Trim2DArray(input [][]string) (output [][]string) {
 		return [][]string{}
 	}
 	//find max line cell number
-	MaxLineCellNumber := len(trimRightRowString(input[0]))
+	MaxLineCellNumber := len(TrimRightRowString(input[0]))
 	LineNumber := 0
 	for _, row := range input {
-		thisLineCellNumber := len(trimRightRowString(row))
+		thisLineCellNumber := len(TrimRightRowString(row))
 		if thisLineCellNumber != 0 {
 			LineNumber++
 		}
@@ -21,7 +21,7 @@ func Trim2DArray(input [][]string) (output [][]string) {
 	output = make([][]string, LineNumber)
 	i := 0
 	for _, row := range input {
-		thisLineCellNumber := len(trimRightRowString(row))
+		thisLineCellNumber := len(TrimRightRowString(row))
 		if thisLineCellNumber == 0 {
 			continue
 		}

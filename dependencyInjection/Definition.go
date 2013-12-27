@@ -67,7 +67,7 @@ func (definition *Definition) Init() (err error) {
 		definition.TypeReflect = reflect.TypeOf(definition.Type)
 	}
 	if definition.TypeReflect != nil {
-		definition.TypeName, _ = kmgReflect.GetTypeFullName(definition.TypeReflect)
+		definition.TypeName = kmgReflect.GetTypeFullName(definition.TypeReflect)
 	}
 	//guess Id
 	if definition.Id == "" {
@@ -138,8 +138,8 @@ func (definition *Definition) getInstFromType(c *Container) (interface{}, error)
 				continue
 			}
 			//guess from type
-			fullName, ok := kmgReflect.GetTypeFullName(ft.Type)
-			if ok {
+			fullName := kmgReflect.GetTypeFullName(ft.Type)
+			if fullName != "" {
 				if c.IsActiveService(fullName) && c.definition_map[fullName].TypeReflect == ft.Type {
 					finst, err := c.Get(fullName)
 					if err != nil {
@@ -166,8 +166,8 @@ func (definition *Definition) guessId() {
 	if definition.Inst == nil {
 		return
 	}
-	name, ok := kmgReflect.GetTypeFullName(reflect.TypeOf(definition.Inst))
-	if ok {
+	name := kmgReflect.GetTypeFullName(reflect.TypeOf(definition.Inst))
+	if name != "" {
 		definition.Id = name
 	}
 }

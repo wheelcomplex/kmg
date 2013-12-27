@@ -77,8 +77,8 @@ func (c *Container) GetByType(ti interface{}) (service interface{}, err error) {
 	default:
 		t = reflect.TypeOf(ti)
 	}
-	typeName, ok := kmgReflect.GetTypeFullName(t)
-	if !ok {
+	typeName := kmgReflect.GetTypeFullName(t)
+	if typeName == "" {
 		return nil, ServiceTypeNotExistError
 	}
 	return c.Get(typeName)
