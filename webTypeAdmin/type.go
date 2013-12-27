@@ -1,11 +1,9 @@
 package webTypeAdmin
 
 import (
-	"reflect"
-	//"github.com/bronze1man/kmg/kmgReflect"
-	//"fmt"
 	"github.com/bronze1man/kmg/kmgType"
 	"html/template"
+	"reflect"
 )
 
 type adminType interface {

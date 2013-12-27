@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"github.com/bronze1man/kmg/console"
+	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/errors"
 	"github.com/bronze1man/kmg/fsnotify"
 	"os"
@@ -17,6 +18,7 @@ import (
 //TODO wrap lastHappendTime watch stuff
 type GoWatch struct {
 	context        *console.Context
+	GOPATH         string
 	wd             string
 	watcher        *fsnotify.Watcher
 	cmd            *exec.Cmd
@@ -27,22 +29,23 @@ type GoWatch struct {
 
 func (command *GoWatch) GetNameConfig() *console.NameConfig {
 	return &console.NameConfig{Name: "GoWatch",
-		Short: "watch current directory and rebuild and restart app when some file changed",
+		Short: "watch current project and rebuild and restart app when some file changed",
 	}
 }
 
-func (command *GoWatch) Execute(context *console.Context) error {
+func (command *GoWatch) Execute(context *console.Context) (err error) {
 	command.isDebug = false
 	command.context = context
 	if len(context.Args) != 3 {
 		return errors.Sprintf("usage: %s watch [packages]", context.ExecutionName)
 	}
 	command.mainFilePath = context.Args[2]
-	var err error
-	command.wd, err = os.Getwd()
+	kmgc, err := kmgContext.FindFromWd()
 	if err != nil {
-		return err
+		return
 	}
+	command.GOPATH = kmgc.GOPATHToString()
+	command.wd = kmgc.ProjectPath
 	runner, err := fsnotify.NewRunner(10000)
 	if err != nil {
 		return err
@@ -87,7 +90,7 @@ func (command *GoWatch) restart() error {
 	command.debugPrintln("target file path: ", command.targetFilePath)
 
 	command.cmd = console.NewStdioCmd(command.context, "go", "build", "-o", command.targetFilePath, command.mainFilePath)
-	err = console.SetCmdEnv(command.cmd, "GOPATH", command.wd)
+	err = console.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
 	if err != nil {
 		return err
 	}
@@ -101,7 +104,7 @@ func (command *GoWatch) restart() error {
 		return err
 	}
 	command.cmd = console.NewStdioCmd(command.context, command.targetFilePath)
-	err = console.SetCmdEnv(command.cmd, "GOPATH", command.wd)
+	err = console.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
 	if err != nil {
 		return err
 	}
@@ -138,15 +141,4 @@ func (command *GoWatch) debugPrintln(o ...interface{}) {
 	if command.isDebug {
 		fmt.Println(o...)
 	}
-}
-
-func (command *GoWatch) setEnv() error {
-	env, err := console.NewEnvFromArray(os.Environ())
-	if err != nil {
-		fmt.Printf("%#v", os.Environ())
-		return err
-	}
-	env.Values["GOPATH"] = command.wd
-	command.cmd.Env = env.ToArray()
-	return nil
 }

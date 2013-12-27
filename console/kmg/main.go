@@ -9,6 +9,7 @@ func main() {
 	manager := console.NewManager()
 	manager.MustAdd(&command.GoFmt{})
 	manager.MustAdd(&command.GoRun{})
+	manager.MustAdd(&command.GoBuild{})
 	manager.MustAdd(&command.GoWatch{})
 	manager.MustAdd(&command.WatchCmd{})
 	manager.MustAdd(&command.CurrentDir{})
@@ -17,5 +18,4 @@ func main() {
 	manager.MustAdd(&command.ParpareReflect{})
 	manager.MustAdd(&command.GoTest{})
 	manager.ExecuteGlobal()
-
 }

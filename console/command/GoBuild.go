@@ -5,14 +5,14 @@ import (
 	"github.com/bronze1man/kmg/console/kmgContext"
 )
 
-type GoRun struct {
+type GoBuild struct {
 }
 
-func (command *GoRun) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "GoRun", Short: "run some golang code in current project"}
+func (command *GoBuild) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "GoBuild", Short: "build some golang code in current project"}
 }
-func (command *GoRun) Execute(context *console.Context) (err error) {
-	args := append([]string{"run"}, context.Args[2:]...)
+func (command *GoBuild) Execute(context *console.Context) (err error) {
+	args := append([]string{"build"}, context.Args[2:]...)
 	cmd := console.NewStdioCmd(context, "go", args...)
 	kmgc, err := kmgContext.FindFromWd()
 	if err != nil {
