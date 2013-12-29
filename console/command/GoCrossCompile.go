@@ -8,19 +8,19 @@ import (
 	"path/filepath"
 )
 
-type GoCrossComplie struct {
+type GoCrossCompile struct {
 }
 
-func (command *GoCrossComplie) GetNameConfig() *console.NameConfig {
+func (command *GoCrossCompile) GetNameConfig() *console.NameConfig {
 	return &console.NameConfig{
-		Name:  "GoCrossComplie",
+		Name:  "GoCrossCompile",
 		Short: "cross compile target in current project",
 		Detail: `GoCrossComplie [gofile]
 the output file will put into $project_root/bin/name_GOOS_GOARCH[.exe]
 `,
 	}
 }
-func (command *GoCrossComplie) Execute(context *console.Context) (err error) {
+func (command *GoCrossCompile) Execute(context *console.Context) (err error) {
 	if len(context.Args) <= 2 {
 		return fmt.Errorf("need gofile parameter")
 	}

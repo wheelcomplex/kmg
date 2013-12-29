@@ -11,8 +11,8 @@ func main() {
 	manager.MustAdd(&command.GoRun{})
 	manager.MustAdd(&command.GoBuild{})
 	manager.MustAdd(&command.GoWatch{})
-	manager.MustAdd(&command.GoCrossComplieInit{})
-	manager.MustAdd(&command.GoCrossComplie{})
+	manager.MustAdd(&command.GoCrossCompileInit{})
+	manager.MustAdd(&command.GoCrossCompile{})
 
 	manager.MustAdd(&command.CurrentDir{})
 	manager.MustAdd(&command.CurrentPlatform{})

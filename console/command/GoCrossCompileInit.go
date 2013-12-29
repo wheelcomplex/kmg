@@ -8,13 +8,13 @@ import (
 	"runtime"
 )
 
-type GoCrossComplieInit struct {
+type GoCrossCompileInit struct {
 }
 
-func (command *GoCrossComplieInit) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "GoCrossComplieInit", Short: "cross compile init target in current project"}
+func (command *GoCrossCompileInit) GetNameConfig() *console.NameConfig {
+	return &console.NameConfig{Name: "GoCrossCompileInit", Short: "cross compile init target in current project"}
 }
-func (command *GoCrossComplieInit) Execute(context *console.Context) (err error) {
+func (command *GoCrossCompileInit) Execute(context *console.Context) (err error) {
 	kmgc, err := kmgContext.FindFromWd()
 	if err != nil {
 		return

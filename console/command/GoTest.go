@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/kmgFile"
@@ -23,6 +24,7 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 	if err != nil {
 		return
 	}
+	fmt.Printf("%#v\n", kmgc.GOPATH)
 	command.wd = kmgc.GOPATH[0]
 	//TODO handle several GOPATH
 	root := filepath.Join(command.wd, "src")
