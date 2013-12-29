@@ -72,8 +72,6 @@ func FindFromPath(p string) (context *Context, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("%s\n", kmgFilePath)
-	fmt.Printf("%#v\n", context)
 	context.ProjectPath = filepath.Dir(kmgFilePath)
 	context.init()
 	return
