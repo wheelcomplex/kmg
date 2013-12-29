@@ -9,12 +9,12 @@ import (
 )
 
 type Context struct {
-	GOPATH             []string        `yaml:"GOPATH"`
-	CrossCompileTarget []CompileTarget `yaml:"CrossCompileTarget"`
+	GOPATH             []string
+	CrossCompileTarget []CompileTarget
 	//should come from environment
-	GOROOT string `yaml:"GOROOT"`
+	GOROOT string
 	//should come from dir of ".kmg.yml"
-	ProjectPath string `yaml:"ProjectPath"`
+	ProjectPath string
 }
 
 // see http://golang.org/doc/install/source to get all possiable GOOS and GOARCH
