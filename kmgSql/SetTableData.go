@@ -3,8 +3,8 @@ package kmgSql
 import (
 	"database/sql"
 	"fmt"
+	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/errors"
-	"launchpad.net/goyaml"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func (db *Db) MustSetTablesDataYaml(yaml string) {
 }
 func (db *Db) SetTablesDataYaml(yaml string) (err error) {
 	data := make(map[string][]map[string]string)
-	err = goyaml.Unmarshal([]byte(yaml), &data)
+	err = kmgYaml.Unmarshal([]byte(yaml), &data)
 	if err != nil {
 		return err
 	}

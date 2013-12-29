@@ -4,10 +4,8 @@ import (
 	"flag"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/encoding/excel"
+	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/errors"
-	"launchpad.net/goyaml"
-	//"fmt"
-	//"fmt"
 )
 
 type Xlsx2Yaml struct {
@@ -42,7 +40,7 @@ func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	outByte, err := goyaml.Marshal(output)
+	outByte, err := kmgYaml.Marshal(output)
 	if err != nil {
 		return err
 	}

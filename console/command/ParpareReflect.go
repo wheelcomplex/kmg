@@ -2,8 +2,8 @@ package command
 
 import (
 	"github.com/bronze1man/kmg/console"
+	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/kmgReflect"
-	"launchpad.net/goyaml"
 	"os"
 	"path/filepath"
 )
@@ -25,7 +25,7 @@ func (command *ParpareReflect) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	out, err := goyaml.Marshal(contextDecl)
+	out, err := kmgYaml.Marshal(contextDecl)
 	if err != nil {
 		return err
 	}

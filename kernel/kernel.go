@@ -2,9 +2,9 @@ package kernel
 
 import (
 	"github.com/bronze1man/kmg/dependencyInjection"
+	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/errors"
 	"io/ioutil"
-	"launchpad.net/goyaml"
 	"os"
 	"path/filepath"
 )
@@ -71,7 +71,7 @@ func (kernel *Kernel) guessParameter() (err error) {
 		}
 		return err
 	}
-	err = goyaml.Unmarshal(data, parameter)
+	err = kmgYaml.Unmarshal(data, parameter)
 	if err != nil {
 		return err
 	}

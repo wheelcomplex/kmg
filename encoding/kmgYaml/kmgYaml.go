@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"launchpad.net/goyaml"
 	"os"
 	"strconv"
 )
@@ -27,11 +26,11 @@ func ReadFileGoyaml(path string, obj interface{}) error {
 	if err != nil {
 		return err
 	}
-	return goyaml.Unmarshal(b, obj)
+	return Unmarshal(b, obj)
 }
 
 func WriteFileGoyaml(path string, obj interface{}) error {
-	out, err := goyaml.Marshal(obj)
+	out, err := Marshal(obj)
 	if err != nil {
 		return err
 	}
@@ -40,7 +39,7 @@ func WriteFileGoyaml(path string, obj interface{}) error {
 
 func Yaml2JsonBytes(input []byte) (output []byte, err error) {
 	var data interface{}
-	err = goyaml.Unmarshal(input, &data)
+	err = Unmarshal(input, &data)
 	if err != nil {
 		return nil, err
 	}
