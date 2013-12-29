@@ -12,3 +12,7 @@ func IsDotFile(path string) bool {
 	}
 	return false
 }
+
+func GetFileBaseWithoutExt(p string) string {
+	return filepath.Base(p[:len(p)-len(filepath.Ext(p))])
+}

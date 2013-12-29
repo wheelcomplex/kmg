@@ -9,8 +9,25 @@ import (
 )
 
 type Context struct {
-	GOPATH      []string
+	GOPATH             []string
+	CrossCompileTarget []CompileTarget
+	//should come from environment
+	GOROOT string
+	//should come from dir of ".kmg.yml"
 	ProjectPath string
+}
+
+// see http://golang.org/doc/install/source to get all possiable GOOS and GOARCH
+// should be something like "windows_amd64","darwin_386",etc..
+type CompileTarget string
+
+func (target CompileTarget) GetGOOS() string {
+	part := strings.Split(string(target), "_")
+	return part[0]
+}
+func (target CompileTarget) GetGOARCH() string {
+	part := strings.Split(string(target), "_")
+	return part[1]
 }
 
 func (context *Context) GOPATHToString() string {
@@ -22,6 +39,9 @@ func (context *Context) init() {
 			continue
 		}
 		context.GOPATH[i] = filepath.Join(context.ProjectPath, p)
+	}
+	if context.GOROOT == "" {
+		context.GOROOT = os.Getenv("GOROOT")
 	}
 }
 func FindFromPath(p string) (context *Context, err error) {

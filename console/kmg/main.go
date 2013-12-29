@@ -11,6 +11,8 @@ func main() {
 	manager.MustAdd(&command.GoRun{})
 	manager.MustAdd(&command.GoBuild{})
 	manager.MustAdd(&command.GoWatch{})
+	manager.MustAdd(&command.GoCrossComplieInit{})
+	manager.MustAdd(&command.GoCrossComplie{})
 	manager.MustAdd(&command.WatchCmd{})
 	manager.MustAdd(&command.CurrentDir{})
 	manager.MustAdd(&command.Yaml2Json{})
