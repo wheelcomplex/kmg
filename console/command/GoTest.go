@@ -24,8 +24,8 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("%#v\n", kmgc.GOPATH)
 	command.wd = kmgc.GOPATH[0]
+	fmt.Printf("GOPATH: %#v\n", kmgc.GOPATH)
 	//TODO handle several GOPATH
 	root := filepath.Join(command.wd, "src")
 	if context.FlagSet().NArg() == 1 {

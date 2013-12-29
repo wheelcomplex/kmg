@@ -51,6 +51,7 @@ func FindFromPath(p string) (context *Context, err error) {
 	}
 	var kmgFilePath string
 	for {
+		fmt.Println(p)
 		kmgFilePath = filepath.Join(p, ".kmg.yml")
 		_, err = os.Stat(kmgFilePath)
 		if err == nil {
@@ -60,11 +61,12 @@ func FindFromPath(p string) (context *Context, err error) {
 		if !os.IsNotExist(err) {
 			return
 		}
-		p = filepath.Dir(p)
-		if p == "" {
+		thisP := filepath.Dir(p)
+		if p == thisP {
 			err = fmt.Errorf("not found .kmg.yml in the project dir")
 			return
 		}
+		p = thisP
 	}
 	context = &Context{}
 	err = kmgYaml.ReadFileGoyaml(kmgFilePath, context)
@@ -81,5 +83,6 @@ func FindFromWd() (context *Context, err error) {
 	if err != nil {
 		return
 	}
+	fmt.Println(p)
 	return FindFromPath(p)
 }
