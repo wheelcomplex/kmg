@@ -13,8 +13,11 @@ func main() {
 	manager.MustAdd(&command.GoWatch{})
 	manager.MustAdd(&command.GoCrossComplieInit{})
 	manager.MustAdd(&command.GoCrossComplie{})
-	manager.MustAdd(&command.WatchCmd{})
+
 	manager.MustAdd(&command.CurrentDir{})
+	manager.MustAdd(&command.CurrentPlatform{})
+
+	manager.MustAdd(&command.WatchCmd{})
 	manager.MustAdd(&command.Yaml2Json{})
 	manager.MustAdd(&command.Xlsx2Yaml{})
 	manager.MustAdd(&command.ParpareReflect{})
