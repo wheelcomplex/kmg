@@ -82,6 +82,5 @@ func FindFromWd() (context *Context, err error) {
 	if err != nil {
 		return
 	}
-	fmt.Println(p)
 	return FindFromPath(p)
 }
