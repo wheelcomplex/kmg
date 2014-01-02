@@ -15,14 +15,14 @@ type Kernel struct {
 	Bundles   []*Bundle
 	Container *dependencyInjection.Container
 	// app env "dev" or "test" or "prod",default "dev"
+	// This value priority is
+	// 1.Kernel.Env
+	// 2.Parameter.Env
 	Env string
 	// set this value to tell kernel where some path is,or it will guess from work dir.
 	Context *kmgContext.Context
-	// default load from Context.ConfigPath/config.yml Parameters
+	// default load from Context.ConfigPath/parameters.yml
 	Parameters map[string]string
-
-	// default load from Context.ConfigPath/config.yml Config
-	Config map[string]interface{}
 }
 
 func NewKernel() *Kernel {
@@ -54,36 +54,26 @@ func (kernel *Kernel) AddBundle(bundle *Bundle) {
 	kernel.Bundles = append(kernel.Bundles, bundle)
 }
 
-//parameter should in ./app/config/config.yml
+//parameter should in ./app/config/parameters.yml
 func (kernel *Kernel) handleConfig(builder *dependencyInjection.ContainerBuilder) (err error) {
 	// already set
 	// TODO pass in kernel.Parameters problem
-	/*
-		if len(kernel.Parameters) != 0 {
-			return nil
-		}
-	*/
 	err = kernel.guessContext()
 	if err != nil {
 		return err
 	}
-	data, err := ioutil.ReadFile(filepath.Join(kernel.Context.ConfigPath, "config.yml"))
+	data, err := ioutil.ReadFile(filepath.Join(kernel.Context.ConfigPath, "parameters.yml"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return errors.New("config file not found!\nyou should put config into ./app/config/config.yml")
+			return errors.New("config file not found!\nyou should put config into ./app/config/parameters.yml")
 		}
 		return err
 	}
-	configFile := struct {
-		Parameter map[string]string
-		Config    map[string]interface{}
-	}{}
-	err = kmgYaml.Unmarshal(data, &configFile)
+
+	err = kmgYaml.Unmarshal(data, &kernel.Parameters)
 	if err != nil {
 		return fmt.Errorf("config file parse fail! error:%s", err)
 	}
-	kernel.Parameters = configFile.Parameter
-	kernel.Config = configFile.Config
 
 	kernel.Parameters["AppPath"] = kernel.Context.AppPath
 	kernel.Parameters["DataPath"] = kernel.Context.DataPath
@@ -97,14 +87,6 @@ func (kernel *Kernel) handleConfig(builder *dependencyInjection.ContainerBuilder
 
 	for k, v := range kernel.Parameters {
 		k = "Parameter." + k
-		err = builder.Set(k, v, "")
-		if err != nil {
-			return
-		}
-	}
-
-	for k, v := range kernel.Config {
-		k = "Config." + k
 		err = builder.Set(k, v, "")
 		if err != nil {
 			return

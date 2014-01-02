@@ -4,35 +4,31 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"reflect"
-	//"fmt"
+	"sync"
 	"time"
 )
 
 type BeegoExtension struct {
 }
 
-var HasRegisterDb bool
-
 func (extension *BeegoExtension) LoadDependencyInjection(
 	c *dependencyInjection.ContainerBuilder) error {
-	if !HasRegisterDb {
-		orm.RegisterDataBase("default", c.MustGetString("Parameter.databaseType"),
-			c.MustGetString("Parameter.databaseDsn"))
-		orm.SetDataBaseTZ("default", time.UTC)
-	}
-	HasRegisterDb = true
-
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &BeegoOrmSyncDbCommand{},
+		Type: (*BeegoOrmSyncDbCommand)(nil),
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Inst: &BeegoOrmCreateDbCommand{},
+		Type: (*BeegoOrmCreateDbCommand)(nil),
 	}).AddTag("command")
 
+	RegisterDb := sync.Once{}
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		TypeReflect: reflect.TypeOf((*orm.Ormer)(nil)).Elem(),
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			RegisterDb.Do(func() {
+				orm.RegisterDataBase("default", "mysql", c.MustGetString("kmgSql.DbConfig.Dsn"))
+				orm.SetDataBaseTZ("default", time.UTC)
+			})
 			return orm.NewOrm(), nil
 		},
 		Scope: dependencyInjection.ScopeRequest,

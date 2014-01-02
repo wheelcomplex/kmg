@@ -69,6 +69,13 @@ func (c *Container) MustGet(id string) interface{} {
 	}
 	return service
 }
+func (c *Container) MustGetString(id string) string {
+	service, err := c.Get(id)
+	if err != nil {
+		panic(err)
+	}
+	return service.(string)
+}
 func (c *Container) GetByType(ti interface{}) (service interface{}, err error) {
 	var t reflect.Type
 	switch ti.(type) {

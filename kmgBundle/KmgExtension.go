@@ -50,13 +50,33 @@ func (extension *KmgExtension) LoadDependencyInjection(
 		Type: (*sessionStore.Manager)(nil),
 	})
 
-	databaseDsn := c.MustGetString("Parameter.databaseDsn")
-	databaseType := c.MustGetString("Parameter.databaseType")
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			DbConfig := &kmgSql.DbConfig{
+				Username: c.MustGetString("Parameter.DatabaseUsername"),
+				Password: c.MustGetString("Parameter.DatabasePassword"),
+				Host:     c.MustGetString("Parameter.DatabaseHost"),
+				DbName:   c.MustGetString("Parameter.DatabaseDbName"),
+			}
+
+			if c.MustGetString("Parameter.Env") == "test" {
+				DbConfig.DbName = c.MustGetString("Parameter.DatabaseTestDbName")
+			}
+			return DbConfig, nil
+		},
+		Type: (*kmgSql.DbConfig)(nil),
+	})
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Id: "kmgSql.DbConfig.Dsn",
+		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
+			return c.MustGetByType((*kmgSql.DbConfig)(nil)).(*kmgSql.DbConfig).GetDsn(), nil
+		},
+	})
 	//kmgSql
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Id: "kmgSql.godb",
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
-			return sql.Open(databaseType, databaseDsn)
+			return sql.Open("mysql", c.MustGetString("kmgSql.DbConfig.Dsn"))
 		},
 	})
 
