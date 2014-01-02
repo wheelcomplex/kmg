@@ -16,15 +16,18 @@ var HasRegisterDb bool
 func (extension *BeegoExtension) LoadDependencyInjection(
 	c *dependencyInjection.ContainerBuilder) error {
 	if !HasRegisterDb {
-		orm.RegisterDataBase("default", c.Parameters["databaseType"],
-			c.Parameters["databaseDsn"])
+		orm.RegisterDataBase("default", c.MustGetString("Parameter.databaseType"),
+			c.MustGetString("Parameter.databaseDsn"))
 		orm.SetDataBaseTZ("default", time.UTC)
 	}
 	HasRegisterDb = true
 
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Id:   "beego.command.orm",
-		Inst: &OrmCommand{},
+		Inst: &BeegoOrmSyncDbCommand{},
+	}).AddTag("command")
+
+	c.MustSetDefinition(&dependencyInjection.Definition{
+		Inst: &BeegoOrmCreateDbCommand{},
 	}).AddTag("command")
 
 	c.MustSetDefinition(&dependencyInjection.Definition{

@@ -1,6 +1,8 @@
 package kernel
 
 import (
+	"fmt"
+	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/errors"
@@ -12,11 +14,15 @@ import (
 type Kernel struct {
 	Bundles   []*Bundle
 	Container *dependencyInjection.Container
-	// app env "dev" or "test" or "prod"
+	// app env "dev" or "test" or "prod",default "dev"
 	Env string
-	// set this value to tell kernel where app path is,or it will guess.
-	AppPath    string
+	// set this value to tell kernel where some path is,or it will guess from work dir.
+	Context *kmgContext.Context
+	// default load from Context.ConfigPath/config.yml Parameters
 	Parameters map[string]string
+
+	// default load from Context.ConfigPath/config.yml Config
+	Config map[string]interface{}
 }
 
 func NewKernel() *Kernel {
@@ -24,16 +30,11 @@ func NewKernel() *Kernel {
 }
 
 func (kernel *Kernel) Boot() (err error) {
-	err = kernel.guessParameter()
+	builder := dependencyInjection.NewContainerBuilder()
+	err = kernel.handleConfig(builder)
 	if err != nil {
 		return err
 	}
-	kernel.Parameters["AppPath"] = kernel.AppPath
-	kernel.Parameters["DataPath"] = filepath.Join(kernel.AppPath, "data")
-	kernel.Parameters["TmpPath"] = filepath.Join(kernel.AppPath, "tmp")
-
-	builder := dependencyInjection.NewContainerBuilder()
-	builder.Parameters = kernel.Parameters
 	for _, bundle := range kernel.Bundles {
 		bundle.Build(builder)
 	}
@@ -53,89 +54,71 @@ func (kernel *Kernel) AddBundle(bundle *Bundle) {
 	kernel.Bundles = append(kernel.Bundles, bundle)
 }
 
-//parameter should in ./app/config/parameters.yml
-func (kernel *Kernel) guessParameter() (err error) {
+//parameter should in ./app/config/config.yml
+func (kernel *Kernel) handleConfig(builder *dependencyInjection.ContainerBuilder) (err error) {
 	// already set
-	if len(kernel.Parameters) != 0 {
-		return nil
-	}
-	parameter := make(map[string]string)
-	err = kernel.guessAppPath()
+	// TODO pass in kernel.Parameters problem
+	/*
+		if len(kernel.Parameters) != 0 {
+			return nil
+		}
+	*/
+	err = kernel.guessContext()
 	if err != nil {
 		return err
 	}
-	data, err := ioutil.ReadFile(filepath.Join(kernel.AppPath, "config", "parameters.yml"))
+	data, err := ioutil.ReadFile(filepath.Join(kernel.Context.ConfigPath, "config.yml"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return errors.New("config file not found!\nyou should put config into ./app/config/parameters.yml")
+			return errors.New("config file not found!\nyou should put config into ./app/config/config.yml")
 		}
 		return err
 	}
-	err = kmgYaml.Unmarshal(data, parameter)
+	configFile := struct {
+		Parameter map[string]string
+		Config    map[string]interface{}
+	}{}
+	err = kmgYaml.Unmarshal(data, &configFile)
 	if err != nil {
-		return err
+		return fmt.Errorf("config file parse fail! error:%s", err)
 	}
-	kernel.Parameters = parameter
+	kernel.Parameters = configFile.Parameter
+	kernel.Config = configFile.Config
+
+	kernel.Parameters["AppPath"] = kernel.Context.AppPath
+	kernel.Parameters["DataPath"] = kernel.Context.DataPath
+	kernel.Parameters["TmpPath"] = kernel.Context.TmpPath
+	kernel.Parameters["ConfigPath"] = kernel.Context.ConfigPath
+
+	if kernel.Env == "" {
+		kernel.Env = "dev"
+	}
+	kernel.Parameters["Env"] = kernel.Env
+
+	for k, v := range kernel.Parameters {
+		k = "Parameter." + k
+		err = builder.Set(k, v, "")
+		if err != nil {
+			return
+		}
+	}
+
+	for k, v := range kernel.Config {
+		k = "Config." + k
+		err = builder.Set(k, v, "")
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
 //guess path find a base path with config
-func (kernel *Kernel) guessAppPath() (err error) {
+func (kernel *Kernel) guessContext() (err error) {
 	// already set
-	if kernel.AppPath != "" {
+	if kernel.Context != nil {
 		return nil
 	}
-	// find a directory named app from current directory
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	thisPath := wd
-	for {
-		fi, err := os.Stat(filepath.Join(thisPath, "app"))
-		if err != nil && (!os.IsNotExist(err)) {
-			return err
-		}
-		if err == nil && fi.IsDir() {
-			kernel.AppPath = filepath.Join(thisPath, "app")
-			return nil
-		}
-		lastPath := thisPath
-		thisPath = filepath.Dir(thisPath)
-		if lastPath == thisPath {
-			break
-		}
-	}
-	return errors.New("can not guess app path")
+	kernel.Context, err = kmgContext.FindFromWd()
+	return
 }
-
-/*
-type KernelInterface interface {
-	//register bundles to this kernel
-	//all register bundles name should be unique
-	RegisterBundles() []BundleInterface
-	RegisterContainerConfiguration()
-	Boot()
-	//use for functional testing
-	Shutdown()
-	GetBundles() []BundleInterface
-	GetBundle(name string) BundleInterface
-	// Returns the file path for a given resource.
-	// A Resource can be a file or a directory.
-	// The resource name must follow the following pattern:
-	//   @BundleName/path/to/a/file.something
-	// where BundleName is the name of the bundle
-	// and the remaining part is the relative path in the bundle.
-	LocateResource(name string) string
-	// the environment name of kernel : prod,dev,test
-	GetEnvironment() string
-	// Checks if debug mode is enabled.
-	IsDebug() bool
-	// It is "app/xxx" in standard way
-	GetRootDir() string
-	GetCacheDir() string
-	GetLogDir() string
-	// Gets the current container.
-	GetContainer() dependencyInjection.ContainerInterface
-}
-*/

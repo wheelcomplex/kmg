@@ -3,7 +3,6 @@ package kmgBundle
 import (
 	"database/sql"
 	"github.com/bronze1man/kmg/ajkApi"
-	"github.com/bronze1man/kmg/console/command"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"github.com/bronze1man/kmg/kmgSql"
 	"github.com/bronze1man/kmg/sessionStore"
@@ -51,8 +50,8 @@ func (extension *KmgExtension) LoadDependencyInjection(
 		Type: (*sessionStore.Manager)(nil),
 	})
 
-	databaseDsn := c.Parameters["databaseDsn"]
-	databaseType := c.Parameters["databaseType"]
+	databaseDsn := c.MustGetString("Parameter.databaseDsn")
+	databaseType := c.MustGetString("Parameter.databaseType")
 	//kmgSql
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Id: "kmgSql.godb",
@@ -69,41 +68,8 @@ func (extension *KmgExtension) LoadDependencyInjection(
 			}, nil
 		},
 	})
-	/*
-		//ok
-		c.MustSetFactory("ajkApi.JsonHttpHandler", func(c *dependencyInjection.Container) (interface{}, error) {
-			return &ajkApi.JsonHttpHandler{
-				ApiManager:          c.MustGet("ajkApi.ApiManager").(ajkApi.ApiManagerInterface),
-				SessionStoreManager: c.MustGet("sessionStore.Manager").(*sessionStore.Manager),
-			}, nil
-		}, "")
 
-		//sessionStore
-		c.MustSet("sessionStore.Provider", sessionStore.NewMemoryProvider(), "") //ok
-		c.MustSetFactory("sessionStore.Manager", func(c *dependencyInjection.Container) (interface{}, error) {
-			return &sessionStore.Manager{
-				c.MustGet("sessionStore.Provider").(sessionStore.Provider),
-			}, nil
-		}, "")
-
-	*/
 	// build command
-	c.MustSetDefinition(&dependencyInjection.Definition{
-		Type: (*command.GoFmt)(nil),
-	}).AddTag("command")
-
-	c.MustSetDefinition(&dependencyInjection.Definition{
-		Type: (*command.GoRun)(nil),
-	}).AddTag("command")
-
-	c.MustSetDefinition(&dependencyInjection.Definition{
-		Type: (*command.WatchCmd)(nil),
-	}).AddTag("command")
-
-	c.MustSetDefinition(&dependencyInjection.Definition{
-		Type: (*command.GoWatch)(nil),
-	}).AddTag("command")
-
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		Type: (*ajkApi.GoHttpApiServerCommand)(nil),
 	}).AddTag("command")

@@ -9,13 +9,11 @@ type ContainerBuilder struct {
 	extensions     []ExtensionInterface
 	compliePasses  []CompilePassInterface
 	bootes         []BootInterface
-	Parameters     map[string]string
 }
 
 func NewContainerBuilder() *ContainerBuilder {
 	cb := &ContainerBuilder{
 		definition_map: make(map[string]*Definition),
-		Parameters:     make(map[string]string),
 	}
 	cb.init()
 	return cb
@@ -115,15 +113,6 @@ func (builder *ContainerBuilder) MustSetFactory(id string, factory func(c *Conta
 }
 
 func (builder *ContainerBuilder) Compile() (c *Container, err error) {
-	for k, v := range builder.Parameters {
-		if builder.HasDefinition(k) {
-			return nil, fmt.Errorf("[ContainerBuilder.Compile]a definition name same with a parameter,name: %s", k)
-		}
-		err = builder.Set(k, v, "")
-		if err != nil {
-			return
-		}
-	}
 	for _, v := range builder.extensions {
 		err = v.LoadDependencyInjection(builder)
 		if err != nil {
@@ -155,4 +144,39 @@ func (builder *ContainerBuilder) MustCompile() (c *Container) {
 		panic(err)
 	}
 	return c
+}
+
+//get some stuff before Compile
+func (builder *ContainerBuilder) Get(id string) (service interface{}, err error) {
+	def, exist := builder.GetDefinition(id)
+	if !exist {
+		return nil, fmt.Errorf("[ContainerBuilder.Get] definition %s not exist", id)
+	}
+	if def.Scope != ScopeSingleton {
+		return nil, fmt.Errorf("[ContainerBuilder.Get] definition %s scope is not Singleton", id)
+	}
+	if def.InitType != DefinitionFromInst {
+		return nil, fmt.Errorf("[ContainerBuilder.Get] definition %s is not init from inst", id)
+	}
+	return def.Inst, nil
+}
+
+func (builder *ContainerBuilder) MustGetString(id string) (service string) {
+	obj, err := builder.Get(id)
+	if err != nil {
+		panic(err)
+	}
+	service, ok := obj.(string)
+	if !ok {
+		panic(fmt.Errorf("[ContainerBuilder.MustGetString] definition %s is not string type", id))
+	}
+	return
+}
+
+func (builder *ContainerBuilder) MustGet(id string) (service interface{}) {
+	service, err := builder.Get(id)
+	if err != nil {
+		panic(err)
+	}
+	return
 }

@@ -8,9 +8,20 @@ import (
 	"strings"
 )
 
+//if you init it like &Context{xxx},please call Init()
 type Context struct {
 	GOPATH             []string
 	CrossCompileTarget []CompileTarget
+
+	//default to $ProjectPath/app
+	AppPath string
+	//default to $ProjectPath/config
+	ConfigPath string
+	//default to $AppPath/data
+	DataPath string
+	//default to $AppPath/tmp
+	TmpPath string
+
 	//should come from environment
 	GOROOT string
 	//should come from dir of ".kmg.yml"
@@ -33,7 +44,7 @@ func (target CompileTarget) GetGOARCH() string {
 func (context *Context) GOPATHToString() string {
 	return strings.Join(context.GOPATH, ":")
 }
-func (context *Context) init() {
+func (context *Context) Init() {
 	for i, p := range context.GOPATH {
 		if filepath.IsAbs(p) {
 			continue
@@ -42,6 +53,18 @@ func (context *Context) init() {
 	}
 	if context.GOROOT == "" {
 		context.GOROOT = os.Getenv("GOROOT")
+	}
+	if context.AppPath == "" {
+		context.AppPath = filepath.Join(context.ProjectPath, "app")
+	}
+	if context.DataPath == "" {
+		context.DataPath = filepath.Join(context.AppPath, "data")
+	}
+	if context.TmpPath == "" {
+		context.TmpPath = filepath.Join(context.AppPath, "tmp")
+	}
+	if context.ConfigPath == "" {
+		context.ConfigPath = filepath.Join(context.AppPath, "config")
 	}
 }
 func FindFromPath(p string) (context *Context, err error) {
@@ -72,8 +95,11 @@ func FindFromPath(p string) (context *Context, err error) {
 	if err != nil {
 		return
 	}
-	context.ProjectPath = filepath.Dir(kmgFilePath)
-	context.init()
+	context.ProjectPath, err = filepath.Abs(filepath.Dir(kmgFilePath))
+	if err != nil {
+		return
+	}
+	context.Init()
 	return
 }
 
