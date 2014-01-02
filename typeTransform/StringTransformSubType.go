@@ -6,9 +6,13 @@ import (
 	"reflect"
 )
 
-//transform some string on some sub type base on type full name
-//can be general by callback base on type
-//all value must exist in that transformTable
+/*
+transform some string on some sub type base on type full name
+can be general by callback base on type
+all value must exist in that transformTable
+specal case:
+1."" -> ""
+*/
 func StringTransformSubType(in interface{}, transformTable map[string]map[string]string) (err error) {
 	return stringTransformSubType(reflect.ValueOf(in), transformTable)
 }
@@ -20,9 +24,14 @@ func stringTransformSubType(in reflect.Value, transformTable map[string]map[stri
 		if !exist {
 			return
 		}
-		oVal, exist := thisTable[in.String()]
+		inS := in.String()
+		if inS == "" {
+			in.SetString("")
+			return
+		}
+		oVal, exist := thisTable[inS]
 		if !exist {
-			return fmt.Errorf(`string transform fail! from:"%s",type:"%s"`, in.String(), typeName)
+			return fmt.Errorf(`string transform fail! from:"%s",type:"%s"`, inS, typeName)
 		}
 		in.SetString(oVal)
 		return

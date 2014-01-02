@@ -6,7 +6,7 @@ import (
 )
 
 type Context struct {
-	Args    []string //origin args,if you want args after command name and flag->FlagSet().Args()
+	Args    []string //origin args,if you want args after command name and flag FlagSet().Args()
 	flagSet *flag.FlagSet
 	Stdin   io.ReadCloser  // in
 	Stdout  io.WriteCloser // in
@@ -21,6 +21,7 @@ type Context struct {
 	exitCode    int //exit code
 }
 
+//args after execute name and command name. Arg(0) is the first arg that can not parse
 func (c *Context) FlagSet() *flag.FlagSet {
 	return c.flagSet
 }
