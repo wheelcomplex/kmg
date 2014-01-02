@@ -28,25 +28,12 @@ func (command *Yaml2Json) Execute(context *console.Context) error {
 	inputPath := *command.inputPath
 	outputPath := *command.outputPath
 	if inputPath == "" || outputPath == "" {
-		return yaml2JsonIo(context.Stdin, context.Stdout)
+		return kmgYaml.Yaml2JsonIo(context.Stdin, context.Stdout)
 	}
 	transform := &kmgFile.DirectoryFileTransform{
 		InputExt:  "yml",
 		OuputExt:  "json",
-		Transform: yaml2JsonIo,
+		Transform: kmgYaml.Yaml2JsonIo,
 	}
 	return transform.Run(inputPath, outputPath)
-}
-
-func yaml2JsonIo(r io.Reader, w io.Writer) error {
-	input, err := ioutil.ReadAll(r)
-	if err != nil {
-		return err
-	}
-	output, err := kmgYaml.Yaml2JsonBytes(input)
-	if err != nil {
-		return err
-	}
-	_, err = w.Write(output)
-	return err
 }

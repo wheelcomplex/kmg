@@ -61,7 +61,7 @@ func (transform *DirectoryFileTransform) Run(inputPath string, outputPath string
 		oFilePath = oFilePath + "." + transform.OuputExt
 		err = transform.transformOneFile(path, oFilePath)
 		if err != nil {
-			return fmt.Errorf("error at file %s,err: %s", relPath, err.Error())
+			return fmt.Errorf("[%s] %s", relPath, err.Error())
 		}
 		return nil
 	})

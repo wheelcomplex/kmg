@@ -3,6 +3,7 @@ package kmgYaml
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -35,6 +36,19 @@ func WriteFileGoyaml(path string, obj interface{}) error {
 		return err
 	}
 	return ioutil.WriteFile(path, out, os.FileMode(0777))
+}
+
+func Yaml2JsonIo(r io.Reader, w io.Writer) error {
+	input, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	output, err := Yaml2JsonBytes(input)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(output)
+	return err
 }
 
 func Yaml2JsonBytes(input []byte) (output []byte, err error) {
