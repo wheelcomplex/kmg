@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var RegisterDb sync.Once
+
 type BeegoExtension struct {
 }
 
@@ -21,7 +23,6 @@ func (extension *BeegoExtension) LoadDependencyInjection(
 		Type: (*BeegoOrmCreateDbCommand)(nil),
 	}).AddTag("command")
 
-	RegisterDb := sync.Once{}
 	c.MustSetDefinition(&dependencyInjection.Definition{
 		TypeReflect: reflect.TypeOf((*orm.Ormer)(nil)).Elem(),
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
