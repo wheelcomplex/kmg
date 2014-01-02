@@ -5,8 +5,6 @@ import (
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/kmgFile"
-	"io"
-	"io/ioutil"
 )
 
 type Yaml2Json struct {
