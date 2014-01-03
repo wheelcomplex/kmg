@@ -340,6 +340,12 @@ func (d *decoder) scalar(n *node, out reflect.Value) (good bool) {
 		case float64:
 			out.SetFloat(resolved)
 			good = true
+		case int:
+			out.SetFloat(float64(resolved))
+			good = true
+		case int64:
+			out.SetFloat(float64(resolved))
+			good = true
 		}
 	case reflect.Ptr:
 		switch resolved.(type) {

@@ -1,9 +1,10 @@
 package kmgYaml
 
 import (
-	. "launchpad.net/gocheck"
+	"github.com/bronze1man/kmg/test"
 	"math"
 	"reflect"
+	"testing"
 )
 
 var unmarshalIntTest = 123
@@ -202,31 +203,31 @@ var unmarshalTests = []struct {
 
 	// Structs and type conversions.
 	{
-		"hello: world",
+		"Hello: world",
 		&struct{ Hello string }{"world"},
 	}, {
-		"a: {b: c}",
+		"A: {B: c}",
 		&struct{ A struct{ B string } }{struct{ B string }{"c"}},
 	}, {
-		"a: {b: c}",
+		"A: {B: c}",
 		&struct{ A *struct{ B string } }{&struct{ B string }{"c"}},
 	}, {
-		"a: {b: c}",
+		"A: {b: c}",
 		&struct{ A map[string]string }{map[string]string{"b": "c"}},
 	}, {
-		"a: {b: c}",
+		"A: {b: c}",
 		&struct{ A *map[string]string }{&map[string]string{"b": "c"}},
 	}, {
-		"a:",
+		"A:",
 		&struct{ A map[string]string }{},
 	}, {
-		"a: 1",
+		"A: 1",
 		&struct{ A int }{1},
 	}, {
-		"a: [1, 2]",
+		"A: [1, 2]",
 		&struct{ A []int }{[]int{1, 2}},
 	}, {
-		"a: 1",
+		"A: 1",
 		&struct{ B int }{0},
 	}, {
 		"a: 1",
@@ -234,7 +235,7 @@ var unmarshalTests = []struct {
 			B int "a"
 		}{1},
 	}, {
-		"a: y",
+		"A: y",
 		&struct{ A bool }{true},
 	},
 
@@ -285,17 +286,17 @@ var unmarshalTests = []struct {
 
 	// Anchors and aliases.
 	{
-		"a: &x 1\nb: &y 2\nc: *x\nd: *y\n",
+		"A: &x 1\nB: &y 2\nC: *x\nD: *y\n",
 		&struct{ A, B, C, D int }{1, 2, 1, 2},
 	}, {
-		"a: &a {c: 1}\nb: *a",
+		"A: &a {C: 1}\nB: *a",
 		&struct {
 			A, B struct {
 				C int
 			}
 		}{struct{ C int }{1}, struct{ C int }{1}},
 	}, {
-		"a: &a [1, 2]\nb: *a",
+		"A: &a [1, 2]\nB: *a",
 		&struct{ B []int }{[]int{1, 2}},
 	},
 
@@ -310,7 +311,7 @@ var unmarshalTests = []struct {
 
 	// Ignored field
 	{
-		"a: 1\nb: 2\n",
+		"A: 1\nB: 2\n",
 		&struct {
 			A int
 			B int "-"
@@ -334,11 +335,26 @@ var unmarshalTests = []struct {
 
 	// Struct inlining
 	{
-		"a: 1\nb: 2\nc: 3\n",
+		"A: 1\nB: 2\nC: 3\n",
 		&struct {
 			A int
 			C inlineB `yaml:",inline"`
 		}{1, inlineB{2, inlineC{3}}},
+	},
+	{
+		`0: 2
+1: 0.4
+2: 0.7
+3: 1
+4: 1.5
+`,
+		map[int]float64{
+			0: 2.0,
+			1: 0.4,
+			2: 0.7,
+			3: 1.0,
+			4: 1.5,
+		},
 	},
 }
 
@@ -351,8 +367,9 @@ type inlineC struct {
 	C int
 }
 
-func (s *S) TestUnmarshal(c *C) {
-	for i, item := range unmarshalTests {
+func TestUnmarshal(ot *testing.T) {
+	c := test.NewTestTools(ot)
+	for _, item := range unmarshalTests {
 		t := reflect.ValueOf(item.value).Type()
 		var value interface{}
 		switch t.Kind() {
@@ -368,20 +385,26 @@ func (s *S) TestUnmarshal(c *C) {
 			value = pv.Interface()
 		}
 		err := Unmarshal([]byte(item.data), value)
-		c.Assert(err, IsNil, Commentf("Item #%d", i))
+		c.Equal(err, nil)
+		//c.Assert(err, IsNil, Commentf("Item #%d", i))
 		if t.Kind() == reflect.String {
-			c.Assert(*value.(*string), Equals, item.value, Commentf("Item #%d", i))
+			c.Equal(*value.(*string), item.value)
+			//c.Assert(*value.(*string), Equals, item.value, Commentf("Item #%d", i))
 		} else {
-			c.Assert(value, DeepEquals, item.value, Commentf("Item #%d", i))
+			c.Equal(value, item.value)
+			//c.Assert(value, DeepEquals, item.value, Commentf("Item #%d", i))
 		}
 	}
 }
 
-func (s *S) TestUnmarshalNaN(c *C) {
+func TestUnmarshalNaN(ot *testing.T) {
+	c := test.NewTestTools(ot)
 	value := map[string]interface{}{}
 	err := Unmarshal([]byte("notanum: .NaN"), &value)
-	c.Assert(err, IsNil)
-	c.Assert(math.IsNaN(value["notanum"].(float64)), Equals, true)
+	c.Equal(err, nil)
+	c.Equal(math.IsNaN(value["notanum"].(float64)), true)
+	//c.Assert(err, IsNil)
+	//c.Assert(math.IsNaN(value["notanum"].(float64)), Equals, true)
 }
 
 var unmarshalErrorTests = []struct {
@@ -394,11 +417,12 @@ var unmarshalErrorTests = []struct {
 	{"a: &a\n  b: *a\n", "YAML error: Anchor 'a' value contains itself"},
 }
 
-func (s *S) TestUnmarshalErrors(c *C) {
+func TestUnmarshalErrors(ot *testing.T) {
+	c := test.NewTestTools(ot)
 	for _, item := range unmarshalErrorTests {
 		var value interface{}
 		err := Unmarshal([]byte(item.data), &value)
-		c.Assert(err, ErrorMatches, item.error, Commentf("Partial unmarshal: %#v", value))
+		c.Equal(err.Error(), item.error)
 	}
 }
 
@@ -435,29 +459,44 @@ type typeWithSetterField struct {
 	Field *typeWithSetter "_"
 }
 
-func (s *S) TestUnmarshalWithSetter(c *C) {
+func TestUnmarshalWithSetter(ot *testing.T) {
+	c := test.NewTestTools(ot)
 	for _, item := range setterTests {
 		obj := &typeWithSetterField{}
 		err := Unmarshal([]byte(item.data), obj)
-		c.Assert(err, IsNil)
-		c.Assert(obj.Field, NotNil,
-			Commentf("Pointer not initialized (%#v)", item.value))
-		c.Assert(obj.Field.tag, Equals, item.tag)
-		c.Assert(obj.Field.value, DeepEquals, item.value)
+		c.Equal(err, nil)
+		c.Ok(obj.Field != nil)
+		c.Equal(obj.Field.tag, item.tag)
+		c.Equal(obj.Field.value, item.value)
+		/*
+			c.Assert(err, IsNil)
+			c.Assert(obj.Field, NotNil,
+				Commentf("Pointer not initialized (%#v)", item.value))
+			c.Assert(obj.Field.tag, Equals, item.tag)
+			c.Assert(obj.Field.value, DeepEquals, item.value)
+		*/
 	}
 }
 
-func (s *S) TestUnmarshalWholeDocumentWithSetter(c *C) {
+func TestUnmarshalWholeDocumentWithSetter(ot *testing.T) {
+	c := test.NewTestTools(ot)
 	obj := &typeWithSetter{}
 	err := Unmarshal([]byte(setterTests[0].data), obj)
-	c.Assert(err, IsNil)
-	c.Assert(obj.tag, Equals, setterTests[0].tag)
+	c.Equal(err, nil)
+	c.Equal(obj.tag, setterTests[0].tag)
+	//c.Assert(err, IsNil)
+	//c.Assert(obj.tag, Equals, setterTests[0].tag)
+
 	value, ok := obj.value.(map[interface{}]interface{})
-	c.Assert(ok, Equals, true)
-	c.Assert(value["_"], DeepEquals, setterTests[0].value)
+	c.Equal(ok, true)
+	c.Equal(value["_"], setterTests[0].value)
+
+	//c.Assert(ok, Equals, true)
+	//c.Assert(value["_"], DeepEquals, setterTests[0].value)
 }
 
-func (s *S) TestUnmarshalWithFalseSetterIgnoresValue(c *C) {
+func TestUnmarshalWithFalseSetterIgnoresValue(ot *testing.T) {
+	c := test.NewTestTools(ot)
 	setterResult[2] = false
 	setterResult[4] = false
 	defer func() {
@@ -468,14 +507,23 @@ func (s *S) TestUnmarshalWithFalseSetterIgnoresValue(c *C) {
 	m := map[string]*typeWithSetter{}
 	data := "{abc: 1, def: 2, ghi: 3, jkl: 4}"
 	err := Unmarshal([]byte(data), m)
-	c.Assert(err, IsNil)
-	c.Assert(m["abc"], NotNil)
-	c.Assert(m["def"], IsNil)
-	c.Assert(m["ghi"], NotNil)
-	c.Assert(m["jkl"], IsNil)
+	c.Equal(err, nil)
+	c.Ok(m["abc"] != nil)
+	c.Equal(m["def"], nil)
+	c.Ok(m["ghi"] != nil)
+	c.Equal(m["jkl"], nil)
+	c.Equal(m["abc"].value, 1)
+	c.Equal(m["ghi"].value, 3)
+	/*
+		c.Assert(err, IsNil)
+		c.Assert(m["abc"], NotNil)
+		c.Assert(m["def"], IsNil)
+		c.Assert(m["ghi"], NotNil)
+		c.Assert(m["jkl"], IsNil)
 
-	c.Assert(m["abc"].value, Equals, 1)
-	c.Assert(m["ghi"].value, Equals, 3)
+		c.Assert(m["abc"].value, Equals, 1)
+		c.Assert(m["ghi"].value, Equals, 3)
+	*/
 }
 
 //var data []byte

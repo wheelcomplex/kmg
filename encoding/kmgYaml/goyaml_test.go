@@ -3,7 +3,7 @@ package kmgYaml
 import "testing"
 import "github.com/bronze1man/kmg/test"
 
-func TestUnicode(ot *testing.T) {
+func TestUnicodeMarshal(ot *testing.T) {
 	t := test.NewTestTools(ot)
 	testCaseTable := []struct {
 		in  string
