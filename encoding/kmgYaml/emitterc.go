@@ -1313,7 +1313,6 @@ func yaml_emitter_write_plain_scalar(emitter *yaml_emitter_t, value []byte, allo
 			return false
 		}
 	}
-
 	spaces := false
 	breaks := false
 	for i := 0; i < len(value); {

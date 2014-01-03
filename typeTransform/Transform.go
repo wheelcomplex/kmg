@@ -37,6 +37,8 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Uintptr:
 			return StringToInt(in, out)
+		case reflect.Float32, reflect.Float64:
+			return StringToFloat(in, out)
 		}
 	case reflect.Ptr:
 		switch out.Kind() {
@@ -133,5 +135,20 @@ func StringToInt(in reflect.Value, out reflect.Value) (err error) {
 		return
 	}
 	out.SetInt(i)
+	return
+}
+
+// "" => 0.0
+func StringToFloat(in reflect.Value, out reflect.Value) (err error) {
+	inS := in.String()
+	if inS == "" {
+		out.SetFloat(0.0)
+		return nil
+	}
+	i, err := strconv.ParseFloat(inS, out.Type().Bits())
+	if err != nil {
+		return
+	}
+	out.SetFloat(i)
 	return
 }

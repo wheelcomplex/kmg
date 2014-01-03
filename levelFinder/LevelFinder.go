@@ -18,6 +18,12 @@ func (provider ArrayLevelProvider) GetExpByLevel(lv int) int {
 func (provider ArrayLevelProvider) MaxLevel() int {
 	return len(provider) + 1
 }
+func (provider ArrayLevelProvider) SetExpByLevel(lv int, exp int) {
+	provider[lv-1] = exp
+}
+func NewArrayLevelProvider(maxLevel int) ArrayLevelProvider {
+	return make(ArrayLevelProvider, maxLevel-2)
+}
 
 type LevelExpResult struct {
 	Exp                   int  //规整经验(处理负经验问题和满经验问题)

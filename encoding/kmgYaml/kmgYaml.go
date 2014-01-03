@@ -100,3 +100,7 @@ func Yaml2JsonTransformData(in interface{}) (out interface{}, err error) {
 	}
 	return in, nil
 }
+
+func debugPrintf(s string, sa ...interface{}) {
+	fmt.Printf(s, sa...)
+}

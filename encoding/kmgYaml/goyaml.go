@@ -133,6 +133,7 @@ func Marshal(in interface{}) (out []byte, err error) {
 	defer handleErr(&err)
 	e := newEncoder()
 	defer e.destroy()
+	yaml_emitter_set_unicode(&e.emitter, true)
 	e.marshal("", reflect.ValueOf(in))
 	e.finish()
 	out = e.out
