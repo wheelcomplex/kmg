@@ -7,22 +7,8 @@ type LevelProvider interface {
 	//输入范围 1-MaxLevel()-1 ,两端包含
 	GetExpByLevel(lv int) int
 	//最大等级(到达这个等级以后,不能升级了)
+	//对某一个实例,这个值不应该变化
 	MaxLevel() int
-}
-
-type ArrayLevelProvider []int
-
-func (provider ArrayLevelProvider) GetExpByLevel(lv int) int {
-	return provider[lv-1]
-}
-func (provider ArrayLevelProvider) MaxLevel() int {
-	return len(provider) + 1
-}
-func (provider ArrayLevelProvider) SetExpByLevel(lv int, exp int) {
-	provider[lv-1] = exp
-}
-func NewArrayLevelProvider(maxLevel int) ArrayLevelProvider {
-	return make(ArrayLevelProvider, maxLevel-2)
 }
 
 type LevelExpResult struct {
