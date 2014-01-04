@@ -2,14 +2,18 @@ package typeTransform
 
 import (
 	"fmt"
+	"github.com/bronze1man/kmg/kmgTime"
+	"github.com/bronze1man/kmg/kmgType"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 /*
 try best transform one type to another type
 special case:
 "" => 0
+"" => 0.0
 */
 func Transform(in interface{}, out interface{}) (err error) {
 	return Tran(reflect.ValueOf(in), reflect.ValueOf(out))
@@ -39,6 +43,17 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 			return StringToInt(in, out)
 		case reflect.Float32, reflect.Float64:
 			return StringToFloat(in, out)
+		case reflect.Bool:
+			return StringToBool(in, out)
+		}
+		if out.Type() == kmgType.DateTimeReflectType {
+			var t time.Time
+			t, err = kmgTime.ParseAutoInLocal(in.String())
+			if err != nil {
+				return
+			}
+			out.Set(reflect.ValueOf(t))
+			return
 		}
 	case reflect.Ptr:
 		switch out.Kind() {
@@ -107,6 +122,21 @@ func MapToStruct(in reflect.Value, out reflect.Value) (err error) {
 		if err != nil {
 			return
 		}
+		//TODO remove this workaroud
+		if oVal.Kind() == reflect.Float64 {
+			f, ok := out.Type().FieldByName(sKey)
+			if !ok {
+				return
+			}
+			div := f.Tag.Get("floatDiv")
+			if div != "" {
+				divI, err := strconv.ParseFloat(div, 64)
+				if err != nil {
+					return err
+				}
+				oVal.SetFloat(oVal.Float() / divI)
+			}
+		}
 	}
 	return
 }
@@ -150,5 +180,20 @@ func StringToFloat(in reflect.Value, out reflect.Value) (err error) {
 		return
 	}
 	out.SetFloat(i)
+	return
+}
+
+// "" => false
+func StringToBool(in reflect.Value, out reflect.Value) (err error) {
+	inS := in.String()
+	if inS == "" {
+		out.SetBool(false)
+		return nil
+	}
+	i, err := strconv.ParseBool(inS)
+	if err != nil {
+		return
+	}
+	out.SetBool(i)
 	return
 }

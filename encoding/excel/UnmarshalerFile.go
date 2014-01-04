@@ -27,3 +27,19 @@ func UnmarshalFile(filePath string, obj interface{}) (err error) {
 	}
 	return
 }
+
+func UnmarshalFileSkipLine(filePath string, obj interface{}, skipline int) (err error) {
+	rawArray, err := XlsxFile2Array(filePath)
+	if err != nil {
+		return
+	}
+	gridArray, err := TitleArrayToGrid(rawArray[0][skipline:])
+	if err != nil {
+		return
+	}
+	err = typeTransform.Transform(gridArray, obj)
+	if err != nil {
+		return
+	}
+	return
+}

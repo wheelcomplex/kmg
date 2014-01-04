@@ -1,37 +1,38 @@
 package kmgTime
 
-import "time"
-
-const (
-	FormatMysql = "2006-01-02 15:04:05"
+import (
+	"fmt"
+	"time"
 )
 
-type Nower interface {
-	Now() time.Time
+const (
+	FormatMysql   = "2006-01-02 15:04:05"
+	Iso3339Hour   = "2006-01-02T15"
+	Iso3339Minute = "2006-01-02T15:04"
+	Iso3339Second = "2006-01-02T15:04:05"
+)
+
+var ParseFormatGuessList = []string{
+	FormatMysql,
+	Iso3339Hour,
+	Iso3339Minute,
+	Iso3339Second,
 }
 
-func GetDefaultNower() Nower {
-	return DefaultNower
+func ParseAutoInLocal(sTime string) (t time.Time, err error) {
+	return ParseAutoInLocation(sTime, time.Local)
 }
 
-var DefaultNower tDefaultNower
-
-func NewFixedNower(time time.Time) Nower {
-	return FixedNower{time}
-}
-
-type tDefaultNower struct{}
-
-func (nower tDefaultNower) Now() time.Time {
-	return time.Now()
-}
-
-type FixedNower struct {
-	Time time.Time
-}
-
-func (nower FixedNower) Now() time.Time {
-	return nower.Time
+//auto guess format from ParseFormatGuessList
+func ParseAutoInLocation(sTime string, loc *time.Location) (t time.Time, err error) {
+	for _, format := range ParseFormatGuessList {
+		t, err = time.ParseInLocation(format, sTime, loc)
+		if err == nil {
+			return
+		}
+	}
+	err = fmt.Errorf("[ParseAutoInLocation] time: %s can not parse", sTime)
+	return
 }
 
 //utc time

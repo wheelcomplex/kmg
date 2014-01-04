@@ -56,7 +56,7 @@ type GetElemByStringAndReflectTypeGetterInterface interface {
 
 func TypeOf(rt reflect.Type) (KmgType, error) {
 	switch rt {
-	case dateTimeReflectType:
+	case DateTimeReflectType:
 		t := &DateTimeType{reflectTypeGetterImp: reflectTypeGetterImp{rt}}
 		t.saveScaleFromStringer = saveScaleFromStringer{t, t}
 		t.saveScaleEditabler = saveScaleEditabler{t, t}

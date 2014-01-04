@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var dateTimeReflectType = reflect.TypeOf((*time.Time)(nil)).Elem()
+var DateTimeReflectType = reflect.TypeOf((*time.Time)(nil)).Elem()
 
 type DateTimeType struct {
 	reflectTypeGetterImp
