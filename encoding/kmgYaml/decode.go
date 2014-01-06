@@ -382,22 +382,41 @@ func (d *decoder) sequence(n *node, out reflect.Value) (good bool) {
 		out = settableValueOf(make([]interface{}, 0))
 	}
 
-	if out.Kind() != reflect.Slice {
-		return false
-	}
-	et := out.Type().Elem()
+	if out.Kind() == reflect.Slice {
+		et := out.Type().Elem()
 
-	l := len(n.children)
-	for i := 0; i < l; i++ {
-		e := reflect.New(et).Elem()
-		if ok := d.unmarshal(n.children[i], e); ok {
-			out.Set(reflect.Append(out, e))
+		l := len(n.children)
+		for i := 0; i < l; i++ {
+			e := reflect.New(et).Elem()
+			if ok := d.unmarshal(n.children[i], e); ok {
+				out.Set(reflect.Append(out, e))
+			}
 		}
+		if iface.IsValid() {
+			iface.Set(out)
+		}
+		return true
+	} else if out.Kind() == reflect.Array {
+		et := out.Type().Elem()
+
+		l := len(n.children)
+		// cut elements more than type allowed
+		if l > out.Type().Len() {
+			l = out.Type().Len()
+		}
+		for i := 0; i < l; i++ {
+			e := reflect.New(et).Elem()
+			if ok := d.unmarshal(n.children[i], e); ok {
+				out.Index(i).Set(e)
+			}
+		}
+		if iface.IsValid() {
+			iface.Set(out)
+		}
+		return true
 	}
-	if iface.IsValid() {
-		iface.Set(out)
-	}
-	return true
+
+	return false
 }
 
 func (d *decoder) mapping(n *node, out reflect.Value) (good bool) {

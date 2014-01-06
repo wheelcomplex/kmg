@@ -59,5 +59,10 @@ func (r *KmgRand) HappendBaseOnPossibility(possibility float64) bool {
 
 //return a random int in [min,max]
 func (r *KmgRand) IntBetween(min int, max int) int {
+	if min > max {
+		panic(fmt.Errorf("[KmgRand.IntBetween] min:%d<max:%d", min, max))
+	} else if min == max {
+		return min
+	}
 	return r.Intn(max-min) + min
 }
