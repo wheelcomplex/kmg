@@ -4,7 +4,8 @@ type LevelProvider interface {
 	//根据等级获得升级经验(即累计经验达到这个经验升lv+1级)
 	//当前经验为升级经验时,处于lv+1
 	//默认升到1级,需要0经验(初始1级,0经验)
-	//输入范围 1-MaxLevel()-1 ,两端包含
+	//输入范围 [1,MaxLevel()-1] ,两端包含
+	//不处理边界情况,调用者保证边界情况
 	GetExpByLevel(lv int) int
 	//最大等级(到达这个等级以后,不能升级了)
 	//对某一个实例,这个值不应该变化
@@ -54,4 +55,18 @@ func GetLevelByExp(provider LevelProvider, exp int) (result LevelExpResult) {
 	result.CurrentLevelExcessExp = result.Exp - provider.GetExpByLevel(level-1)
 	result.NextLevelAllNeedExp = provider.GetExpByLevel(level) - provider.GetExpByLevel(level-1)
 	return
+}
+
+//根据等级获取 刚升到这个等级的累计经验
+//合理处理边界情况,不报错
+//含义和LevelProvider.GetExpByLevel不一样
+func GetExpByLevel(provider LevelProvider, level int) (exp int) {
+	if level <= 1 {
+		return 0
+	}
+
+	if level > provider.MaxLevel() {
+		level = provider.MaxLevel()
+	}
+	return provider.GetExpByLevel(level - 1)
 }
