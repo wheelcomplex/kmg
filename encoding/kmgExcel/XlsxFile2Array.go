@@ -4,7 +4,8 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
-//output index mean=> sheet ,row ,cell ,value
+// output index mean=> sheet ,row ,cell ,value
+// not remove any cells
 func XlsxFile2Array(path string) ([][][]string, error) {
 	file, err := xlsx.OpenFile(path)
 	if err != nil {
@@ -23,16 +24,13 @@ func XlsxFile2Array(path string) ([][][]string, error) {
 			}
 			s = append(s, r)
 		}
-		//ignore empty Sheet
-		if len(s) == 0 {
-			continue
-		}
 		output = append(output, s)
 	}
 	return output, nil
 }
 
 //output index mean=> row ,cell ,value
+// not remove any cells
 func XlsxFileSheetIndex2Array(path string, index int) ([][]string, error) {
 	file, err := xlsx.OpenFile(path)
 	if err != nil {
