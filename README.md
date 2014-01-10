@@ -13,4 +13,4 @@ go get -u github.com/bronze1man/kmg/console/kmg
 
 Notice
 =============================
-* Do not use this package in product environment.It is under development...
+* It is under development,api may change without notice.
