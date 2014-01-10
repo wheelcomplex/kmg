@@ -1,4 +1,4 @@
-package excel
+package kmgExcel
 
 import "testing"
 import "github.com/bronze1man/kmg/test"

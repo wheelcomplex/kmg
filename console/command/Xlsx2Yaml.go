@@ -3,7 +3,7 @@ package command
 import (
 	"flag"
 	"github.com/bronze1man/kmg/console"
-	"github.com/bronze1man/kmg/encoding/excel"
+	"github.com/bronze1man/kmg/encoding/kmgExcel"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"github.com/bronze1man/kmg/errors"
 )
@@ -32,7 +32,7 @@ func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 			return errors.New("need input file")
 		}
 	}
-	rawArray, err := excel.XlsxFile2Array(*command.filePath)
+	rawArray, err := kmgExcel.XlsxFile2Array(*command.filePath)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (command *Xlsx2Yaml) formatOutput(rawArray [][][]string) (interface{}, erro
 	case "grid":
 		o := [][]map[string]string{}
 		for _, s := range rawArray {
-			o1, err := excel.TitleArrayToGrid(s)
+			o1, err := kmgExcel.TitleArrayToGrid(s)
 			if err != nil {
 				return nil, err
 			}

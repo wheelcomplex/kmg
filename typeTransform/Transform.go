@@ -20,10 +20,13 @@ func Transform(in interface{}, out interface{}) (err error) {
 }
 
 func Tran(in reflect.Value, out reflect.Value) (err error) {
-	if in.Type() == out.Type() && out.CanSet() {
-		out.Set(in)
-		return nil
-	}
+	/*
+		if in.Type() == out.Type() && out.CanSet() {
+			out.Set(in)
+			return nil
+		}
+	*/
+	//fmt.Printf("%#v\n",out.Interface())
 	switch in.Kind() {
 	case reflect.Map:
 		switch out.Kind() {
@@ -82,9 +85,12 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 		}
 	}
 	if out.Kind() == reflect.Ptr {
+		if out.IsNil() {
+			out.Set(reflect.New(out.Type().Elem()))
+		}
 		return Tran(in, out.Elem())
 	}
-	return fmt.Errorf("[typeTransform.tran] not support tran kind: %s %s", in.Kind(), out.Kind())
+	return fmt.Errorf("[typeTransform.tran] not support tran kind: [%s] to [%s]", in.Kind(), out.Kind())
 }
 func MapToMap(in reflect.Value, out reflect.Value) (err error) {
 	oKey := reflect.New(out.Type().Key()).Elem()

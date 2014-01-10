@@ -1,4 +1,4 @@
-package excel
+package kmgExcel
 
 import (
 	"github.com/bronze1man/kmg/errors"

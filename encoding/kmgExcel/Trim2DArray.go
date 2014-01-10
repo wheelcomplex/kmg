@@ -1,4 +1,4 @@
-package excel
+package kmgExcel
 
 //remove empty cell right(every line will have same length)
 //remove all empty line (include some empty line in between)

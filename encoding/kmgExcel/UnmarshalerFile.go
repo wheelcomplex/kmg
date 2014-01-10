@@ -1,11 +1,12 @@
-package excel
+package kmgExcel
 
 import (
 	"github.com/bronze1man/kmg/typeTransform"
 )
 
 /*
- unmarshal some stuff from excel File
+ Unmarshal excel into a array of a struct
+
  * you must put data in first sheet
  * accept []struct{Key1 value;Key2 value} or []map[string]string
  * first excel row as struct key,remain excel row as struct value
@@ -28,6 +29,7 @@ func UnmarshalFile(filePath string, obj interface{}) (err error) {
 	return
 }
 
+//Unmarshal excel into a array of a struct and skip some line from start
 func UnmarshalFileSkipLine(filePath string, obj interface{}, skipline int) (err error) {
 	rawArray, err := XlsxFile2Array(filePath)
 	if err != nil {
