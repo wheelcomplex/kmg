@@ -50,7 +50,8 @@ func (db *Db) SetTablesData(data map[string][]map[string]string) (err error) {
 }
 func setTablesDataTransaction(data map[string][]map[string]string, tx *sql.Tx) error {
 	for tableName, tableData := range data {
-		_, err := tx.Exec(fmt.Sprintf("truncate `%s`", tableName))
+		sql := fmt.Sprintf("truncate `%s`", tableName)
+		_, err := tx.Exec(sql)
 		if err != nil {
 			return err
 		}
@@ -64,7 +65,7 @@ func setTablesDataTransaction(data map[string][]map[string]string, tx *sql.Tx) e
 			}
 			sqlColNamePart := "`" + strings.Join(colNameList, "`, `") + "`"
 			sqlValuePart := strings.Repeat("?, ", placeHolderNum-1) + "?"
-			sql := fmt.Sprintf("INSERT INTO `%s` (%s) VALUES (%s)", tableName, sqlColNamePart, sqlValuePart)
+			sql = fmt.Sprintf("INSERT INTO `%s` (%s) VALUES (%s)", tableName, sqlColNamePart, sqlValuePart)
 			_, err := tx.Exec(sql, valueList...)
 			if err != nil {
 				return err
