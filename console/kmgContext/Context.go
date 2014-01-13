@@ -91,7 +91,7 @@ func FindFromPath(p string) (context *Context, err error) {
 		p = thisP
 	}
 	context = &Context{}
-	err = kmgYaml.ReadFileGoyaml(kmgFilePath, context)
+	err = kmgYaml.ReadFile(kmgFilePath, context)
 	if err != nil {
 		return
 	}

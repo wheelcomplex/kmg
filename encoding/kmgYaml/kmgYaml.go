@@ -9,20 +9,7 @@ import (
 	"strconv"
 )
 
-//快速解决 goyaml 的各种奇葩问题...->转成json->转成对象
 func ReadFile(path string, obj interface{}) error {
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	jsonb, err := Yaml2JsonBytes(b)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(jsonb, obj)
-}
-
-func ReadFileGoyaml(path string, obj interface{}) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -30,7 +17,7 @@ func ReadFileGoyaml(path string, obj interface{}) error {
 	return Unmarshal(b, obj)
 }
 
-func WriteFileGoyaml(path string, obj interface{}) error {
+func WriteFile(path string, obj interface{}) error {
 	out, err := Marshal(obj)
 	if err != nil {
 		return err
