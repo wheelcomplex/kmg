@@ -1,6 +1,7 @@
 package kmgExcel
 
 import (
+	"fmt"
 	"github.com/bronze1man/kmg/typeTransform"
 )
 
@@ -34,6 +35,10 @@ func UnmarshalFileSkipLine(filePath string, obj interface{}, skipline int) (err 
 	rawArray, err := XlsxFile2Array(filePath)
 	if err != nil {
 		return
+	}
+	if len(rawArray[0]) < skipline+1 {
+		return fmt.Errorf("[kmgExcel.UnmarshalFileSkipLine]filePath:%s len(rawArray[0])<skipline+1 len(rawArray[0]):%d skipline:%d",
+			filePath, len(rawArray[0]), skipline+1)
 	}
 	gridArray, err := TitleArrayToGrid(rawArray[0][skipline:])
 	if err != nil {

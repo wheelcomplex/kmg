@@ -2,6 +2,7 @@ package kmgExcel
 
 import (
 	"github.com/tealeg/xlsx"
+	//"fmt"
 )
 
 // output index mean=> sheet ,row ,cell ,value
@@ -12,6 +13,7 @@ func XlsxFile2Array(path string) ([][][]string, error) {
 		return nil, err
 	}
 	output := [][][]string{}
+	//fmt.Printf("%#v\n",file.Sheet["工作表1"])
 	for _, sheet := range file.Sheets {
 		s := [][]string{}
 		for _, row := range sheet.Rows {
