@@ -5,6 +5,8 @@ import (
 	"reflect"
 )
 
+//transform slice of struct to map of struct,
+//it will report error if Id is not unique
 func SliceStructToMapStruct(in interface{}, out interface{}, idFieldName string) (err error) {
 	inV := reflect.ValueOf(in)
 	outV := reflect.ValueOf(out)
@@ -28,6 +30,10 @@ func sliceStructToMapStructValue(in reflect.Value, out reflect.Value, idFieldNam
 		}
 		if isOutPtr {
 			thisValue = thisValue.Addr()
+		}
+		oExist := out.MapIndex(oKey)
+		if oExist.IsValid() {
+			return fmt.Errorf(`%s:%v repeat`, idFieldName, oKey.Interface())
 		}
 		out.SetMapIndex(oKey, thisValue)
 	}
