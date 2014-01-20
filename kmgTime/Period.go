@@ -1,7 +1,9 @@
 package kmgTime
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
 	"sort"
 	"time"
 )
@@ -12,6 +14,13 @@ type Period struct {
 	Start time.Time
 	End   time.Time
 }
+
+type PeriodGetter interface {
+	GetPeriod() Period
+}
+
+var ReflectTypePeriodGetter = reflect.TypeOf((*PeriodGetter)(nil)).Elem()
+var NotFoundError = errors.New("not found")
 
 func (p Period) IsIn(t time.Time) bool {
 	if t.After(p.End) {
@@ -34,12 +43,39 @@ func NewPeriod(Start time.Time, End time.Time) (period Period, err error) {
 
 //SortedList should sort by start time and should not overlap each other
 func GetPeriodFromSortedList(t time.Time, SortedList []Period) (index int, ok bool) {
-	for index, thisPeriod := range SortedList {
-		if thisPeriod.End.Before(t) && thisPeriod.Start.After(t) {
-			return index, true
-		}
+	n := len(SortedList)
+	i := sort.Search(n, func(i int) bool {
+		return SortedList[i].End.After(t)
+	})
+	if i == n {
+		return 0, false
 	}
-	return 0, false
+	if !(SortedList[i].Start.Before(t) || SortedList[i].Start.Equal(t)) {
+		return 0, false
+	}
+	return i, true
+}
+
+func GetPeriodFromGenericSortedList(t time.Time, SortedList interface{}) (index int, err error) {
+	reflectList := reflect.Indirect(reflect.ValueOf(SortedList))
+	if reflectList.Kind() != reflect.Slice && reflectList.Kind() != reflect.Array {
+		panic(fmt.Errorf("[GetPeriodFromGenericSortedList] need array or slice get %s", reflectList.Kind().String()))
+	}
+	if !reflectList.Type().Elem().Implements(ReflectTypePeriodGetter) {
+		panic(fmt.Errorf("[GetPeriodFromGenericSortedList] need elem implement 'PeriodGetter' get %s",
+			reflectList.Elem().Type().Name()))
+	}
+	n := reflectList.Len()
+	i := sort.Search(n, func(i int) bool {
+		return reflectList.Index(i).Interface().(PeriodGetter).GetPeriod().End.After(t)
+	})
+	if i == n {
+		return 0, NotFoundError
+	}
+	if !reflectList.Index(i).Interface().(PeriodGetter).GetPeriod().Start.Before(t) {
+		return 0, NotFoundError
+	}
+	return i, nil
 }
 
 type PeriodSlice []Period
