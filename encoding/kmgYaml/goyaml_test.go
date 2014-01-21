@@ -1,10 +1,10 @@
 package kmgYaml
 
 import "testing"
-import "github.com/bronze1man/kmg/test"
+import "github.com/bronze1man/kmg/kmgTest"
 
 func TestUnicodeMarshal(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	testCaseTable := []struct {
 		in  string
 		out string

@@ -1,7 +1,7 @@
 package kmgReflect
 
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"reflect"
 	"testing"
 )
@@ -10,7 +10,7 @@ type ta struct {
 }
 
 func TestGetFullName(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	name := GetTypeFullName(reflect.TypeOf(""))
 	t.Equal(name, "string")
 

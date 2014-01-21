@@ -1,4 +1,4 @@
-package test
+package kmgTest
 
 //测试组件的测试
 

@@ -1,4 +1,4 @@
-package test
+package kmgTest
 
 //kmpTest Component
 import "runtime"

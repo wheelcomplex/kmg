@@ -2,12 +2,12 @@ package typeTransform
 
 import "testing"
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"reflect"
 )
 
 func TestManager(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	Int := 0
 	ArrMapStringInt := []map[string]int{}
 	type T1 struct {

@@ -1,10 +1,10 @@
 package dependencyInjection
 
 import "testing"
-import "github.com/bronze1man/kmg/test"
+import "github.com/bronze1man/kmg/kmgTest"
 
 func TestContainer(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	c := NewContainer()
 	err := c.Set("num", 1, "")
 	t.Equal(err, nil)

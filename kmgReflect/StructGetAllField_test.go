@@ -1,7 +1,7 @@
 package kmgReflect
 
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"reflect"
 	"testing"
 )
@@ -35,7 +35,7 @@ type GetAllFieldT5 struct {
 type GetAllFieldT6 int
 
 func TestStructGetAllField(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	t1 := reflect.TypeOf(&GetAllFieldT1{})
 	ret := StructGetAllField(t1)
 	t.Equal(len(ret), 7)
@@ -57,7 +57,7 @@ func TestStructGetAllField(ot *testing.T) {
 }
 
 func TestStructGetAllFieldMap(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	t1 := reflect.TypeOf(&GetAllFieldT1{})
 	ret := StructGetAllFieldMap(t1)
 	t.Equal(ret["A"].Index, []int{0, 0})

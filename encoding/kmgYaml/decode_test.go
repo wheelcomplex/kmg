@@ -1,7 +1,7 @@
 package kmgYaml
 
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"math"
 	"reflect"
 	"testing"
@@ -371,7 +371,7 @@ type inlineC struct {
 }
 
 func TestUnmarshal(ot *testing.T) {
-	c := test.NewTestTools(ot)
+	c := kmgTest.NewTestTools(ot)
 	for _, item := range unmarshalTests {
 		t := reflect.ValueOf(item.value).Type()
 		var value interface{}
@@ -401,7 +401,7 @@ func TestUnmarshal(ot *testing.T) {
 }
 
 func TestUnmarshalNaN(ot *testing.T) {
-	c := test.NewTestTools(ot)
+	c := kmgTest.NewTestTools(ot)
 	value := map[string]interface{}{}
 	err := Unmarshal([]byte("notanum: .NaN"), &value)
 	c.Equal(err, nil)
@@ -421,7 +421,7 @@ var unmarshalErrorTests = []struct {
 }
 
 func TestUnmarshalErrors(ot *testing.T) {
-	c := test.NewTestTools(ot)
+	c := kmgTest.NewTestTools(ot)
 	for _, item := range unmarshalErrorTests {
 		var value interface{}
 		err := Unmarshal([]byte(item.data), &value)
@@ -463,7 +463,7 @@ type typeWithSetterField struct {
 }
 
 func TestUnmarshalWithSetter(ot *testing.T) {
-	c := test.NewTestTools(ot)
+	c := kmgTest.NewTestTools(ot)
 	for _, item := range setterTests {
 		obj := &typeWithSetterField{}
 		err := Unmarshal([]byte(item.data), obj)
@@ -482,7 +482,7 @@ func TestUnmarshalWithSetter(ot *testing.T) {
 }
 
 func TestUnmarshalWholeDocumentWithSetter(ot *testing.T) {
-	c := test.NewTestTools(ot)
+	c := kmgTest.NewTestTools(ot)
 	obj := &typeWithSetter{}
 	err := Unmarshal([]byte(setterTests[0].data), obj)
 	c.Equal(err, nil)
@@ -499,7 +499,7 @@ func TestUnmarshalWholeDocumentWithSetter(ot *testing.T) {
 }
 
 func TestUnmarshalWithFalseSetterIgnoresValue(ot *testing.T) {
-	c := test.NewTestTools(ot)
+	c := kmgTest.NewTestTools(ot)
 	setterResult[2] = false
 	setterResult[4] = false
 	defer func() {

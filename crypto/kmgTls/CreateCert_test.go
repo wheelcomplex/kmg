@@ -3,7 +3,7 @@ package kmgTls
 import (
 	"bytes"
 	"crypto/tls"
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"net"
 	"testing"
 	"time"
@@ -61,7 +61,7 @@ func (*mockConn) SetWriteDeadline(t time.Time) error {
 	return nil
 }
 func TestCreateCert(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	config, err := CreateTlsConfig()
 	t.Equal(err, nil)
 	t.Ok(config != nil)

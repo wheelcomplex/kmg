@@ -1,13 +1,13 @@
 package kmgTime
 
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"testing"
 	"time"
 )
 
 func TestGetPeriodFromSortedList(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	SortedList := []Period{
 		{
 			Start: MustFromMysqlFormat("2001-01-01 00:00:00"),

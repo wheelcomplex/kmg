@@ -1,10 +1,10 @@
 package sessionStore
 
 import "testing"
-import "github.com/bronze1man/kmg/test"
+import "github.com/bronze1man/kmg/kmgTest"
 
 func TestManager(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	manager := &Manager{NewMemoryProvider()}
 	store, err := manager.LoadStoreOrNewIfNotExist("1")
 	t.Equal(err, nil)

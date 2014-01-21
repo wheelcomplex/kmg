@@ -1,10 +1,10 @@
 package sessionStore
 
 import "testing"
-import "github.com/bronze1man/kmg/test"
+import "github.com/bronze1man/kmg/kmgTest"
 
 func TestStore(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	store := NewStore("1", make(map[string]interface{}))
 	value, ok := store.Get("A")
 	t.Equal(ok, false)

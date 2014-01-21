@@ -3,7 +3,7 @@ package ajkApi
 import (
 	"errors"
 	//"github.com/bronze1man/kmg/dependencyInjection"
-	//"github.com/bronze1man/kmg/test"
+	//"github.com/bronze1man/kmg/kmgTest"
 	"testing"
 )
 

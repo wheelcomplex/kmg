@@ -1,7 +1,7 @@
 package kmgType
 
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"testing"
 )
 
@@ -23,7 +23,7 @@ type T2 struct {
 }
 
 func TestPtrType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	var data **string
 	data = new(*string)
 	m, err := NewContext(data)
@@ -37,7 +37,7 @@ func TestPtrType(ot *testing.T) {
 }
 
 func TestStringType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	var data *string
 	data = new(string)
 	m, err := NewContext(data)
@@ -50,7 +50,7 @@ func TestStringType(ot *testing.T) {
 }
 
 func TestStructType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	data := &struct {
 		A string
 	}{}
@@ -64,7 +64,7 @@ func TestStructType(ot *testing.T) {
 }
 
 func TestType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	data := &T{}
 	m, err := NewContext(data)
 	t.Equal(err, nil)

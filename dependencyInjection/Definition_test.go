@@ -1,7 +1,7 @@
 package dependencyInjection
 
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 	"reflect"
 	"testing"
 )
@@ -26,7 +26,7 @@ func (t3 *DefinitionTestT3) GetNum() int {
 	return t3.A
 }
 func TestDefinitionInitInst(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	c := NewContainer()
 	//init from Inst
 	inst := &DefinitionTestT1{}
@@ -47,7 +47,7 @@ func TestDefinitionInitInst(ot *testing.T) {
 }
 
 func TestDefinitionInitInterface(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	c := NewContainer()
 	//init from Inst
 	inst := &DefinitionTestT3{}
@@ -69,7 +69,7 @@ func TestDefinitionInitInterface(ot *testing.T) {
 }
 
 func TestDefinitionInitScope(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	//scope
 	def := &Definition{
 		Inst:  &DefinitionTestT1{},
@@ -82,7 +82,7 @@ func TestDefinitionInitScope(ot *testing.T) {
 }
 
 func TestDefinitionInitFactory(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	c := NewContainer()
 	// init from factory
 	def := &Definition{
@@ -102,7 +102,7 @@ func TestDefinitionInitFactory(ot *testing.T) {
 	t.Equal(ret.(*DefinitionTestT1).A, 5)
 }
 func TestDefinitionInitType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	c := NewContainer()
 	//init from type
 	def := &Definition{

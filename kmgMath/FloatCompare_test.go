@@ -1,10 +1,10 @@
 package kmgMath
 
 import "testing"
-import "github.com/bronze1man/kmg/test"
+import "github.com/bronze1man/kmg/kmgTest"
 
 func TestFloatCompare(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	for i, testCase := range []struct {
 		f      func(x float64, y float64) bool
 		x      float64

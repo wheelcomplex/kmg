@@ -1,7 +1,7 @@
 package webTypeAdmin
 
 import (
-	//"github.com/bronze1man/kmg/test"
+	//"github.com/bronze1man/kmg/kmgTest"
 	"testing"
 )
 
@@ -22,7 +22,7 @@ type T2 struct {
 
 func TestPtrType(ot *testing.T) {
 	/*
-		t := test.NewTestTools(ot)
+		t := kmgTest.NewTestTools(ot)
 		var data **string
 		data = new(*string)
 		m, err := NewManagerFromPtr(data)
@@ -38,7 +38,7 @@ func TestPtrType(ot *testing.T) {
 
 /*
 func TestStringType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	var data *string
 	data = new(string)
 	m, err := NewManagerFromPtr(data)
@@ -51,7 +51,7 @@ func TestStringType(ot *testing.T) {
 }
 
 func TestStructType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	data := &struct {
 		A string
 	}{}
@@ -65,7 +65,7 @@ func TestStructType(ot *testing.T) {
 }
 
 func TestType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	data := &T{}
 	m, err := NewManagerFromPtr(data)
 	t.Equal(err, nil)

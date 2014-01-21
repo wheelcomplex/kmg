@@ -1,15 +1,15 @@
 package ajkApi
 
 import (
-	"bytes"
-	"encoding/json"
+	//"bytes"
+	//"encoding/json"
 	"errors"
 	//"fmt"
 	//"github.com/bronze1man/kmg/dependencyInjection"
 	"github.com/bronze1man/kmg/sessionStore"
-	"github.com/bronze1man/kmg/test"
-	"net/http"
-	"net/http/httptest"
+	//"github.com/bronze1man/kmg/kmgTest"
+	//"net/http"
+	//"net/http/httptest"
 	"testing"
 )
 
@@ -45,7 +45,7 @@ func (this *TestHttpHandlerService) TestFunc3() {
 
 func TestHttpHandler(ot *testing.T) {
 	/*
-		t := test.NewTestTools(ot)
+		t := kmgTest.NewTestTools(ot)
 		c := dependencyInjection.NewContainer()
 		err := c.SetFactory("TestService", func(c *dependencyInjection.Container) (interface{}, error) {
 			return &TestHttpHandlerService{
@@ -74,6 +74,7 @@ func TestHttpHandler(ot *testing.T) {
 
 }
 
+/*
 func apiCall(h *JsonHttpHandler, t *test.TestTools, j string) map[string]interface{} {
 	w := httptest.NewRecorder()
 	request, err := http.NewRequest("POST",
@@ -87,3 +88,4 @@ func apiCall(h *JsonHttpHandler, t *test.TestTools, j string) map[string]interfa
 	t.Equal(err, nil)
 	return outputi.(map[string]interface{})
 }
+*/

@@ -2,7 +2,7 @@ package typeTransform
 
 import "testing"
 import (
-	"github.com/bronze1man/kmg/test"
+	"github.com/bronze1man/kmg/kmgTest"
 )
 
 type StringTranT1 struct {
@@ -11,7 +11,7 @@ type StringTranT1 struct {
 type StringTranT2 string
 
 func TestStringTransformSubType(ot *testing.T) {
-	t := test.NewTestTools(ot)
+	t := kmgTest.NewTestTools(ot)
 	in := &StringTranT1{
 		T2: "6",
 	}
