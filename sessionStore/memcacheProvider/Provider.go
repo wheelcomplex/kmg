@@ -7,7 +7,7 @@ import (
 type Provider struct {
 	Client     *memcache.Client
 	Prefix     string
-	Expiration int
+	Expiration int32
 }
 
 func New(server ...string) *Provider {
@@ -20,11 +20,11 @@ func (provider *Provider) Get(Id string) (Value []byte, Exist bool, err error) {
 	if err == memcache.ErrCacheMiss {
 		return nil, false, nil
 	}
-	Value := item.Value
+	Value = item.Value
 	return
 }
 func (provider *Provider) Set(Id string, Value []byte) (err error) {
-	item = &memcache.Item{
+	item := &memcache.Item{
 		Key:        provider.Prefix + Id,
 		Value:      Value,
 		Expiration: provider.Expiration,
