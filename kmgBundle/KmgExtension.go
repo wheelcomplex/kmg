@@ -23,16 +23,16 @@ func (extension *KmgExtension) LoadDependencyInjection(
 		},
 	})
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Type:  (*ajkApi.Session)(nil),
+		Type:  (*ajkApi.SessionIdContainer)(nil),
 		Scope: dependencyInjection.ScopeRequest,
 	})
 	c.MustSetDefinition(&dependencyInjection.Definition{
-		Type: (*sessionStore.Store)(nil),
+		Type: (*sessionStore.Session)(nil),
 		Factory: func(c *dependencyInjection.Container) (interface{}, error) {
-			session := c.MustGetByType((*ajkApi.Session)(nil)).(*ajkApi.Session)
+			session := c.MustGetByType((*ajkApi.SessionIdContainer)(nil)).(*ajkApi.SessionIdContainer)
 			provider := c.MustGetByType((*sessionStore.Manager)(nil)).(*sessionStore.Manager)
-			store, err := provider.LoadStoreOrNewIfNotExist(session.Guid)
-			session.Guid = store.Guid()
+			store, err := provider.Load(session.SessionId)
+			session.SessionId = store.Id
 			return store, err
 		},
 		Scope: dependencyInjection.ScopeRequest,

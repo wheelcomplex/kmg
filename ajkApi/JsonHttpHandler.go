@@ -36,16 +36,23 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 		return
 	}
 	var apiOutput interface{}
-	session := &Session{Guid: rawInput.Guid}
+	session, err := handler.SessionStoreManager.Load(rawInput.Guid)
+	if err != nil {
+		panic(err)
+	}
 	err = handler.ApiManager.RpcCall(session, rawInput.Name, func(meta *ApiFuncMeta) error {
 		apiOutput, err = handler.rpcCall(meta, rawInput)
 		return err
 	})
 	if err != nil {
-		handler.returnOutput(w, &httpOutput{Err: err.Error(), Guid: session.Guid})
+		handler.returnOutput(w, &httpOutput{Err: err.Error(), Guid: session.Id})
 		return
 	}
-	handler.returnOutput(w, &httpOutput{Data: apiOutput, Guid: session.Guid})
+	err = handler.SessionStoreManager.Save(session)
+	if err != nil {
+		panic(err)
+	}
+	handler.returnOutput(w, &httpOutput{Data: apiOutput, Guid: session.Id})
 }
 
 //TODO finish rpcCall by function param name

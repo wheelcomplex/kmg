@@ -16,7 +16,7 @@ import (
 var globalTestVar = 0
 
 type TestHttpHandlerService struct {
-	Store *sessionStore.Store
+	Store *sessionStore.Session
 }
 
 func (this *TestHttpHandlerService) TestFunc1(

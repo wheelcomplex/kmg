@@ -1,5 +1,7 @@
 package ajkApi
 
+import "github.com/bronze1man/kmg/sessionStore"
+
 /*
 
  ApiFunc must be something like(follow golang rpc protocol)(can not reflect parameter name)
@@ -15,5 +17,5 @@ type ApiManagerInterface interface {
 		*struct{xxx}
 		map[string]interface
 	*/
-	RpcCall(session *Session, name string, caller func(*ApiFuncMeta) error) error
+	RpcCall(session *sessionStore.Session, name string, caller func(*ApiFuncMeta) error) error
 }

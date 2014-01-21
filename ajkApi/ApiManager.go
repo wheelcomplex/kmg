@@ -3,6 +3,7 @@ package ajkApi
 import (
 	"fmt"
 	"github.com/bronze1man/kmg/dependencyInjection"
+	"github.com/bronze1man/kmg/sessionStore"
 	"reflect"
 	"strings"
 )
@@ -36,7 +37,7 @@ func NewApiManagerFromContainer(c *dependencyInjection.Container) ApiManagerInte
 	return &containerAwareApiManager{c: c}
 }
 func (manager *containerAwareApiManager) RpcCall(
-	session *Session,
+	session *sessionStore.Session,
 	name string,
 	caller func(*ApiFuncMeta) error,
 ) error {
@@ -49,7 +50,7 @@ func (manager *containerAwareApiManager) RpcCall(
 		return err
 	}
 
-	err = c.Set("github.com/bronze1man/kmg/ajkApi.Session", session, dependencyInjection.ScopeRequest)
+	err = c.Set("github.com/bronze1man/kmg/sessionStore.Session", session, dependencyInjection.ScopeRequest)
 	if err != nil {
 		return err
 	}

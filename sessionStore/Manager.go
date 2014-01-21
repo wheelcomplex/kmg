@@ -7,6 +7,49 @@ import (
 )
 
 type Manager struct {
+	Provider Provider
+}
+
+func (manager *Manager) Load(id string) (session *Session, err error) {
+	if id == "" {
+		return manager.newSession()
+	}
+	value, exist, err := manager.Provider.Get(id)
+	if !exist {
+		return manager.newSession()
+	}
+	session, err = unmarshalSession(value, manager, id)
+	return
+}
+func (manager *Manager) newSession() (session *Session, err error) {
+	id, err := generateId()
+	if err != nil {
+		return
+	}
+	session = newSession(manager, id)
+	return
+}
+func (manager *Manager) Save(session *Session) (err error) {
+	value, err := session.marshal()
+	if err != nil {
+		return
+	}
+	manager.Provider.Set(session.Id, value)
+	return
+}
+
+func generateId() (string, error) {
+	b := make([]byte, 16)
+	_, err := io.ReadFull(rand.Reader, b)
+	if err != nil {
+		return "", err
+	}
+	guid := base64.URLEncoding.EncodeToString(b)
+	return guid, nil
+}
+
+/*
+type Manager struct {
 	Provider
 }
 
@@ -37,3 +80,4 @@ func (manager *Manager) generateGuid() (string, error) {
 	guid := base64.URLEncoding.EncodeToString(b)
 	return guid, nil
 }
+*/
