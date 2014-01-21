@@ -1,6 +1,7 @@
 package kmgYaml
 
 import (
+	"encoding"
 	"reflect"
 	"sort"
 	"strconv"
@@ -62,6 +63,13 @@ func (e *encoder) marshal(tag string, in reflect.Value) {
 			return
 		}
 		in = reflect.ValueOf(value)
+	}
+	if marhsaler, ok := in.Interface().(encoding.TextMarshaler); ok {
+		text, err := marhsaler.MarshalText()
+		if err != nil {
+			panic(err)
+		}
+		in = reflect.ValueOf(string(text))
 	}
 	switch in.Kind() {
 	case reflect.Interface:

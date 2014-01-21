@@ -5,9 +5,12 @@ import (
 	"strings"
 )
 
-func TestWrapper(T Fatalfer, testObject FatalferAware) {
+//use T for error report,automatic call every function start with Test
+//function start with Test must not have input arguments,output arguments.
+func TestWarpper(T Fatalfer, testObject FatalferAware) {
 	testObject.SetFatalfer(T)
-	tov := reflect.Indirect(reflect.ValueOf(testObject))
+	tov := reflect.ValueOf(testObject)
+	//tov := reflect.Indirect(reflect.ValueOf(testObject))
 	tot := tov.Type()
 	for i := 0; i < tov.NumMethod(); i++ {
 		tm := tot.Method(i)

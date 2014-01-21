@@ -14,14 +14,15 @@ type FatalferAware interface {
 }
 
 type TestTools struct {
-	T Fatalfer
+	Fatalfer
 }
 
 func NewTestTools(T Fatalfer) *TestTools {
-	return &TestTools{T: T}
+	return &TestTools{Fatalfer: T}
 }
+
 func (tools *TestTools) SetFatalfer(T Fatalfer) {
-	tools.T = T
+	tools.Fatalfer = T
 }
 func (tools *TestTools) Ok(expectTrue bool) {
 	if !expectTrue {
@@ -52,7 +53,7 @@ func (tools *TestTools) assertFail(msg string, skip int) {
 	if ok != false {
 		line_info = fmt.Sprintf("%v:%v:%x", file, line, pc)
 	}
-	tools.T.Fatalf("%s\n%s", msg, line_info)
+	tools.Fatalf("%s\n%s", msg, line_info)
 }
 
 func isEqual(a interface{}, b interface{}) bool {

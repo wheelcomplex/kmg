@@ -5,10 +5,11 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
 )
 
 var unmarshalIntTest = 123
-
+var unmarshalTimeTest = time.Date(2001, 2, 3, 4, 5, 6, 0, time.UTC)
 var unmarshalTests = []struct {
 	data  string
 	value interface{}
@@ -359,6 +360,10 @@ var unmarshalTests = []struct {
 			4: 1.5,
 		},
 	},
+	{
+		`2001-02-03T04:05:06Z`,
+		&unmarshalTimeTest,
+	},
 }
 
 type inlineB struct {
@@ -370,8 +375,7 @@ type inlineC struct {
 	C int
 }
 
-func TestUnmarshal(ot *testing.T) {
-	c := kmgTest.NewTestTools(ot)
+func (c *S) TestUnmarshal() {
 	for _, item := range unmarshalTests {
 		t := reflect.ValueOf(item.value).Type()
 		var value interface{}
@@ -382,9 +386,13 @@ func TestUnmarshal(ot *testing.T) {
 			t := reflect.ValueOf(item.value).Type()
 			v := reflect.New(t)
 			value = v.Interface()
-		default:
-			pt := reflect.ValueOf(item.value).Type()
+		case reflect.Ptr:
+			pt := t
 			pv := reflect.New(pt.Elem())
+			value = pv.Interface()
+		default:
+			pt := t
+			pv := reflect.New(pt)
 			value = pv.Interface()
 		}
 		err := Unmarshal([]byte(item.data), value)

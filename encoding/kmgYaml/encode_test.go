@@ -2,10 +2,10 @@ package kmgYaml
 
 import (
 	"fmt"
-	. "launchpad.net/gocheck"
 	"math"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var marshalIntTest = 123
@@ -92,6 +92,9 @@ var marshalTests = []struct {
 	}, {
 		map[string]interface{}{"a": map[interface{}]interface{}{"b": "c"}},
 		"a:\n  b: c\n",
+	}, {
+		time.Date(2001, 2, 3, 4, 5, 6, 0, time.UTC),
+		"2001-02-03T04:05:06Z\n",
 	},
 
 	// Simple values.
@@ -103,34 +106,34 @@ var marshalTests = []struct {
 	// Structures
 	{
 		&struct{ Hello string }{"world"},
-		"hello: world\n",
+		"Hello: world\n",
 	}, {
 		&struct {
 			A struct {
 				B string
 			}
 		}{struct{ B string }{"c"}},
-		"a:\n  b: c\n",
+		"A:\n  B: c\n",
 	}, {
 		&struct {
 			A *struct {
 				B string
 			}
 		}{&struct{ B string }{"c"}},
-		"a:\n  b: c\n",
+		"A:\n  B: c\n",
 	}, {
 		&struct {
 			A *struct {
 				B string
 			}
 		}{},
-		"a: null\n",
+		"A: null\n",
 	}, {
 		&struct{ A int }{1},
-		"a: 1\n",
+		"A: 1\n",
 	}, {
 		&struct{ A []int }{[]int{1, 2}},
-		"a:\n- 1\n- 2\n",
+		"A:\n- 1\n- 2\n",
 	}, {
 		&struct {
 			B int "a"
@@ -138,7 +141,7 @@ var marshalTests = []struct {
 		"a: 1\n",
 	}, {
 		&struct{ A bool }{true},
-		"a: true\n",
+		"A: true\n",
 	},
 
 	// Conditional flag
@@ -179,7 +182,7 @@ var marshalTests = []struct {
 				B, D string
 			} "a,flow"
 		}{struct{ B, D string }{"c", "e"}},
-		"a: {b: c, d: e}\n",
+		"a: {B: c, D: e}\n",
 	},
 
 	// Unexported field
@@ -188,7 +191,7 @@ var marshalTests = []struct {
 			u int
 			A int
 		}{0, 1},
-		"a: 1\n",
+		"A: 1\n",
 	},
 
 	// Ignored field
@@ -197,7 +200,7 @@ var marshalTests = []struct {
 			A int
 			B int "-"
 		}{1, 2},
-		"a: 1\n",
+		"A: 1\n",
 	},
 
 	// Struct inlining
@@ -206,15 +209,15 @@ var marshalTests = []struct {
 			A int
 			C inlineB `yaml:",inline"`
 		}{1, inlineB{2, inlineC{3}}},
-		"a: 1\nb: 2\nc: 3\n",
+		"A: 1\nB: 2\nC: 3\n",
 	},
 }
 
-func (s *S) TestMarshal(c *C) {
+func (t *S) TestMarshal() {
 	for _, item := range marshalTests {
-		data, err := goyaml.Marshal(item.value)
-		c.Assert(err, IsNil)
-		c.Assert(string(data), Equals, item.data)
+		data, err := Marshal(item.value)
+		t.Equal(err, nil)
+		t.Equal(string(data), item.data)
 	}
 }
 
@@ -227,14 +230,15 @@ var marshalErrorTests = []struct {
 			B       int
 			inlineB ",inline"
 		}{1, inlineB{2, inlineC{3}}},
-		`Duplicated key 'b' in struct struct \{ B int; .*`,
+		`Duplicated key 'B' in struct struct { B int; kmgYaml.inlineB ",inline" }`,
 	},
 }
 
-func (s *S) TestMarshalErrors(c *C) {
+func (t *S) TestMarshalErrors() {
 	for _, item := range marshalErrorTests {
-		_, err := goyaml.Marshal(item.value)
-		c.Assert(err, ErrorMatches, item.error)
+		_, err := Marshal(item.value)
+		t.Ok(err != nil)
+		t.Equal(err.Error(), item.error)
 	}
 }
 
@@ -257,23 +261,23 @@ var getterTests = []struct {
 	{"_: !foo true\n", "!foo", true},
 	{"_: !foo\n- A\n- B\n", "!foo", []string{"A", "B"}},
 	{"_: !foo\n  A: B\n", "!foo", map[string]string{"A": "B"}},
-	{"_: !foo\n  a: B\n", "!foo", &marshalTaggedIfaceTest},
+	{"_: !foo\n  A: B\n", "!foo", &marshalTaggedIfaceTest},
 }
 
-func (s *S) TestMarshalTypeCache(c *C) {
+func (t *S) TestMarshalTypeCache() {
 	var data []byte
 	var err error
 	func() {
 		type T struct{ A int }
-		data, err = goyaml.Marshal(&T{})
-		c.Assert(err, IsNil)
+		data, err = Marshal(&T{})
+		t.Equal(err, nil)
 	}()
 	func() {
 		type T struct{ B int }
-		data, err = goyaml.Marshal(&T{})
-		c.Assert(err, IsNil)
+		data, err = Marshal(&T{})
+		t.Equal(err, nil)
 	}()
-	c.Assert(string(data), Equals, "b: 0\n")
+	t.Equal(string(data), "B: 0\n")
 }
 
 type typeWithGetter struct {
@@ -289,27 +293,27 @@ type typeWithGetterField struct {
 	Field typeWithGetter "_"
 }
 
-func (s *S) TestMashalWithGetter(c *C) {
+func (t *S) TestMashalWithGetter() {
 	for _, item := range getterTests {
 		obj := &typeWithGetterField{}
 		obj.Field.tag = item.tag
 		obj.Field.value = item.value
-		data, err := goyaml.Marshal(obj)
-		c.Assert(err, IsNil)
-		c.Assert(string(data), Equals, string(item.data))
+		data, err := Marshal(obj)
+		t.Equal(err, nil)
+		t.Equal(string(data), string(item.data))
 	}
 }
 
-func (s *S) TestUnmarshalWholeDocumentWithGetter(c *C) {
+func (t *S) TestUnmarshalWholeDocumentWithGetter() {
 	obj := &typeWithGetter{}
 	obj.tag = ""
 	obj.value = map[string]string{"hello": "world!"}
-	data, err := goyaml.Marshal(obj)
-	c.Assert(err, IsNil)
-	c.Assert(string(data), Equals, "hello: world!\n")
+	data, err := Marshal(obj)
+	t.Equal(err, nil)
+	t.Equal(string(data), "hello: world!\n")
 }
 
-func (s *S) TestSortedOutput(c *C) {
+func (t *S) TestSortedOutput() {
 	order := []interface{}{
 		false,
 		true,
@@ -352,8 +356,8 @@ func (s *S) TestSortedOutput(c *C) {
 	for _, k := range order {
 		m[k] = 1
 	}
-	data, err := goyaml.Marshal(m)
-	c.Assert(err, IsNil)
+	data, err := Marshal(m)
+	t.Equal(err, nil)
 	out := "\n" + string(data)
 	last := 0
 	for i, k := range order {
@@ -365,10 +369,10 @@ func (s *S) TestSortedOutput(c *C) {
 		}
 		index := strings.Index(out, "\n"+repr+":")
 		if index == -1 {
-			c.Fatalf("%#v is not in the output: %#v", k, out)
+			t.Fatalf("%#v is not in the output: %#v", k, out)
 		}
 		if index < last {
-			c.Fatalf("%#v was generated before %#v: %q", k, order[i-1], out)
+			t.Fatalf("%#v was generated before %#v: %q", k, order[i-1], out)
 		}
 		last = index
 	}

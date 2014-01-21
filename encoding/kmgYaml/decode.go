@@ -1,6 +1,7 @@
 package kmgYaml
 
 import (
+	"encoding"
 	"reflect"
 	"strconv"
 )
@@ -288,6 +289,16 @@ func (d *decoder) scalar(n *node, out reflect.Value) (good bool) {
 		tag, resolved = resolve(n.tag, n.value)
 		if set := d.setter(tag, &out, &good); set != nil {
 			defer set()
+		}
+	}
+	if out.CanAddr() {
+		marhsaler, ok := (out).Addr().Interface().(encoding.TextUnmarshaler)
+		if ok {
+			err := marhsaler.UnmarshalText([]byte(n.value))
+			if err != nil {
+				panic(err)
+			}
+			return true
 		}
 	}
 	switch out.Kind() {
