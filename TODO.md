@@ -11,3 +11,7 @@
 ### refactor
 * test -> kmgTest
 * use test.TestWarpper
+
+### test
+* stdout in TestXxx
+* skip

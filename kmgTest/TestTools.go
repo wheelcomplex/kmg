@@ -4,6 +4,9 @@ package kmgTest
 import "runtime"
 import "fmt"
 import "reflect"
+import (
+	"testing"
+)
 
 type Fatalfer interface {
 	Fatalf(s string, v ...interface{})
@@ -45,6 +48,9 @@ func (tools *TestTools) EqualMsg(get interface{}, expect interface{}, format str
 		return
 	}
 	tools.assertFail(fmt.Sprintf("%s\nexpect:%#v (%T)\nget:%#v (%T)", fmt.Sprintf(format, args...), expect, expect, get, get), 2)
+}
+func (tools *TestTools) GetTestingT() *testing.T {
+	return tools.Fatalfer.(*testing.T)
 }
 
 //an easy way to Printf(avoid of import fmt,and remove it ...)should for Debug only

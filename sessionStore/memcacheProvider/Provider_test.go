@@ -2,6 +2,7 @@ package memcacheProvider
 
 import (
 	"github.com/bronze1man/kmg/kmgTest"
+	"os"
 	"testing"
 )
 
@@ -14,7 +15,15 @@ type Tester struct {
 }
 
 func (t *Tester) TestProvider() {
-	p := New("10.1.1.8:11211")
+	host := os.Getenv("TEST_MEMCACHE_HOST")
+	if host == "" {
+		t.GetTestingT().Skip(`need memcache host
+export TEST_MEMCACHE_HOST=127.0.0.1:11211
+
+skip this test ...`)
+		return
+	}
+	p := New(host)
 	p.Prefix = "memcache_test_"
 	err := p.Set("g881r0H-B4fIGF8ktUWeUg==", []byte("2"))
 	t.Equal(err, nil)

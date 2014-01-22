@@ -1,6 +1,7 @@
 package command
 
 import (
+	"flag"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/kmgFile"
@@ -12,10 +13,15 @@ import (
 type GoTest struct {
 	wd      string
 	context *console.Context
+	v       bool
 }
 
 func (command *GoTest) GetNameConfig() *console.NameConfig {
 	return &console.NameConfig{Name: "GoTest", Short: `test all go package in a directory in current project`}
+}
+func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
+	f.BoolVar(&commamd.v, "v", false, "show output of test")
+
 }
 func (command *GoTest) Execute(context *console.Context) (err error) {
 	command.context = context
@@ -58,7 +64,11 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 	})
 }
 func (command *GoTest) gotest(path string) error {
-	cmd := console.NewStdioCmd(command.context, "go", "test")
+	args := []string{"test"}
+	if command.v {
+		args = append(args, "-v")
+	}
+	cmd := console.NewStdioCmd(command.context, "go", args...)
 	cmd.Dir = path
 	err := console.SetCmdEnv(cmd, "GOPATH", command.wd)
 	if err != nil {
