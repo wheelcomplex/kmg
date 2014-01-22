@@ -47,6 +47,16 @@ func (tools *TestTools) EqualMsg(get interface{}, expect interface{}, format str
 	tools.assertFail(fmt.Sprintf("%s\nexpect:%#v (%T)\nget:%#v (%T)", fmt.Sprintf(format, args...), expect, expect, get, get), 2)
 }
 
+//an easy way to Printf(avoid of import fmt,and remove it ...)should for Debug only
+func (tools *TestTools) Printf(format string, objs ...interface{}) (n int, err error) {
+	return fmt.Printf(format, objs...)
+}
+
+//an easy way to Println (avoid of import fmt,and remove it ...)should for Debug only
+func (tools *TestTools) Println(objs ...interface{}) (n int, err error) {
+	return fmt.Println(objs...)
+}
+
 func (tools *TestTools) assertFail(msg string, skip int) {
 	pc, file, line, ok := runtime.Caller(skip)
 	line_info := ""

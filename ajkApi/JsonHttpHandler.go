@@ -44,6 +44,7 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 		apiOutput, err = handler.rpcCall(meta, rawInput)
 		return err
 	})
+
 	if err != nil {
 		handler.returnOutput(w, &httpOutput{Err: err.Error(), Guid: session.Id})
 		return

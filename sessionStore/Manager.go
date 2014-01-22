@@ -15,6 +15,9 @@ func (manager *Manager) Load(id string) (session *Session, err error) {
 		return manager.newSession()
 	}
 	value, exist, err := manager.Provider.Get(id)
+	if err != nil {
+		return
+	}
 	if !exist {
 		return manager.newSession()
 	}

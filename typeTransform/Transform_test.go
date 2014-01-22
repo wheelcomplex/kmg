@@ -15,6 +15,7 @@ func TestManager(ot *testing.T) {
 		B string
 	}
 	ArrStruct := []T1{}
+	StringSlice := []string{}
 	testCaseTable := []struct {
 		in  interface{}
 		out interface{}
@@ -63,6 +64,17 @@ func TestManager(ot *testing.T) {
 					A: 0,
 					B: "",
 				},
+			},
+		},
+		{
+			[]interface{}{
+				"1",
+				"2",
+			},
+			&StringSlice,
+			[]string{
+				"1",
+				"2",
 			},
 		},
 	}

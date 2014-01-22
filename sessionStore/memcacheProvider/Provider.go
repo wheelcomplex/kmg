@@ -11,16 +11,23 @@ type Provider struct {
 }
 
 func New(server ...string) *Provider {
+	if len(server) == 0 {
+		panic("[memcacheProvider.New] len(server)==0")
+	}
 	return &Provider{
 		Client: memcache.New(server...),
 	}
 }
 func (provider *Provider) Get(Id string) (Value []byte, Exist bool, err error) {
 	item, err := provider.Client.Get(provider.Prefix + Id)
-	if err == memcache.ErrCacheMiss {
-		return nil, false, nil
+	if err != nil {
+		if err == memcache.ErrCacheMiss {
+			return nil, false, nil
+		}
+		return
 	}
 	Value = item.Value
+	Exist = true
 	return
 }
 func (provider *Provider) Set(Id string, Value []byte) (err error) {

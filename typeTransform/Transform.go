@@ -69,10 +69,13 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 			return SliceToSlice(in, out)
 		}
 	case reflect.Interface:
-		switch out.Kind() {
-		case reflect.Interface:
-			return Tran(in.Elem(), out.Elem())
-		}
+		return Tran(in.Elem(), out)
+		/*
+			switch out.Kind() {
+			case reflect.Interface:
+				return Tran(in.Elem(), out.Elem())
+			}
+		*/
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 		reflect.Uintptr:

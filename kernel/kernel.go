@@ -22,7 +22,7 @@ type Kernel struct {
 	// set this value to tell kernel where some path is,or it will guess from work dir.
 	Context *kmgContext.Context
 	// default load from Context.ConfigPath/parameters.yml
-	Parameters map[string]string
+	Parameters map[string]interface{}
 }
 
 func NewKernel() *Kernel {

@@ -1,21 +1,16 @@
 package sessionStore
 
-import "testing"
+func (t *Tester) TestManager() {
+	manager := &Manager{NewMemoryProvider()}
+	session, err := manager.Load("1")
+	t.Equal(err, nil)
+	session.Set("A", 5)
+	err = manager.Save(session)
+	t.Equal(err, nil)
 
-//import "github.com/bronze1man/kmg/kmgTest"
-
-func TestManager(ot *testing.T) {
-	/*
-		t := kmgTest.NewTestTools(ot)
-		manager := &Manager{NewMemoryProvider()}
-		store, err := manager.LoadStoreOrNewIfNotExist("1")
-		t.Equal(err, nil)
-		store.Set("A", 5)
-
-		store, err = manager.LoadStoreOrNewIfNotExist(store.Guid())
-		t.Equal(err, nil)
-		value, ok := store.Get("A")
-		t.Equal(ok, true)
-		t.Equal(value, 5)
-	*/
+	session, err = manager.Load(session.Id)
+	t.Equal(err, nil)
+	value, ok := session.Get("A")
+	t.Equal(ok, true)
+	t.Equal(value, 5)
 }
