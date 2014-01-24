@@ -42,10 +42,10 @@ func (c *Container) init() {
 func (c *Container) Get(id string) (service interface{}, err error) {
 	definition, ok := c.definition_map[id]
 	if !ok {
-		return nil, ServiceIdNotExistError
+		return nil, fmt.Errorf("service id:%s not exist", id)
 	}
 	if !c.IsScopeActive(definition.Scope) {
-		return nil, ScopeNotActiveError
+		return nil, fmt.Errorf("service id:%s scope:%s not active", id, definition.Scope)
 	}
 	container := c.scope_map[definition.Scope]
 	//TODO Concurrent safe
