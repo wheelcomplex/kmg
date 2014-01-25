@@ -2,7 +2,7 @@ package kmgTest
 
 //测试组件的测试
 
-import "testing"
+//import "testing"
 
 type logFatalfer struct {
 	call_num int
@@ -15,6 +15,7 @@ func (l *logFatalfer) getCallNum() int {
 	return l.call_num
 }
 
+/*
 func TestEqual(ot *testing.T) {
 	l := &logFatalfer{}
 	t := NewTestTools(l)
@@ -35,3 +36,4 @@ func TestIsEqual(ot *testing.T) {
 	t := NewTestTools(ot)
 	t.Equal(true, isEqual(map[string]interface{}{"a": 1}, map[string]interface{}{"a": 1}))
 }
+*/

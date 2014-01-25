@@ -26,6 +26,11 @@ func NewCryptSeedKmgRand() (r *KmgRand, err error) {
 	return &KmgRand{mr}, nil
 }
 
+func NewInt64SeedKmgRand(seed int64) (r *KmgRand) {
+	mr := mrand.New(mrand.NewSource(seed))
+	return &KmgRand{mr}
+}
+
 type KmgRand struct {
 	*mrand.Rand
 }
@@ -65,4 +70,18 @@ func (r *KmgRand) IntBetween(min int, max int) int {
 		return min
 	}
 	return r.Intn(max-min) + min
+}
+
+func (r *KmgRand) ChoiceFromIntSlice(slice []int) int {
+	return slice[r.Intn(len(slice))]
+}
+
+func (r *KmgRand) PermIntSlice(slice []int) (output []int) {
+	thisLen := len(slice)
+	output = make([]int, thisLen)
+	permSlice := r.Perm(thisLen)
+	for i := 0; i < thisLen; i++ {
+		output[i] = slice[permSlice[i]]
+	}
+	return
 }
