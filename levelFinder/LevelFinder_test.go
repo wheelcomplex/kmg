@@ -1,12 +1,6 @@
 package levelFinder
 
-import (
-	"github.com/bronze1man/kmg/kmgTest"
-	"testing"
-)
-
-func TestLevelFinder(ot *testing.T) {
-	t := kmgTest.NewTestTools(ot)
+func (t *Tester) TestLevelFinder() {
 	ExpTable := ArrayLevelProvider{12, 29, 57}
 	levelTestTable := []struct {
 		exp        int

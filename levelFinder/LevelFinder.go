@@ -32,6 +32,12 @@ func GetLevelByExp(provider LevelProvider, exp int) (result LevelExpResult) {
 	}
 	//找当前等级
 	maxLevel := provider.MaxLevel()
+	if maxLevel == 1 {
+		result.Exp = 0
+		result.IsMaxLevel = true
+		result.Level = 1
+		return
+	}
 	level := maxLevel
 	for i := 1; i <= maxLevel-1; i++ {
 		thisLevelExp := provider.GetExpByLevel(i)
