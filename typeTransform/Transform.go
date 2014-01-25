@@ -2,6 +2,7 @@ package typeTransform
 
 import (
 	"fmt"
+	"github.com/bronze1man/kmg/kmgReflect"
 	"github.com/bronze1man/kmg/kmgTime"
 	"github.com/bronze1man/kmg/kmgType"
 	"reflect"
@@ -113,6 +114,8 @@ func MapToMap(in reflect.Value, out reflect.Value) (err error) {
 	}
 	return
 }
+
+/*
 func MapToStruct(in reflect.Value, out reflect.Value) (err error) {
 	oKey := reflect.New(reflect.TypeOf("")).Elem()
 	out.Set(reflect.New(out.Type()).Elem())
@@ -145,6 +148,55 @@ func MapToStruct(in reflect.Value, out reflect.Value) (err error) {
 				}
 				oVal.SetFloat(oVal.Float() / divI)
 			}
+		}
+	}
+	return
+} */
+
+//every field in struct must in the map
+//TODO 用户可以配置这个东西...
+func MapToStruct(in reflect.Value, out reflect.Value) (err error) {
+	oKey := reflect.New(reflect.TypeOf("")).Elem()
+	out.Set(reflect.New(out.Type()).Elem())
+	fieldNameMap := map[string]bool{}
+	for _, key := range in.MapKeys() {
+		err = Tran(key, oKey)
+		if err != nil {
+			return
+		}
+		sKey := oKey.String()
+		fieldNameMap[sKey] = true
+		oVal := out.FieldByName(sKey)
+		if !oVal.IsValid() {
+			continue
+		}
+		val := in.MapIndex(key)
+		err = Tran(val, oVal)
+		if err != nil {
+			return
+		}
+		//TODO remove this workaroud
+		if oVal.Kind() == reflect.Float64 {
+			f, ok := out.Type().FieldByName(sKey)
+			if !ok {
+				return
+			}
+			div := f.Tag.Get("floatDiv")
+			if div != "" {
+				divI, err := strconv.ParseFloat(div, 64)
+				if err != nil {
+					return err
+				}
+				oVal.SetFloat(oVal.Float() / divI)
+			}
+		}
+	}
+	for _, structField := range kmgReflect.StructGetAllField(out.Type()) {
+		if structField.Anonymous {
+			continue
+		}
+		if !fieldNameMap[structField.Name] {
+			return fmt.Errorf("[MapToStruct]type:%s field:%s not found", out.Type().Name(), structField.Name)
 		}
 	}
 	return

@@ -7,6 +7,7 @@ import (
 
 //transform slice of struct to map of struct,
 //it will report error if Id is not unique
+//有Id重复验证
 func SliceStructToMapStruct(in interface{}, out interface{}, idFieldName string) (err error) {
 	inV := reflect.ValueOf(in)
 	outV := reflect.ValueOf(out)
