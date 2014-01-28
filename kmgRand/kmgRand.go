@@ -37,11 +37,12 @@ type KmgRand struct {
 
 //return not repeat size number in [0,n) as random order,
 //it will panic if size>n or size<0 or n<0
-func (r *KmgRand) MulitChoice(n int, size int) []int {
-	if size > n || n < 0 || size < 0 {
-		panic(fmt.Errorf("[KmgRand.MulitChoice] input error size=%d n=%d,need (size<=n&&n>=0&&size>=0) ", size, n))
+func (r *KmgRand) MulitChoice(totalLength int, choiceNumber int) []int {
+	if choiceNumber > totalLength || totalLength < 0 || choiceNumber < 0 {
+		panic(fmt.Errorf("[KmgRand.MulitChoice] input error totalLength=%d choiceNumber=%d,need (choiceNumber<=totalLength&&totalLength>=0&&choiceNumber>=0) ",
+			totalLength, choiceNumber))
 	}
-	return r.Perm(n)[:size]
+	return r.Perm(totalLength)[:choiceNumber]
 }
 
 //return not repeat size number in [0,n) as origin order,
