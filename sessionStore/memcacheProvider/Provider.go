@@ -40,5 +40,12 @@ func (provider *Provider) Set(Id string, Value []byte) (err error) {
 	return
 }
 func (provider *Provider) Delete(Id string) (err error) {
-	return provider.Client.Delete(provider.Prefix + Id)
+	err = provider.Client.Delete(provider.Prefix + Id)
+	if err == nil {
+		return nil
+	}
+	if err == memcache.ErrCacheMiss {
+		return nil
+	}
+	return err
 }

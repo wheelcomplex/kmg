@@ -31,6 +31,25 @@ func (sess *Session) Get(key string) (value interface{}, ok bool) {
 	return
 }
 
+//delete current session,delete all data in this session ,create a new one,
+//it will panic if an error happened
+func (sess *Session) DeleteAndNewSession() {
+	err := sess.manager.Provider.Delete(sess.Id)
+	if err != nil {
+		panic(err)
+	}
+	newSess, err := sess.manager.newSession()
+	if err != nil {
+		panic(err)
+	}
+	*sess = *newSess
+}
+
+//delete current session,and delete all data in this session
+func (sess *Session) DeleteSession() {
+	panic("[Session.DeleteSession]not implement!")
+}
+
 func newSession(Manager *Manager, Id string) *Session {
 	return &Session{
 		Id:      Id,
