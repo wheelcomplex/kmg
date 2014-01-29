@@ -1,6 +1,8 @@
 package sessionStore
 
 import (
+	"fmt"
+	"github.com/bronze1man/kmg/typeTransform"
 	"labix.org/v2/mgo/bson"
 )
 
@@ -31,23 +33,46 @@ func (sess *Session) Get(key string) (value interface{}, ok bool) {
 	return
 }
 
+func (sess *Session) GetWithType(key string, out interface{}) (err error) {
+	value, ok := sess.data[key]
+	if !ok {
+		return fmt.Errorf("[GetWithType]key:%s not found", key)
+	}
+	return typeTransform.Transform(value, out)
+}
+
 //delete current session,delete all data in this session ,create a new one,
 //it will panic if an error happened
-func (sess *Session) DeleteAndNewSession() {
-	err := sess.manager.Provider.Delete(sess.Id)
+func (sess *Session) DeleteAndNewSession() (err error) {
+	err = sess.manager.Provider.Delete(sess.Id)
 	if err != nil {
-		panic(err)
+		return
 	}
 	newSess, err := sess.manager.newSession()
 	if err != nil {
-		panic(err)
+		return
 	}
 	*sess = *newSess
+	return
 }
 
 //delete current session,and delete all data in this session
-func (sess *Session) DeleteSession() {
+func (sess *Session) DeleteSession() (err error) {
 	panic("[Session.DeleteSession]not implement!")
+}
+
+//save this Session and reload it from SessionProvider,should only used for test
+func (sess *Session) SaveAndReload() (err error) {
+	err = sess.manager.Save(sess)
+	if err != nil {
+		return
+	}
+	newSess, err := sess.manager.Load(sess.Id)
+	if err != nil {
+		return
+	}
+	*sess = *newSess
+	return
 }
 
 func newSession(Manager *Manager, Id string) *Session {

@@ -2,10 +2,10 @@ package command
 
 import (
 	"flag"
+	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/encoding/kmgExcel"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
-	"github.com/bronze1man/kmg/errors"
 )
 
 type Xlsx2Yaml struct {
@@ -29,7 +29,7 @@ func (command *Xlsx2Yaml) Execute(context *console.Context) error {
 		if context.FlagSet().NArg() == 1 {
 			*command.filePath = context.FlagSet().Arg(0)
 		} else {
-			return errors.New("need input file")
+			return fmt.Errorf("need input file")
 		}
 	}
 	rawArray, err := kmgExcel.XlsxFile2Array(*command.filePath)
@@ -74,6 +74,6 @@ func (command *Xlsx2Yaml) formatOutput(rawArray [][][]string) (interface{}, erro
 			return o[0], nil
 		}
 	default:
-		return nil, errors.Sprintf("not support output format: %s", command.format)
+		return nil, fmt.Errorf("not support output format: %s", command.format)
 	}
 }

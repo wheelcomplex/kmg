@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"github.com/bronze1man/kmg/console"
-	"github.com/bronze1man/kmg/errors"
 	"github.com/bronze1man/kmg/fsnotify"
 	"os"
 	"os/exec"
@@ -27,7 +26,7 @@ func (command *WatchCmd) Execute(context *console.Context) error {
 	command.isDebug = false
 	command.context = context
 	if len(context.Args) <= 2 {
-		return errors.Sprintf("usage: %s watch [command]", context.ExecutionName)
+		return fmt.Errorf("usage: %s watch [command]", context.ExecutionName)
 	}
 	var err error
 	command.wd, err = os.Getwd()
@@ -61,7 +60,7 @@ func (command *WatchCmd) restart() error {
 	command.cmd = console.NewStdioCmd(command.context, command.context.Args[2], command.context.Args[3:]...)
 	err = command.cmd.Start()
 	if err != nil {
-		return errors.Sprintf("restart error: %s", err.Error())
+		return fmt.Errorf("restart error: %s", err.Error())
 	}
 	fmt.Println("[kmg] cmd running pid:", command.cmd.Process.Pid)
 	go func() {

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
-	"github.com/bronze1man/kmg/errors"
 	"strings"
 )
 
@@ -38,7 +37,7 @@ func (db *Db) SetTablesData(data map[string][]map[string]string) (err error) {
 	if err != nil {
 		errRoll := tx.Rollback()
 		if errRoll != nil {
-			return errors.Sprintf("error [transaction] %s,[rollback] %s", err, errRoll)
+			return fmt.Errorf("error [transaction] %s,[rollback] %s", err, errRoll)
 		}
 		return err
 	}

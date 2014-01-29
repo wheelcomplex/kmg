@@ -1,7 +1,7 @@
 package console
 
 import (
-	"github.com/bronze1man/kmg/errors"
+	"fmt"
 	"strings"
 )
 
@@ -14,7 +14,7 @@ func NewEnvFromArray(env []string) (envObj *Env, err error) {
 	for _, v1 := range env {
 		pos := strings.IndexRune(v1, '=')
 		if pos == -1 {
-			return nil, errors.Sprintf("NewEnvFromArray: input string not have =, string: %s", v1)
+			return nil, fmt.Errorf("NewEnvFromArray: input string not have =, string: %s", v1)
 		}
 		key := v1[:pos]
 		v2 := v1[pos+1:]

@@ -3,7 +3,6 @@ package console
 import (
 	"flag"
 	"fmt"
-	"github.com/bronze1man/kmg/errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -24,7 +23,7 @@ func (manager *Manager) Add(command Command) error {
 	name := strings.ToLower(getNameFromCommand(command))
 	_, ok := manager.Map[name]
 	if ok {
-		return errors.Sprintf("command %s already exist,command name is case insensitive.", name)
+		return fmt.Errorf("command %s already exist,command name is case insensitive.", name)
 	}
 	manager.Map[name] = command
 	return nil

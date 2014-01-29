@@ -21,9 +21,9 @@ func TestManager(ot *testing.T) {
 		out interface{}
 		exp interface{}
 	}{
-		{1, &Int, 1},
+		{1, &Int, 1}, //0
 		{int64(1), &Int, 1},
-		{
+		{ //2
 			[]map[string]string{
 				{
 					"a": "1",
@@ -42,7 +42,7 @@ func TestManager(ot *testing.T) {
 				},
 			},
 		},
-		{
+		{ //3
 			[]map[string]string{
 				{
 					"A": "1",
@@ -51,6 +51,7 @@ func TestManager(ot *testing.T) {
 				},
 				{
 					"A": "",
+					"B": "",
 					"C": "abd",
 				},
 			},
@@ -66,7 +67,7 @@ func TestManager(ot *testing.T) {
 				},
 			},
 		},
-		{
+		{ //4
 			[]interface{}{
 				"1",
 				"2",
@@ -78,9 +79,9 @@ func TestManager(ot *testing.T) {
 			},
 		},
 	}
-	for _, testCase := range testCaseTable {
+	for i, testCase := range testCaseTable {
 		err := Transform(testCase.in, testCase.out)
-		t.Equal(err, nil)
-		t.Equal(reflect.ValueOf(testCase.out).Elem().Interface(), testCase.exp)
+		t.EqualMsg(err, nil, "fail at %d", i)
+		t.EqualMsg(reflect.ValueOf(testCase.out).Elem().Interface(), testCase.exp, "fail at %d", i)
 	}
 }

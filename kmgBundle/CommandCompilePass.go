@@ -1,9 +1,9 @@
 package kmgBundle
 
 import (
+	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/dependencyInjection"
-	"github.com/bronze1man/kmg/errors"
 )
 
 type CommandCompilePass struct {
@@ -27,7 +27,7 @@ func (extension *CommandCompilePass) CompilePass(
 				}
 				command, ok := obj.(console.Command)
 				if !ok {
-					return nil, errors.Sprintf("service %s register as command but not implement command interface", id)
+					return nil, fmt.Errorf("service %s register as command but not implement command interface", id)
 				}
 				err = manager.Add(command)
 				if err != nil {

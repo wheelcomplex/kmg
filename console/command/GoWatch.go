@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
-	"github.com/bronze1man/kmg/errors"
 	"github.com/bronze1man/kmg/fsnotify"
 	"os"
 	"os/exec"
@@ -37,7 +36,7 @@ func (command *GoWatch) Execute(context *console.Context) (err error) {
 	command.isDebug = false
 	command.context = context
 	if len(context.Args) != 3 {
-		return errors.Sprintf("usage: %s watch [packages]", context.ExecutionName)
+		return fmt.Errorf("usage: %s watch [packages]", context.ExecutionName)
 	}
 	command.mainFilePath = context.Args[2]
 	kmgc, err := kmgContext.FindFromWd()
@@ -97,7 +96,7 @@ func (command *GoWatch) restart() error {
 
 	err = command.cmd.Run()
 	if err != nil {
-		return errors.Sprintf("rebuild error: %s", err.Error())
+		return fmt.Errorf("rebuild error: %s", err.Error())
 	}
 	_, err = os.Stat(command.targetFilePath)
 	if err != nil {
@@ -110,7 +109,7 @@ func (command *GoWatch) restart() error {
 	}
 	err = command.cmd.Start()
 	if err != nil {
-		return errors.Sprintf("restart error: %s", err.Error())
+		return fmt.Errorf("restart error: %s", err.Error())
 	}
 	fmt.Println("[kmg] app running pid:", command.cmd.Process.Pid)
 	go func() {

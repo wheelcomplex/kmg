@@ -5,7 +5,6 @@ import (
 	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
-	"github.com/bronze1man/kmg/errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -65,7 +64,7 @@ func (kernel *Kernel) handleConfig(builder *dependencyInjection.ContainerBuilder
 	data, err := ioutil.ReadFile(filepath.Join(kernel.Context.ConfigPath, "parameters.yml"))
 	if err != nil {
 		if os.IsNotExist(err) {
-			return errors.New("config file not found!\nyou should put config into ./app/config/parameters.yml")
+			return fmt.Errorf("config file not found!\nyou should put config into ./app/config/parameters.yml")
 		}
 		return err
 	}

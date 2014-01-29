@@ -1,7 +1,7 @@
 package kmgExcel
 
 import (
-	"github.com/bronze1man/kmg/errors"
+	"fmt"
 	"strings"
 )
 
@@ -21,7 +21,7 @@ func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err er
 		lenRow := len(row)
 		//there can be some blank row of left of row
 		if lenRow > lenTitles {
-			return nil, errors.Sprintf(
+			return nil, fmt.Errorf(
 				"titleArrayToGrid not all row length less or equal than first row length,"+
 					"rowIndex: %d thisRowLen:%d firstRowLen:%d", rowIndex, lenRow, lenTitles)
 		}
