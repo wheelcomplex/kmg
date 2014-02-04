@@ -6,6 +6,7 @@ import (
 	"fmt"
 	mrand "math/rand"
 	"sort"
+	"time"
 )
 
 func NewCryptSeedMathRand() (r *mrand.Rand, err error) {
@@ -71,6 +72,19 @@ func (r *KmgRand) IntBetween(min int, max int) int {
 		return min
 	}
 	return r.Intn(max-min) + min
+}
+
+func (r *KmgRand) Int63Between(min int64, max int64) int64 {
+	if min > max {
+		panic(fmt.Errorf("[KmgRand.Int63Between] min:%d<max:%d", min, max))
+	} else if min == max {
+		return min
+	}
+	return r.Int63n(max-min) + min
+}
+
+func (r *KmgRand) TimeDurationBetween(min time.Duration, max time.Duration) time.Duration {
+	return time.Duration(r.Int63Between(int64(min), int64(max)))
 }
 
 func (r *KmgRand) ChoiceFromIntSlice(slice []int) int {

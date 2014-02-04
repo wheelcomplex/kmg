@@ -10,12 +10,17 @@ import (
 	"reflect"
 )
 
+type JsonHttpInput struct {
+	Name string
+	Guid string //
+	Data interface{}
+}
 type httpInput struct {
 	Name string
 	Guid string //
 	Data json.RawMessage
 }
-type httpOutput struct {
+type JsonHttpOutput struct {
 	Err  string
 	Guid string // "" as not set guid to peer
 	Data interface{}
@@ -32,7 +37,7 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 	rawInput := &httpInput{}
 	err = json.NewDecoder(req.Body).Decode(rawInput)
 	if err != nil {
-		handler.returnOutput(w, &httpOutput{Err: err.Error()})
+		handler.returnOutput(w, &JsonHttpOutput{Err: err.Error()})
 		return
 	}
 	var apiOutput interface{}
@@ -46,14 +51,14 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 	})
 
 	if err != nil {
-		handler.returnOutput(w, &httpOutput{Err: err.Error(), Guid: session.Id})
+		handler.returnOutput(w, &JsonHttpOutput{Err: err.Error(), Guid: session.Id})
 		return
 	}
 	err = handler.SessionStoreManager.Save(session)
 	if err != nil {
 		panic(err)
 	}
-	handler.returnOutput(w, &httpOutput{Data: apiOutput, Guid: session.Id})
+	handler.returnOutput(w, &JsonHttpOutput{Data: apiOutput, Guid: session.Id})
 }
 
 //TODO finish rpcCall by function param name
@@ -171,7 +176,7 @@ func jsonUnmarshalFromPtrReflectType(inputType reflect.Type, data []byte) (refle
 	}
 	return apiInputValue, nil
 }
-func (handler *JsonHttpHandler) returnOutput(w http.ResponseWriter, output *httpOutput) {
+func (handler *JsonHttpHandler) returnOutput(w http.ResponseWriter, output *JsonHttpOutput) {
 	err := json.NewEncoder(w).Encode(output)
 	if err != nil {
 		//TODO log error
