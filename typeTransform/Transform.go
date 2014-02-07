@@ -7,6 +7,7 @@ import (
 	"github.com/bronze1man/kmg/kmgType"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -217,6 +218,7 @@ func SliceToSlice(in reflect.Value, out reflect.Value) (err error) {
 // "" => 0
 func StringToInt(in reflect.Value, out reflect.Value) (err error) {
 	inS := in.String()
+	inS = strings.TrimSpace(inS)
 	if inS == "" {
 		out.SetInt(int64(0))
 		return nil
