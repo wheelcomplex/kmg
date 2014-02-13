@@ -48,8 +48,8 @@ func Json2YamlIo(r io.Reader, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	output,err := Marshal(data)
-	if err!=nil{
+	output, err := Marshal(data)
+	if err != nil {
 		return err
 	}
 	_, err = w.Write(output)
