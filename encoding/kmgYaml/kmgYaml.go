@@ -38,6 +38,24 @@ func Yaml2JsonIo(r io.Reader, w io.Writer) error {
 	return err
 }
 
+func Json2YamlIo(r io.Reader, w io.Writer) error {
+	input, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	var data interface{}
+	err = json.Unmarshal(input, &data)
+	if err != nil {
+		return err
+	}
+	output,err := Marshal(data)
+	if err!=nil{
+		return err
+	}
+	_, err = w.Write(output)
+	return err
+}
+
 func Yaml2JsonBytes(input []byte) (output []byte, err error) {
 	var data interface{}
 	err = Unmarshal(input, &data)
