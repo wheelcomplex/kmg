@@ -177,6 +177,7 @@ func jsonUnmarshalFromPtrReflectType(inputType reflect.Type, data []byte) (refle
 	return apiInputValue, nil
 }
 func (handler *JsonHttpHandler) returnOutput(w http.ResponseWriter, output *JsonHttpOutput) {
+	w.Header().Set("Content-Type", "text/json; charset=utf-8")
 	err := json.NewEncoder(w).Encode(output)
 	if err != nil {
 		//TODO log error
