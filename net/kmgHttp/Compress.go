@@ -2,6 +2,7 @@ package kmgHttp
 
 import (
 	"compress/flate"
+	"compress/gzip"
 	"io"
 	"net/http"
 )
@@ -28,6 +29,25 @@ func HttpHandleCompressFlateWrap(fn http.Handler) http.Handler {
 		if err != nil {
 			panic(err)
 		}
+		defer gzw.Close()
+		gzr := ResponseWriterWraper{Writer: gzw, ResponseWriter: w}
+		fn.ServeHTTP(gzr, r)
+	})
+}
+
+func HttpHandleCompressGzipWrap(fn http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		/*
+			oldBody := r.Body
+			defer oldBody.Close()
+			var err error
+			r.Body,err = gzip.NewReader(oldBody)
+			if err!=nil{
+				panic(err)
+			}
+		*/
+		w.Header().Set("Content-Encoding", "gzip")
+		gzw := gzip.NewWriter(w)
 		defer gzw.Close()
 		gzr := ResponseWriterWraper{Writer: gzw, ResponseWriter: w}
 		fn.ServeHTTP(gzr, r)

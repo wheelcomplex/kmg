@@ -49,6 +49,7 @@ func (command *GoHttpApiServerCommand) Execute(context *console.Context) error {
 	handler := ihandler.(http.Handler)
 	http.Handle("/api", handler)
 	http.Handle("/api.deflate", kmgHttp.HttpHandleCompressFlateWrap(handler))
+	http.Handle("/api.gzip", kmgHttp.HttpHandleCompressGzipWrap(handler))
 	l, err := command.listen()
 	if err != nil {
 		return err
