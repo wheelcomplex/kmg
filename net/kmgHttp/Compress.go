@@ -24,7 +24,7 @@ func HttpHandleCompressFlateWrap(fn http.Handler) http.Handler {
 		oldBody := r.Body
 		defer oldBody.Close()
 		r.Body = flate.NewReader(oldBody)
-		w.Header().Set("Content-Encoding", "deflate")
+		//w.Header().Set("Content-Encoding", "deflate")
 		gzw, err := flate.NewWriter(w, -1)
 		if err != nil {
 			panic(err)
@@ -46,7 +46,7 @@ func HttpHandleCompressGzipWrap(fn http.Handler) http.Handler {
 				panic(err)
 			}
 		*/
-		w.Header().Set("Content-Encoding", "gzip")
+		//w.Header().Set("Content-Encoding", "gzip")
 		gzw := gzip.NewWriter(w)
 		defer gzw.Close()
 		gzr := ResponseWriterWraper{Writer: gzw, ResponseWriter: w}
