@@ -17,8 +17,7 @@ func (w ResponseWriterWraper) Write(b []byte) (int, error) {
 }
 
 // a flate(DEFLATE) compress wrap around http request and response,
-// set http header
-// !!not check http header!!
+// !!not handle any http header!!
 func HttpHandleCompressFlateWrap(fn http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		oldBody := r.Body
@@ -35,17 +34,17 @@ func HttpHandleCompressFlateWrap(fn http.Handler) http.Handler {
 	})
 }
 
+// a flate(DEFLATE) compress wrap around http request and response,
+// !!not handle any http header!!
 func HttpHandleCompressGzipWrap(fn http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		/*
-			oldBody := r.Body
-			defer oldBody.Close()
-			var err error
-			r.Body,err = gzip.NewReader(oldBody)
-			if err!=nil{
-				panic(err)
-			}
-		*/
+		oldBody := r.Body
+		defer oldBody.Close()
+		var err error
+		r.Body, err = gzip.NewReader(oldBody)
+		if err != nil {
+			panic(err)
+		}
 		//w.Header().Set("Content-Encoding", "gzip")
 		gzw := gzip.NewWriter(w)
 		defer gzw.Close()
