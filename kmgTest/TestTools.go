@@ -46,7 +46,9 @@ func (tools *TestTools) EqualMsg(get interface{}, expect interface{}, format str
 	if isEqual(expect, get) {
 		return
 	}
-	tools.assertFail(fmt.Sprintf("%s\nexpect2:%#v (%T)\nget1:%#v (%T)", fmt.Sprintf(format, args...), expect, expect, get, get), 2)
+	tools.assertFail(fmt.Sprintf(`%s
+expect2:%#v (%T)
+get1:%#v (%T)`, fmt.Sprintf(format, args...), expect, expect, get, get), 2)
 }
 func (tools *TestTools) GetTestingT() *testing.T {
 	return tools.TestingTB.(*testing.T)
@@ -74,7 +76,11 @@ func (tools *TestTools) assertFail(msg string, skip int) {
 			line_info = fmt.Sprintf("%v:%v:%x", file, line, pc)
 		}
 	*/
-	tools.Printf("\n%s\n\n%s\n", msg, kmgDebug.GetCurrentStack(skip).ToString())
+	tools.Printf(`----------------------------------
+%s
+
+%s----------------------------------
+`, msg, kmgDebug.GetCurrentStack(skip).ToString())
 	tools.TestingTB.FailNow()
 }
 
