@@ -25,17 +25,48 @@ func WriteFile(path string, obj interface{}) error {
 	return ioutil.WriteFile(path, out, os.FileMode(0777))
 }
 
-func Yaml2JsonIo(r io.Reader, w io.Writer) error {
+func Yaml2JsonIo(r io.Reader, w io.Writer) (err error) {
 	input, err := ioutil.ReadAll(r)
 	if err != nil {
-		return err
+		return
 	}
-	output, err := Yaml2JsonBytes(input)
+	var data interface{}
+	err = Unmarshal(input, &data)
 	if err != nil {
-		return err
+		return
+	}
+	data, err = Yaml2JsonTransformData(data)
+	if err != nil {
+		return
+	}
+	output, err := json.Marshal(data)
+	if err != nil {
+		return
 	}
 	_, err = w.Write(output)
-	return err
+	return
+}
+
+func Yaml2JsonIndentIo(r io.Reader, w io.Writer) (err error) {
+	input, err := ioutil.ReadAll(r)
+	if err != nil {
+		return
+	}
+	var data interface{}
+	err = Unmarshal(input, &data)
+	if err != nil {
+		return
+	}
+	data, err = Yaml2JsonTransformData(data)
+	if err != nil {
+		return
+	}
+	output, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return
+	}
+	_, err = w.Write(output)
+	return
 }
 
 func Json2YamlIo(r io.Reader, w io.Writer) error {
@@ -56,18 +87,6 @@ func Json2YamlIo(r io.Reader, w io.Writer) error {
 	return err
 }
 
-func Yaml2JsonBytes(input []byte) (output []byte, err error) {
-	var data interface{}
-	err = Unmarshal(input, &data)
-	if err != nil {
-		return nil, err
-	}
-	data, err = Yaml2JsonTransformData(data)
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(data)
-}
 func Yaml2JsonTransformData(in interface{}) (out interface{}, err error) {
 	switch in.(type) {
 	case map[interface{}]interface{}:

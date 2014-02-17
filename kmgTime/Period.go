@@ -32,6 +32,14 @@ func (p Period) IsIn(t time.Time) bool {
 	return true
 }
 
+func (p Period) IsValid() bool {
+	if p.End.Before(p.Start) {
+		return false
+	} else {
+		return true
+	}
+}
+
 // start must before or equal end
 func NewPeriod(Start time.Time, End time.Time) (period Period, err error) {
 	if Start.After(End) {
