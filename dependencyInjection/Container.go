@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bronze1man/kmg/kmgReflect"
 	"reflect"
+	"sync"
 )
 
 var ServiceIdNotExistError = errors.New("service id not exist")
@@ -21,6 +22,7 @@ type Container struct {
 	scope_map      map[string]*Container  //contain all scope
 	scope          string
 	parent         *Container
+	serivce_lock   sync.RWMutex
 }
 
 //a simple container implement,which can only set object in runtime.
@@ -49,7 +51,9 @@ func (c *Container) Get(id string) (service interface{}, err error) {
 	}
 	container := c.scope_map[definition.Scope]
 	//TODO Concurrent safe
+	c.serivce_lock.RLock()
 	service, ok = container.service_map[id]
+	c.serivce_lock.RUnlock()
 	if ok {
 		return service, nil
 	}
@@ -58,7 +62,9 @@ func (c *Container) Get(id string) (service interface{}, err error) {
 		return nil, err
 	}
 	if definition.Scope != ScopePrototype {
+		c.serivce_lock.Lock()
 		container.service_map[id] = service
+		c.serivce_lock.Unlock()
 	}
 	return
 }
@@ -118,6 +124,8 @@ func (c *Container) Set(id string, obj interface{}, scope string) error {
 		return err
 	}
 	c.definition_map[id] = definition
+	c.serivce_lock.Lock()
+	defer c.serivce_lock.Unlock()
 	c.scope_map[scope].service_map[id] = obj
 	return nil
 }
@@ -207,5 +215,7 @@ func (c *Container) removeInst(id string) {
 	if !ok {
 		return
 	}
+	c.serivce_lock.Lock()
 	delete(container.service_map, id)
+	c.serivce_lock.Unlock()
 }

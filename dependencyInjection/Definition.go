@@ -25,7 +25,7 @@ const (
 */
 type Definition struct {
 	Id          string
-	Scope       string
+	Scope       string //default dependencyInjection.ScopeSingleton
 	Inst        interface{}
 	Factory     func(c *Container) (interface{}, error)
 	Tags        []string
