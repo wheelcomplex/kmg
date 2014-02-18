@@ -50,7 +50,7 @@ func (c *Container) Get(id string) (service interface{}, err error) {
 		return nil, fmt.Errorf("service id:%s scope:%s not active", id, definition.Scope)
 	}
 	container := c.scope_map[definition.Scope]
-	//TODO Concurrent safe
+	//TODO Concurrent safe not work...
 	c.serivce_lock.RLock()
 	service, ok = container.service_map[id]
 	c.serivce_lock.RUnlock()
