@@ -7,6 +7,8 @@ import (
 	"github.com/bronze1man/kmg/dependencyInjection"
 	"os"
 	"time"
+	//"fmt"
+	"github.com/bronze1man/kmg/kmgSql"
 )
 
 type BeegoOrmSyncDbCommand struct {
@@ -29,8 +31,20 @@ func (command *BeegoOrmSyncDbCommand) Execute(context *console.Context) error {
 		os.Args[0], "orm", "syncdb",
 	}
 	command.C.MustSet("Parameter.Env", command.env, "")
+	//fmt.Println(command.C.MustGetString("kmgSql.DbConfig.Dsn"))
+	//work around for container bug
+	DbConfig := &kmgSql.DbConfig{
+		Username: command.C.MustGetString("Parameter.DatabaseUsername"),
+		Password: command.C.MustGetString("Parameter.DatabasePassword"),
+		Host:     command.C.MustGetString("Parameter.DatabaseHost"),
+		DbName:   command.C.MustGetString("Parameter.DatabaseDbName"),
+	}
 
-	orm.RegisterDataBase("default", "mysql", command.C.MustGetString("kmgSql.DbConfig.Dsn"))
+	if command.C.MustGetString("Parameter.Env") == "test" {
+		DbConfig.DbName = command.C.MustGetString("Parameter.DatabaseTestDbName")
+	}
+	//orm.RegisterDataBase("default", "mysql", command.C.MustGetString("kmgSql.DbConfig.Dsn"))
+	orm.RegisterDataBase("default", "mysql", DbConfig.GetDsn())
 	orm.SetDataBaseTZ("default", time.UTC)
 
 	orm.RunCommand()

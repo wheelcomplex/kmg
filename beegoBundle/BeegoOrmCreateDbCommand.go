@@ -26,7 +26,18 @@ func (command *BeegoOrmCreateDbCommand) ConfigFlagSet(flag *flag.FlagSet) {
 }
 func (command *BeegoOrmCreateDbCommand) Execute(context *console.Context) (err error) {
 	command.C.MustSet("Parameter.Env", command.env, "")
-	DbConfig := command.C.MustGetByType((*kmgSql.DbConfig)(nil)).(*kmgSql.DbConfig)
+	//DbConfig := command.C.MustGetByType((*kmgSql.DbConfig)(nil)).(*kmgSql.DbConfig)
+	//work around for container bug
+	DbConfig := &kmgSql.DbConfig{
+		Username: command.C.MustGetString("Parameter.DatabaseUsername"),
+		Password: command.C.MustGetString("Parameter.DatabasePassword"),
+		Host:     command.C.MustGetString("Parameter.DatabaseHost"),
+		DbName:   command.C.MustGetString("Parameter.DatabaseDbName"),
+	}
+
+	if command.C.MustGetString("Parameter.Env") == "test" {
+		DbConfig.DbName = command.C.MustGetString("Parameter.DatabaseTestDbName")
+	}
 	dsn := fmt.Sprintf("%s:%s@%s/?charset=utf8&timeout=5s",
 		DbConfig.Username,
 		DbConfig.Password,
