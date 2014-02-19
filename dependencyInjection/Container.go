@@ -43,7 +43,11 @@ func (c *Container) init() {
 }
 
 //init all singleton object, to avoid data race,eat memory stuff
+//must call it on ScopeSingleton container
 func (c *Container) build() (err error) {
+	if c.scope != ScopeSingleton {
+		return fmt.Errorf("[Container.build] c.scope:%s!=ScopeSingleton ", c.scope)
+	}
 	for name, def := range c.definition_map {
 		if def.Scope != ScopeSingleton {
 			continue
