@@ -136,6 +136,7 @@ func (builder *ContainerBuilder) Compile() (c *Container, err error) {
 			return
 		}
 	}
+	err = c.build()
 	return
 }
 func (builder *ContainerBuilder) MustCompile() (c *Container) {

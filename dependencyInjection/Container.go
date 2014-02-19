@@ -41,6 +41,29 @@ func (c *Container) init() {
 	c.scope_map[ScopeSingleton] = c
 	c.scope_map[ScopePrototype] = c
 }
+
+//init all singleton object, to avoid data race,eat memory stuff
+func (c *Container) build() (err error) {
+	for name, def := range c.definition_map {
+		if def.Scope != ScopeSingleton {
+			continue
+		}
+		c.serivce_lock.RLock()
+		_, ok := c.service_map[name]
+		c.serivce_lock.RUnlock()
+		if ok {
+			return
+		}
+		service, err := def.GetInst(c)
+		if err != nil {
+			return err
+		}
+		c.serivce_lock.Lock()
+		c.service_map[name] = service
+		c.serivce_lock.Unlock()
+	}
+	return nil
+}
 func (c *Container) Get(id string) (service interface{}, err error) {
 	definition, ok := c.definition_map[id]
 	if !ok {
