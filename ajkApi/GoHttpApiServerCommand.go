@@ -7,7 +7,7 @@ import (
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/crypto/kmgTls"
 	"github.com/bronze1man/kmg/dependencyInjection"
-	"github.com/bronze1man/kmg/net/kmgHttp"
+	//"github.com/bronze1man/kmg/net/kmgHttp"
 	"net"
 	"net/http"
 )
@@ -46,10 +46,18 @@ func (command *GoHttpApiServerCommand) Execute(context *console.Context) error {
 	if err != nil {
 		return err
 	}
-	handler := ihandler.(http.Handler)
-	http.Handle("/api", handler)
-	http.Handle("/api.deflate", kmgHttp.HttpHandleCompressFlateWrap(handler))
-	http.Handle("/api.gzip", kmgHttp.HttpHandleCompressGzipWrap(handler))
+	jsonHttpHandler := ihandler.(*JsonHttpHandler)
+	http.Handle("/api", &HttpApiFilterManager{
+		Filters: []HttpApiFilter{
+			jsonHttpHandler.Filter,
+		},
+	})
+	http.Handle("/api.deflate", &HttpApiFilterManager{
+		Filters: []HttpApiFilter{
+			HttpApiDeflateCompressFilter,
+			jsonHttpHandler.Filter,
+		},
+	})
 	l, err := command.listen()
 	if err != nil {
 		return err

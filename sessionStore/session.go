@@ -24,6 +24,17 @@ func (sess *Session) GetIntOrZero(key string) (i int) {
 	}
 	return
 }
+func (sess *Session) GetBool(key string) bool {
+	value, ok := sess.data[key]
+	if !ok {
+		return false
+	}
+	b, ok := value.(bool)
+	if !ok {
+		return false
+	}
+	return b
+}
 func (sess *Session) Set(key string, value interface{}) {
 	sess.data[key] = value
 }

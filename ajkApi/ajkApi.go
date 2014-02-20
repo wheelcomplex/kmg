@@ -1,6 +1,8 @@
 package ajkApi
 
-import "github.com/bronze1man/kmg/sessionStore"
+import (
+	"github.com/bronze1man/kmg/sessionStore"
+)
 
 /*
 

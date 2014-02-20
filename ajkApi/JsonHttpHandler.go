@@ -2,9 +2,9 @@ package ajkApi
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
-	"github.com/bronze1man/kmg/kmgReflect"
+	//"errors"
+	//"fmt"
+	//"github.com/bronze1man/kmg/kmgReflect"
 	"github.com/bronze1man/kmg/sessionStore"
 	"net/http"
 	"reflect"
@@ -28,9 +28,12 @@ type JsonHttpOutput struct {
 type JsonHttpHandler struct {
 	ApiManager          ApiManagerInterface
 	SessionStoreManager *sessionStore.Manager
-	ReflectDecl         *kmgReflect.ContextDecl
+	//	ReflectDecl         *kmgReflect.ContextDecl
 }
 
+func (handler *JsonHttpHandler) Filter(c *HttpApiContext, _ []HttpApiFilter) {
+	handler.ServeHTTP(c.ResponseWriter, c.Request)
+}
 func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var err error
 	defer req.Body.Close()
@@ -46,7 +49,7 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 		panic(err)
 	}
 	err = handler.ApiManager.RpcCall(session, rawInput.Name, func(meta *ApiFuncMeta) error {
-		apiOutput, err = handler.rpcCall(meta, rawInput)
+		apiOutput, err = structRpcCall(meta, rawInput)
 		return err
 	})
 
@@ -62,6 +65,7 @@ func (handler *JsonHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Reque
 }
 
 //TODO finish rpcCall by function param name
+/*
 func (handler *JsonHttpHandler) rpcCall(funcMeta *ApiFuncMeta, rawInput *httpInput) (interface{}, error) {
 	if handler.ReflectDecl == nil {
 		return structRpcCall(funcMeta, rawInput)
@@ -110,6 +114,7 @@ func (handler *JsonHttpHandler) rpcCall(funcMeta *ApiFuncMeta, rawInput *httpInp
 	}
 	return nil, errors.New("not implement rpcCall by function param name")
 }
+*/
 func structRpcCall(funcMeta *ApiFuncMeta, rawInput *httpInput) (interface{}, error) {
 	funcType := funcMeta.Func.Type()
 	var inValues []reflect.Value
