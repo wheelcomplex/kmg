@@ -5,6 +5,7 @@ import (
 	"github.com/bronze1man/kmg/kmgReflect"
 	"github.com/bronze1man/kmg/kmgTime"
 	"github.com/bronze1man/kmg/kmgType"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -72,12 +73,6 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 		}
 	case reflect.Interface:
 		return Tran(in.Elem(), out)
-		/*
-			switch out.Kind() {
-			case reflect.Interface:
-				return Tran(in.Elem(), out.Elem())
-			}
-		*/
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 		reflect.Uintptr:
@@ -86,6 +81,21 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 			reflect.Uintptr:
 			out.SetInt(in.Int())
+			return
+		}
+	case reflect.Float64, reflect.Float32:
+		switch out.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Uintptr:
+			outf1 := in.Float()
+			if math.Floor(outf1) != outf1 {
+				return fmt.Errorf("[typeTransform.tran] it seems to lose some accuracy trying to convert from float to int,float:%f", outf1)
+			}
+			out.SetInt(int64(outf1))
+			return
+		case reflect.Float64, reflect.Float32:
+			out.SetFloat(in.Float())
 			return
 		}
 	}
@@ -98,10 +108,10 @@ func Tran(in reflect.Value, out reflect.Value) (err error) {
 	return fmt.Errorf("[typeTransform.tran] not support tran kind: [%s] to [%s]", in.Kind(), out.Kind())
 }
 func MapToMap(in reflect.Value, out reflect.Value) (err error) {
-	oKey := reflect.New(out.Type().Key()).Elem()
-	oVal := reflect.New(out.Type().Elem()).Elem()
 	out.Set(reflect.MakeMap(out.Type()))
 	for _, key := range in.MapKeys() {
+		oKey := reflect.New(out.Type().Key()).Elem()
+		oVal := reflect.New(out.Type().Elem()).Elem()
 		err = Tran(key, oKey)
 		if err != nil {
 			return

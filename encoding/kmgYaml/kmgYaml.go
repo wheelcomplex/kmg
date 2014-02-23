@@ -69,6 +69,7 @@ func Yaml2JsonIndentIo(r io.Reader, w io.Writer) (err error) {
 	return
 }
 
+//先 Yaml2JsonIo , 后 Json2YamlIo 可能不会获得完全一致的结果
 func Json2YamlIo(r io.Reader, w io.Writer) error {
 	input, err := ioutil.ReadAll(r)
 	if err != nil {
