@@ -1,6 +1,7 @@
 package kmgGob
 
 import (
+	"bytes"
 	"encoding/gob"
 	"os"
 )
@@ -13,4 +14,14 @@ func WriteFile(path string, obj interface{}) (err error) {
 	defer f.Close()
 	encoder := gob.NewEncoder(f)
 	return encoder.Encode(obj)
+}
+
+func Marshal(obj interface{}) (out []byte, err error) {
+	b := &bytes.Buffer{}
+	encoder := gob.NewEncoder(b)
+	err = encoder.Encode(obj)
+	if err != nil {
+		return
+	}
+	return b.Bytes(), nil
 }
