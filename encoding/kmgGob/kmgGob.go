@@ -7,13 +7,23 @@ import (
 )
 
 func WriteFile(path string, obj interface{}) (err error) {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0777))
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0666))
 	if err != nil {
 		return
 	}
 	defer f.Close()
 	encoder := gob.NewEncoder(f)
 	return encoder.Encode(obj)
+}
+
+func ReadFile(path string, obj interface{}) (err error) {
+	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0666))
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	encoder := gob.NewDecoder(f)
+	return encoder.Decode(obj)
 }
 
 func Marshal(obj interface{}) (out []byte, err error) {

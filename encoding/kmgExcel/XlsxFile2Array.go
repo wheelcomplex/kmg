@@ -52,3 +52,14 @@ func XlsxFileSheetIndex2Array(path string, index int) ([][]string, error) {
 	}
 	return output, nil
 }
+
+//output index mean=> row ,cell ,value
+// remove all right and bottom black lines
+func XlsxFileFirstSheet2ArrayTrim(path string) (output [][]string, err error) {
+	output, err = XlsxFileSheetIndex2Array(path, 0)
+	if err != nil {
+		return
+	}
+	output = Trim2DArray(output)
+	return
+}
