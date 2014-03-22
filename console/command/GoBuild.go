@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
+	"github.com/bronze1man/kmg/kmgCmd"
 )
 
 type GoBuild struct {
@@ -18,7 +19,7 @@ func (command *GoBuild) Execute(context *console.Context) (err error) {
 	if err != nil {
 		return
 	}
-	err = console.SetCmdEnv(cmd, "GOPATH", kmgc.GOPATHToString())
+	err = kmgCmd.SetCmdEnv(cmd, "GOPATH", kmgc.GOPATHToString())
 	if err != nil {
 		return err
 	}

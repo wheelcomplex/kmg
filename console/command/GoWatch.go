@@ -5,6 +5,7 @@ import (
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/fsnotify"
+	"github.com/bronze1man/kmg/kmgCmd"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -89,7 +90,7 @@ func (command *GoWatch) restart() error {
 	command.debugPrintln("target file path: ", command.targetFilePath)
 
 	command.cmd = console.NewStdioCmd(command.context, "go", "build", "-o", command.targetFilePath, command.mainFilePath)
-	err = console.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
+	err = kmgCmd.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
 	if err != nil {
 		return err
 	}
@@ -103,7 +104,7 @@ func (command *GoWatch) restart() error {
 		return err
 	}
 	command.cmd = console.NewStdioCmd(command.context, command.targetFilePath)
-	err = console.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
+	err = kmgCmd.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
 	if err != nil {
 		return err
 	}

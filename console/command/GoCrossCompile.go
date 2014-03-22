@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
+	"github.com/bronze1man/kmg/kmgCmd"
 	"github.com/bronze1man/kmg/kmgFile"
 	"path/filepath"
 )
@@ -45,9 +46,9 @@ func (command *GoCrossCompile) Execute(context *console.Context) (err error) {
 		}
 		outputFilePath := filepath.Join(command.outputPath, fileName)
 		cmd := console.NewStdioCmd(context, "go", "build", "-o", outputFilePath, targetFile)
-		console.SetCmdEnv(cmd, "GOOS", target.GetGOOS())
-		console.SetCmdEnv(cmd, "GOARCH", target.GetGOARCH())
-		console.SetCmdEnv(cmd, "GOPATH", kmgc.GOPATHToString())
+		kmgCmd.SetCmdEnv(cmd, "GOOS", target.GetGOOS())
+		kmgCmd.SetCmdEnv(cmd, "GOARCH", target.GetGOARCH())
+		kmgCmd.SetCmdEnv(cmd, "GOPATH", kmgc.GOPATHToString())
 		err = cmd.Run()
 		if err != nil {
 			return err

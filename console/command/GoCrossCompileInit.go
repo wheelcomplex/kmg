@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
+	"github.com/bronze1man/kmg/kmgCmd"
 	"path/filepath"
 	"runtime"
 )
@@ -35,8 +36,8 @@ func (command *GoCrossCompileInit) Execute(context *console.Context) (err error)
 	}
 	for _, target := range kmgc.CrossCompileTarget {
 		cmd := console.NewStdioCmd(context, makeShellName, makeShellArgs...)
-		console.SetCmdEnv(cmd, "GOOS", target.GetGOOS())
-		console.SetCmdEnv(cmd, "GOARCH", target.GetGOARCH())
+		kmgCmd.SetCmdEnv(cmd, "GOOS", target.GetGOOS())
+		kmgCmd.SetCmdEnv(cmd, "GOARCH", target.GetGOARCH())
 		cmd.Dir = runCmdPath
 		err = cmd.Run()
 		if err != nil {

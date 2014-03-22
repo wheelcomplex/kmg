@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
+	"github.com/bronze1man/kmg/kmgCmd"
 	"github.com/bronze1man/kmg/kmgFile"
 	"go/build"
 	"os"
@@ -70,7 +71,7 @@ func (command *GoTest) gotest(path string) error {
 	}
 	cmd := console.NewStdioCmd(command.context, "go", args...)
 	cmd.Dir = path
-	err := console.SetCmdEnv(cmd, "GOPATH", command.wd)
+	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.wd)
 	if err != nil {
 		return err
 	}

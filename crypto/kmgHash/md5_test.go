@@ -1,9 +1,7 @@
 package kmgHash
 
 import (
-	"encoding/hex"
 	"github.com/bronze1man/kmg/kmgTest"
-	"strings"
 	"testing"
 )
 

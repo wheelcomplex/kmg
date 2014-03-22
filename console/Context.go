@@ -32,3 +32,15 @@ func (c *Context) PrintUsage(msg string) {
 	c.Stderr.Write([]byte(msg))
 	c.flagSet.PrintDefaults()
 }
+
+func (c *Context) GetStdin() io.ReadCloser {
+	return c.Stdin
+}
+
+func (c *Context) GetStdout() io.WriteCloser {
+	return c.Stdout
+}
+
+func (c *Context) GetStderr() io.WriteCloser {
+	return c.Stderr
+}

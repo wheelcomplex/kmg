@@ -1,9 +1,24 @@
-package console
+package kmgCmd
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"strings"
 )
+
+func SetCmdEnv(cmd *exec.Cmd, key string, value string) error {
+	if len(cmd.Env) == 0 {
+		cmd.Env = os.Environ()
+	}
+	env, err := NewEnvFromArray(cmd.Env)
+	if err != nil {
+		return err
+	}
+	env.Values[key] = value
+	cmd.Env = env.ToArray()
+	return nil
+}
 
 type Env struct {
 	Values map[string]string
