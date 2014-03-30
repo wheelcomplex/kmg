@@ -8,23 +8,23 @@ import (
 	"text/template"
 )
 
-type SmtpSendEmailRequest struct{
-	SmtpHost string
-	SmtpPort int
-	From string      //also as stmp username
+type SmtpSendEmailRequest struct {
+	SmtpHost     string
+	SmtpPort     int
+	From         string //also as stmp username
 	SmtpPassword string
-	To []string
-	Subject string
-	Message string
+	To           []string
+	Subject      string
+	Message      string
 }
 
-func SmtpSendEmail(req SmtpSendEmailRequest)(err error){
+func SmtpSendEmail(req SmtpSendEmailRequest) (err error) {
 	parameters := &struct {
-			From string
-			To string
-			Subject string
-			Message string
-		}{
+		From    string
+		To      string
+		Subject string
+		Message string
+	}{
 		req.From,
 		strings.Join([]string(req.To), ","),
 		req.Subject,

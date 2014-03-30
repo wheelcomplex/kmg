@@ -66,6 +66,9 @@ func (context *Context) Init() {
 	if context.ConfigPath == "" {
 		context.ConfigPath = filepath.Join(context.AppPath, "config")
 	}
+	if len(context.GOPATH) == 0 {
+		context.GOPATH = []string{context.ProjectPath}
+	}
 }
 func FindFromPath(p string) (context *Context, err error) {
 	p, err = filepath.Abs(p)
