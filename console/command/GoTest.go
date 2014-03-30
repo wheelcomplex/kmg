@@ -96,24 +96,43 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 		}
 		pkg, err := c.ImportDir(path, build.ImportMode(0))
 		if err != nil {
+			//忽略异常文件夹,(不是golang的目录之类的)
+			return nil
+		}
+		if pkg.IsCommand() {
 			return nil
 		}
 		if len(pkg.TestGoFiles) == 0 {
-			return nil
+			//如果没有测试文件,还会尝试build一下这个目录
+			return command.gobuild(path)
+			//return nil
 		}
-		err = command.gotest(path)
-		if err != nil {
-			return err
-		}
-		return nil
+		return command.gotest(path)
 	})
 }
 func (command *GoTest) gotest(path string) error {
+	fmt.Printf("[gotest] path[%s]\n", path)
 	args := []string{"test"}
 	if command.v {
 		args = append(args, "-v")
 	}
 	cmd := console.NewStdioCmd(command.context, "go", args...)
+	cmd.Dir = path
+	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.gopath)
+	if err != nil {
+		return err
+	}
+	return cmd.Run()
+}
+
+func (command *GoTest) gobuild(path string) error {
+	/*
+		args := []string{"build"}
+		if command.v {
+			fmt.Println("building ")
+		} */
+	fmt.Printf("[gobuild] path[%s]\n", path)
+	cmd := console.NewStdioCmd(command.context, "go", "build")
 	cmd.Dir = path
 	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.gopath)
 	if err != nil {

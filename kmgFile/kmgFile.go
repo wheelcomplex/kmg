@@ -8,6 +8,9 @@ import (
 )
 
 func IsDotFile(path string) bool {
+	if path == "./" {
+		return false
+	}
 	base := filepath.Base(path)
 	if strings.HasPrefix(base, ".") {
 		return true

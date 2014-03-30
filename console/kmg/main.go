@@ -13,6 +13,8 @@ func main() {
 	manager.MustAdd(&command.GoWatch{})
 	manager.MustAdd(&command.GoCrossCompileInit{})
 	manager.MustAdd(&command.GoCrossCompile{})
+	manager.MustAdd(&command.GoTest{})
+	manager.MustAdd(&command.GoAllImport{})
 
 	manager.MustAdd(&command.CurrentDir{})
 	manager.MustAdd(&command.CurrentPlatform{})
@@ -22,6 +24,5 @@ func main() {
 	manager.MustAdd(&command.Json2Yaml{})
 	manager.MustAdd(&command.Xlsx2Yaml{})
 	manager.MustAdd(&command.ParpareReflect{})
-	manager.MustAdd(&command.GoTest{})
 	manager.ExecuteGlobal()
 }
