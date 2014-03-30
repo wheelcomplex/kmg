@@ -2,6 +2,7 @@ package command
 
 import (
 	"flag"
+	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
 	"github.com/bronze1man/kmg/kmgCmd"
@@ -11,18 +12,35 @@ import (
 	"path/filepath"
 )
 
+/*
+递归目录的 go test
+ 支持.kmg.yml目录结构提示文件(该文件必须存在)
+ -v 更详细的描述
+ -m 一个模块名,从这个模块名开始递归目录测试
+ -d 一个目录名,从这个目录开始递归目录测试
+*/
 type GoTest struct {
-	wd      string
-	context *console.Context
-	v       bool
+	gopath     string
+	context    *console.Context
+	v          bool
+	dir        string
+	moduleName string
 }
 
 func (command *GoTest) GetNameConfig() *console.NameConfig {
-	return &console.NameConfig{Name: "GoTest", Short: `test all go package in a directory in current project`}
+	return &console.NameConfig{Name: "GoTest",
+		Short: `递归目录的go test`,
+		Detail: `递归目录的go test
+ 支持.kmg.yml目录结构提示文件(该文件必须存在)
+ -v 更详细的描述
+ -m 一个模块名,从这个模块名开始递归目录测试
+ -d 一个目录名,从这个目录开始递归目录测试`,
+	}
 }
 func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&commamd.v, "v", false, "show output of test")
-
+	f.StringVar(&commamd.dir, "d", "", "dir path to test")
+	f.StringVar(&commamd.moduleName, "m", "", "module name to test")
 }
 func (command *GoTest) Execute(context *console.Context) (err error) {
 	command.context = context
@@ -30,11 +48,37 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 	if err != nil {
 		return
 	}
-	command.wd = kmgc.GOPATH[0]
+	command.gopath = kmgc.GOPATH[0]
 	//TODO handle several GOPATH
-	root := filepath.Join(command.wd, "src")
+	root := ""
 	if context.FlagSet().NArg() == 1 {
-		root = filepath.Join(root, context.FlagSet().Arg(0))
+		command.moduleName = context.FlagSet().Arg(0)
+	}
+	if command.dir != "" {
+		root = command.dir
+		exist, err := kmgFile.FileExist(root)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("[GoTest] dir path:[%s] not found", root)
+		}
+	}
+	if command.moduleName != "" {
+		root = filepath.Join(command.gopath, "src", command.moduleName)
+		exist, err := kmgFile.FileExist(root)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("[GoTest] module name:[%s] not found", command.moduleName)
+		}
+	}
+	if root == "" {
+		root, err = os.Getwd()
+		if err != nil {
+			return
+		}
 	}
 	c := &build.Context{
 		GOPATH:   kmgc.GOPATHToString(),
@@ -71,7 +115,7 @@ func (command *GoTest) gotest(path string) error {
 	}
 	cmd := console.NewStdioCmd(command.context, "go", args...)
 	cmd.Dir = path
-	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.wd)
+	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.gopath)
 	if err != nil {
 		return err
 	}

@@ -47,8 +47,8 @@ func (tools *TestTools) EqualMsg(get interface{}, expect interface{}, format str
 		return
 	}
 	tools.assertFail(fmt.Sprintf(`%s
-expect2:%#v (%T)
-get1:%#v (%T)`, fmt.Sprintf(format, args...), expect, expect, get, get), 2)
+get1:%#v (%T)
+expect2:%#v (%T)`, fmt.Sprintf(format, args...), get, get, expect, expect), 2)
 }
 func (tools *TestTools) GetTestingT() *testing.T {
 	return tools.TestingTB.(*testing.T)

@@ -22,3 +22,14 @@ func GetFileBaseWithoutExt(p string) string {
 func WriteFile(path string, content []byte) (err error) {
 	return ioutil.WriteFile(path, content, os.FileMode(0777))
 }
+
+func FileExist(path string) (exist bool, err error) {
+	_, err = os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, err
+}
