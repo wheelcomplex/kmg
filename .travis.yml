@@ -1,0 +1,6 @@
+language: go
+go:
+ - release
+
+script:
+ - pwd && go get ./.. && go run ./console/kmg/main.go gotest
