@@ -1,7 +1,6 @@
 package kmgContext
 
 import (
-	"fmt"
 	"github.com/bronze1man/kmg/encoding/kmgYaml"
 	"os"
 	"path/filepath"
@@ -42,6 +41,9 @@ func (target CompileTarget) GetGOARCH() string {
 }
 
 func (context *Context) GOPATHToString() string {
+	if len(context.GOPATH) == 0 {
+		return ""
+	}
 	return strings.Join(context.GOPATH, ":")
 }
 func (context *Context) Init() {
@@ -88,7 +90,7 @@ func FindFromPath(p string) (context *Context, err error) {
 		}
 		thisP := filepath.Dir(p)
 		if p == thisP {
-			err = fmt.Errorf("not found .kmg.yml in the project dir")
+			err = NotFoundError{}
 			return
 		}
 		p = thisP
@@ -112,4 +114,15 @@ func FindFromWd() (context *Context, err error) {
 		return
 	}
 	return FindFromPath(p)
+}
+
+type NotFoundError struct {
+}
+
+func (e NotFoundError) Error() string {
+	return "not found .kmg.yml in the project dir"
+}
+func IsNotFound(err error) (ok bool) {
+	_, ok = err.(NotFoundError)
+	return
 }

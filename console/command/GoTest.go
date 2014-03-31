@@ -45,43 +45,23 @@ func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
 func (command *GoTest) Execute(context *console.Context) (err error) {
 	command.context = context
 	kmgc, err := kmgContext.FindFromWd()
-	if err != nil {
-		return
-	}
-	command.gopath = kmgc.GOPATH[0]
-	//TODO handle several GOPATH
-	root := ""
-	if context.FlagSet().NArg() == 1 {
-		command.moduleName = context.FlagSet().Arg(0)
-	}
-	if command.dir != "" {
-		root = command.dir
-		exist, err := kmgFile.FileExist(root)
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("[GoTest] dir path:[%s] not found", root)
-		}
-	}
-	if command.moduleName != "" {
-		root = filepath.Join(command.gopath, "src", command.moduleName)
-		exist, err := kmgFile.FileExist(root)
-		if err != nil {
-			return err
-		}
-		if !exist {
-			return fmt.Errorf("[GoTest] module name:[%s] not found", command.moduleName)
-		}
-	}
-	if root == "" {
-		root, err = os.Getwd()
-		if err != nil {
+	if err == nil {
+		command.gopath = kmgc.GOPATH[0]
+	} else {
+		if kmgContext.IsNotFound(err) {
+			command.gopath = os.Getenv("GOPATH")
+		} else {
 			return
 		}
 	}
+	//find root path
+	root, err := command.findRootPath(context)
+	if err != nil {
+		return
+	}
+
 	c := &build.Context{
-		GOPATH:   kmgc.GOPATHToString(),
+		GOPATH:   command.gopath,
 		Compiler: build.Default.Compiler,
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -110,6 +90,43 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 		return command.gotest(path)
 	})
 }
+
+func (command *GoTest) findRootPath(context *console.Context) (root string, err error) {
+	if context.FlagSet().NArg() == 1 {
+		command.moduleName = context.FlagSet().Arg(0)
+	}
+	if command.dir != "" {
+		root = command.dir
+		exist, err := kmgFile.FileExist(root)
+		if err != nil {
+			return "", err
+		}
+		if !exist {
+			return "", fmt.Errorf("[GoTest] dir path:[%s] not found", root)
+		}
+		return root, nil
+	}
+	if command.moduleName != "" {
+		//TODO 处理多个GOPATH的问题,从GOPATH里面找到这个模块
+		root = filepath.Join(command.gopath, "src", command.moduleName)
+		exist, err := kmgFile.FileExist(root)
+		if err != nil {
+			return "", err
+		}
+		if !exist {
+			return "", fmt.Errorf("[GoTest] module name:[%s] not found", command.moduleName)
+		}
+		return root, nil
+	}
+	if root == "" {
+		root, err = os.Getwd()
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 func (command *GoTest) gotest(path string) error {
 	fmt.Printf("[gotest] path[%s]\n", path)
 	args := []string{"test"}
