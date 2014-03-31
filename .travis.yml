@@ -3,4 +3,4 @@ go:
  - release
 
 script:
- - pwd && go get ./.. && go run ./console/kmg/main.go gotest
+ - pwd && go get ./.. && go run ./console/kmg/main.go gotest;
