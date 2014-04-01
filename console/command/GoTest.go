@@ -77,8 +77,12 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 		}
 		pkg, err := c.ImportDir(path, build.ImportMode(0))
 		if err != nil {
-			//忽略异常文件夹,(不是golang的目录之类的)
-			return nil
+			//仅忽略 不是golang的目录的错误
+			_, ok := err.(*build.NoGoError)
+			if ok {
+				return nil
+			}
+			return err
 		}
 		if pkg.IsCommand() {
 			return nil
