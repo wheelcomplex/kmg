@@ -35,3 +35,10 @@ func Marshal(obj interface{}) (out []byte, err error) {
 	}
 	return b.Bytes(), nil
 }
+
+func Unmarshal(data []byte, obj interface{}) (err error) {
+	b := bytes.NewBuffer(data)
+	encoder := gob.NewDecoder(b)
+	err = encoder.Decode(obj)
+	return
+}
