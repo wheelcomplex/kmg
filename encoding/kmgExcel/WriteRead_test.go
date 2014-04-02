@@ -14,7 +14,7 @@ func TestWriteRead(ot *testing.T) {
 	buf := &bytes.Buffer{}
 	inData := [][]string{
 		[]string{"中文"},
-		[]string{"1"},
+		[]string{"1", "", "2"},
 	}
 	err := Array2XlsxIo(inData, buf)
 	t.Equal(err, nil)

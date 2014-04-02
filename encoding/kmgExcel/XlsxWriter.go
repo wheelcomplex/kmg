@@ -65,7 +65,6 @@ func array2XlsxWriteSharedStrings(zw *zip.Writer, data [][]string) (err error) {
 			}
 			siList = append(siList, xlsxSharedStringSi{v1})
 		}
-
 	}
 	sst := xlsxSharedStringSst{
 		Xmlns:  xmlNs,
@@ -98,13 +97,14 @@ func array2XlsxWriteSheet1(zw *zip.Writer, data [][]string) (err error) {
 			index := totalIndex
 			if v1 == "" { //ignore blank cell can save space
 				index = 0
+			} else {
+				totalIndex++
 			}
 			rowList[rowIndex].C[cellIndex] = xlsxC{
 				R: CoordinateXy2Excel(cellIndex, rowIndex),
 				T: "s",
 				V: index,
 			}
-			totalIndex++
 		}
 	}
 	sheetData := xlsxSheetData{
