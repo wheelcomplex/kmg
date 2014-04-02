@@ -27,7 +27,7 @@ func Array2XlsxFile(data [][]string, path string) (err error) {
 
 //write raw data into a io.Writer
 //data key means: rowIndex,columnIndex,value
-//TODO work with reader...
+//Array2XlsxIo can be used to write xlsx file in memory without touch filesystem.
 func Array2XlsxIo(data [][]string, w io.Writer) (err error) {
 	zw := zip.NewWriter(w)
 	defer zw.Close()
