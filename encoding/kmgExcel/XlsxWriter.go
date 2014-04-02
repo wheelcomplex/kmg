@@ -10,6 +10,8 @@ import (
 	"text/template"
 )
 
+//write raw data into xlsx file
+//data key means: rowIndex,columnIndex,value
 func Array2XlsxFile(data [][]string, path string) (err error) {
 	f, err := os.Create(path)
 	if err != nil {
@@ -22,6 +24,10 @@ func Array2XlsxFile(data [][]string, path string) (err error) {
 	}
 	return
 }
+
+//write raw data into a io.Writer
+//data key means: rowIndex,columnIndex,value
+//TODO work with reader...
 func Array2XlsxIo(data [][]string, w io.Writer) (err error) {
 	zw := zip.NewWriter(w)
 	defer zw.Close()
@@ -51,9 +57,12 @@ func Array2XlsxIo(data [][]string, w io.Writer) (err error) {
 	return
 }
 func array2XlsxWriteSharedStrings(zw *zip.Writer, data [][]string) (err error) {
-	siList := []xlsxSharedStringSi{}
+	siList := []xlsxSharedStringSi{xlsxSharedStringSi{""}}
 	for _, row := range data {
 		for _, v1 := range row {
+			if v1 == "" { //ignore blank cell can save space
+				continue
+			}
 			siList = append(siList, xlsxSharedStringSi{v1})
 		}
 
@@ -78,14 +87,22 @@ func array2XlsxWriteSharedStrings(zw *zip.Writer, data [][]string) (err error) {
 
 func array2XlsxWriteSheet1(zw *zip.Writer, data [][]string) (err error) {
 	rowList := make([]xlsxRow, len(data))
-	totalIndex := 0
+	totalIndex := 1
+	MaxCellIndex := 0
 	for rowIndex, row := range data {
 		rowList[rowIndex].C = make([]xlsxC, len(row))
-		for cellIndex := range row {
+		if len(row) > MaxCellIndex {
+			MaxCellIndex = len(row) - 1
+		}
+		for cellIndex, v1 := range row {
+			index := totalIndex
+			if v1 == "" { //ignore blank cell can save space
+				index = 0
+			}
 			rowList[rowIndex].C[cellIndex] = xlsxC{
 				R: CoordinateXy2Excel(cellIndex, rowIndex),
 				T: "s",
-				V: totalIndex,
+				V: index,
 			}
 			totalIndex++
 		}
@@ -98,7 +115,13 @@ func array2XlsxWriteSheet1(zw *zip.Writer, data [][]string) (err error) {
 	if err != nil {
 		return
 	}
-	err = sheelTpl.Execute(thisW, string(xmlBytes))
+	err = sheelTpl.Execute(thisW, struct {
+		MaxPosition string
+		SheetData   string
+	}{
+		MaxPosition: CoordinateXy2Excel(MaxCellIndex, len(data)-1),
+		SheetData:   string(xmlBytes),
+	})
 	if err != nil {
 		return
 	}
@@ -107,20 +130,19 @@ func array2XlsxWriteSheet1(zw *zip.Writer, data [][]string) (err error) {
 
 //坐标系变换,从xy坐标系变化成excel的字符坐标系
 //xy坐标从(0,0)开始,excel坐标从A1开始
-//x as collomnIndex
-//y as rowIndex
-func CoordinateXy2Excel(x int, y int) (output string) {
-	if x < 0 || y < 0 {
-		panic(fmt.Errorf("[CoordinateXy2Excel] x[%d]<0||y[%d]<0", x, y))
+func CoordinateXy2Excel(collomnIndex int, rowIndex int) (output string) {
+	if collomnIndex < 0 || rowIndex < 0 {
+		panic(fmt.Errorf("[CoordinateXy2Excel] collomnIndex[%d]<0||y[%d]<0", collomnIndex, rowIndex))
 	}
 	for {
-		output = string(x%26+int('A')) + output
-		x = x/26 - 1
-		if x < 0 {
+		output = string(collomnIndex%26+int('A')) + output
+		collomnIndex = collomnIndex/26 - 1
+		if collomnIndex < 0 {
 			break
 		}
 	}
 	/*
+		for reference,通过下面的代码推导出上面的循环代码
 		if ((x/26-1)/26-1)>=0{
 		    output+=string((x/26-1)/26-1+int('A'))+string((x/26-1)%26+int('A'))+string(x%26+int('A'))
 		}else if (x/26-1)>=0{
@@ -129,11 +151,11 @@ func CoordinateXy2Excel(x int, y int) (output string) {
 			output+=string(x+int('A'))
 		}
 	*/
-	output += strconv.Itoa(y + 1)
+	output += strconv.Itoa(rowIndex + 1)
 	return output
 }
 
-//从wps生成的xlsx文件中找到的内容
+//file content from wps xlsx file.
 var fixedFileContent = map[string][]byte{
 	"[Content_Types].xml": []byte(`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default ContentType="application/vnd.openxmlformats-package.relationships+xml" Extension="rels"/><Default ContentType="application/xml" Extension="xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml" PartName="/docProps/app.xml"/><Override ContentType="application/vnd.openxmlformats-package.core-properties+xml" PartName="/docProps/core.xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml" PartName="/docProps/custom.xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml" PartName="/xl/sharedStrings.xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml" PartName="/xl/styles.xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.theme+xml" PartName="/xl/theme/theme1.xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" PartName="/xl/workbook.xml"/><Override ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" PartName="/xl/worksheets/sheet1.xml"/></Types>`),
@@ -164,7 +186,8 @@ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
 xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
-{{.}}
+<dimension ref="A1:{{.MaxPosition}}"/>
+{{.SheetData}}
 </worksheet>
 `))
 
@@ -193,15 +216,14 @@ type xlsxC struct {
 const xmlNs = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 
 /*
+for reference of contents of wps xlsx files which dynamically generated from this program
 sharedStrings.xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="2">
   <si><t>中文</t></si>
   <si><t>哈哈</t></si>
 </sst>
-*/
 
-/*
 sheet1.xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -209,6 +231,7 @@ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
 xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+<dimension ref="A1:C1492"/>
 <sheetData>
 <row>
   <c r="A1" t="s"><v>0</v></c>

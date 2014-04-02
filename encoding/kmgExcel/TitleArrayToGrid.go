@@ -2,9 +2,10 @@ package kmgExcel
 
 import (
 	"fmt"
-	"strings"
 )
 
+//transform from title array to grid
+//titleArray should call Trim2DArray already
 func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err error) {
 	titleArray = Trim2DArray(titleArray)
 	lenTitleArray := len(titleArray)
@@ -13,7 +14,6 @@ func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err er
 	}
 	output = make([]map[string]string, lenTitleArray-1)
 	titles := titleArray[0]
-	//titles = TrimRightRowString(titles)
 	lenTitles := len(titles)
 	for rowIndex := 1; rowIndex < lenTitleArray; rowIndex++ {
 		row := titleArray[rowIndex]
@@ -34,11 +34,30 @@ func TitleArrayToGrid(titleArray [][]string) (output []map[string]string, err er
 	return output, nil
 }
 
-func TrimRightRowString(row []string) []string {
-	for i := len(row) - 1; i >= 0; i-- {
-		if strings.Trim(row[i], " ") != "" {
-			return row[:i+1]
+//transform from grid to title array
+//keys not in title will return an error
+// key in title but not in element map ,value will be "" in titleArray
+// len(grid)==0 will return a titleArray only have title in it.
+func GridToTitleArrayWithTitle(grid []map[string]string, title []string) (titleArray [][]string, err error) {
+	if len(grid) == 0 {
+		return [][]string{title}, nil
+	}
+	titleArray = make([][]string, len(grid)+1)
+	lenTitle := len(title)
+	titleIndexMap := make(map[string]int, lenTitle)
+	titleArray[0] = title
+	for i, key := range title {
+		titleIndexMap[key] = i
+	}
+	for i, row := range grid {
+		titleArray[i+1] = make([]string, lenTitle)
+		for key, value := range row {
+			j, exist := titleIndexMap[key]
+			if !exist {
+				return nil, fmt.Errorf("[GridToTitleArray][i:%d] key[%s] in grid Row,but not in title", i, key)
+			}
+			titleArray[i+1][j] = value
 		}
 	}
-	return []string{}
+	return
 }

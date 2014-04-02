@@ -1,5 +1,9 @@
 package kmgExcel
 
+import (
+	"strings"
+)
+
 //remove empty cell right(every line will have same length)
 //remove all empty line (include some empty line in between)
 func Trim2DArray(input [][]string) (output [][]string) {
@@ -40,4 +44,13 @@ func Trim2DArray(input [][]string) (output [][]string) {
 		i++
 	}
 	return output
+}
+
+func TrimRightRowString(row []string) []string {
+	for i := len(row) - 1; i >= 0; i-- {
+		if strings.Trim(row[i], " ") != "" {
+			return row[:i+1]
+		}
+	}
+	return []string{}
 }

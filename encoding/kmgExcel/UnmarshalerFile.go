@@ -8,11 +8,11 @@ import (
 /*
  Unmarshal excel into a array of a struct
 
- * you must put data in first sheet
- * accept []struct{Key1 value;Key2 value} or []map[string]string
- * first excel row as struct key,remain excel row as struct value
- * type can not convert will fail
- * lack key will ignore
+ you must put data in first sheet
+ accept []struct{Key1 value;Key2 value} or []map[string]string
+ first excel row as struct key,remain excel row as struct value
+ type can not convert will fail
+ lack keys will be ignore
 */
 func UnmarshalFile(filePath string, obj interface{}) (err error) {
 	rawArray, err := XlsxFile2Array(filePath)
