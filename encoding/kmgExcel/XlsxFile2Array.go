@@ -2,6 +2,7 @@ package kmgExcel
 
 import (
 	"github.com/tealeg/xlsx"
+	"strings"
 	//"io"
 	//"archive/zip"
 )
@@ -42,13 +43,36 @@ func XlsxFileSheetIndex2Array(path string, index int) ([][]string, error) {
 
 //get data from first sheet of excel
 //output index mean=> row ,cell ,value
-// remove all right and bottom black cells
+// remove all right and bottom blank cells
 func XlsxFileFirstSheet2ArrayTrim(path string) (output [][]string, err error) {
 	output, err = XlsxFileSheetIndex2Array(path, 0)
 	if err != nil {
 		return
 	}
 	output = Trim2DArray(output)
+	return
+}
+
+//get data from first column of first sheet of excel file
+//output index name=>row index,value
+//remove any blank cells.
+// output will not include blank cell in middle.
+func XlsxFileFirstSheet2FirstColumnTrim(path string) (output []string, err error) {
+	outputArray, err := XlsxFileFirstSheet2ArrayTrim(path)
+	if err != nil {
+		return
+	}
+	output = make([]string, len(outputArray))
+	i := 0
+	for _, row := range outputArray {
+		v := strings.TrimSpace(row[0])
+		if v == "" {
+			continue
+		}
+		output[i] = v
+		i++
+	}
+	output = output[:i]
 	return
 }
 

@@ -2,7 +2,7 @@ package kmgYaml
 
 import (
 	"reflect"
-	"unicode"
+	//"unicode"
 )
 
 type keyList []reflect.Value
@@ -36,36 +36,40 @@ func (l keyList) Less(i, j int) bool {
 	if ak != reflect.String || bk != reflect.String {
 		return ak < bk
 	}
-	ar, br := []rune(a.String()), []rune(b.String())
-	for i := 0; i < len(ar) && i < len(br); i++ {
-		if ar[i] == br[i] {
-			continue
-		}
-		al := unicode.IsLetter(ar[i])
-		bl := unicode.IsLetter(br[i])
-		if al && bl {
+	return a.String() < b.String()
+	/*
+		too complex stuff and lots of bugs, just compare string by bytes.
+		ar, br := []rune(a.String()), []rune(b.String())
+		for i := 0; i < len(ar) && i < len(br); i++ {
+			if ar[i] == br[i] {
+				continue
+			}
+			al := unicode.IsLetter(ar[i])
+			bl := unicode.IsLetter(br[i])
+			if al && bl {
+				return ar[i] < br[i]
+			}
+			if al || bl {
+				return bl
+			}
+			var ai, bi int
+			var an, bn int64
+			for ai = i; ai < len(ar) && unicode.IsDigit(ar[ai]); ai++ {
+				an = an*10 + int64(ar[ai]-'0')
+			}
+			for bi = i; bi < len(br) && unicode.IsDigit(br[bi]); bi++ {
+				bn = bn*10 + int64(br[bi]-'0')
+			}
+			if an != bn {
+				return an < bn
+			}
+			if ai != bi {
+				return ai < bi
+			}
 			return ar[i] < br[i]
 		}
-		if al || bl {
-			return bl
-		}
-		var ai, bi int
-		var an, bn int64
-		for ai = i; ai < len(ar) && unicode.IsDigit(ar[ai]); ai++ {
-			an = an*10 + int64(ar[ai]-'0')
-		}
-		for bi = i; bi < len(br) && unicode.IsDigit(br[bi]); bi++ {
-			bn = bn*10 + int64(br[bi]-'0')
-		}
-		if an != bn {
-			return an < bn
-		}
-		if ai != bi {
-			return ai < bi
-		}
-		return ar[i] < br[i]
-	}
-	return len(ar) < len(br)
+		return len(ar) < len(br)
+	*/
 }
 
 // keyFloat returns a float value for v if it is a number/bool

@@ -69,3 +69,12 @@ func UnmarshalNoType(r []byte) (interface{}, error) {
 	}
 	return obj, nil
 }
+
+// for debug to inspect content in obj
+func MustMarshalToString(obj interface{}) string {
+	output, err := json.Marshal(obj)
+	if err != nil {
+		panic(err)
+	}
+	return string(output)
+}

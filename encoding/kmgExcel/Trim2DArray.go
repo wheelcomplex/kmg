@@ -48,7 +48,7 @@ func Trim2DArray(input [][]string) (output [][]string) {
 
 func TrimRightRowString(row []string) []string {
 	for i := len(row) - 1; i >= 0; i-- {
-		if strings.Trim(row[i], " ") != "" {
+		if strings.TrimSpace(row[i]) != "" {
 			return row[:i+1]
 		}
 	}
