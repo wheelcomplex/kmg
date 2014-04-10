@@ -3,6 +3,7 @@ package kmgYaml
 import (
 	"bytes"
 	"fmt"
+	"github.com/bronze1man/kmg/kmgDebug"
 )
 
 // Introduction
@@ -1306,6 +1307,8 @@ func yaml_parser_fetch_value(parser *yaml_parser_t) bool {
 
 			// Check if we are allowed to start a complex value.
 			if !parser.simple_key_allowed {
+				fmt.Println(kmgDebug.GetCurrentStack(0).ToString())
+				panic("mapping values are not allowed in this context1")
 				return yaml_parser_set_scanner_error(parser, "", parser.mark,
 					"mapping values are not allowed in this context")
 			}

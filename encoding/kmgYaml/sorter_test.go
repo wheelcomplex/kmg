@@ -2,7 +2,6 @@ package kmgYaml
 
 import "testing"
 import (
-	"fmt"
 	"github.com/bronze1man/kmg/kmgTest"
 	"reflect"
 	"sort"
@@ -28,5 +27,4 @@ func TestKeyListLess(ot *testing.T) {
 			"%d %d %v", testCase.i, testCase.j, testCase.ret)
 	}
 	sort.Sort(keyList)
-	fmt.Println(keyList)
 }
