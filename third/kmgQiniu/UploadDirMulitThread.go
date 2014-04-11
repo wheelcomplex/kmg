@@ -6,6 +6,7 @@ import (
 	"github.com/qiniu/api/rs"
 	"os"
 	"path/filepath"
+	//"github.com/qiniu/rpc"
 )
 
 type uploadFileRequest struct {
@@ -51,12 +52,26 @@ func UploadDirMulitThread(ctx *Context, localRoot string, remoteRoot string) (er
 		entryPathList[i].Bucket = ctx.bucket
 		entryPathList[i].Key = req.remotePath
 	}
-	batchRet, err := ctx.client.BatchStat(nil, entryPathList)
-	if err != nil {
-		return
+	batchRet, _ := ctx.client.BatchStat(nil, entryPathList)
+	/*
+	//此处返回的错误很奇怪,有大量文件不存在信息,应该是正常情况,此处最简单的解决方案就是假设没有错误
+	if err != nil{
+		fmt.Printf("%T %#v\n",err,err)
+		err1,ok:=err.(*rpc.ErrorInfo)
+		if !ok{
+			return err
+		}
+		if err1.Code!=298{
+			return err
+		}
+	}
+	*/
+	if len(batchRet)!=len(entryPathList){
+		return fmt.Errorf("[UploadDirMulitThread] len(batchRet)[%d]!=len(entryPathList)[%d]",
+			len(batchRet),len(entryPathList))
 	}
 	for i, ret := range batchRet {
-		//验证hash
+		//验证hash,当文件不存在时,err是空
 		if ret.Error != "" && ret.Error != "no such file or directory" {
 			return fmt.Errorf("[UploadDirMulitThread] [remotePath:%s]ctx.client.BatchStat err[%s]",
 				requestList[i].remotePath, ret.Error)

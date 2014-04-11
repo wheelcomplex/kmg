@@ -9,7 +9,7 @@ import (
 	_ "github.com/bronze1man/kmg/console/command"
 	_ "github.com/bronze1man/kmg/console/kmgContext"
 	_ "github.com/bronze1man/kmg/crypto/kmgHash"
-	_ "github.com/bronze1man/kmg/crypto/kmgSsh"
+	//_ "github.com/bronze1man/kmg/crypto/kmgSsh"  //依赖的官方ssh模块有变化,目前不能使用了
 	_ "github.com/bronze1man/kmg/crypto/kmgTls"
 	_ "github.com/bronze1man/kmg/crypto/uuid"
 	_ "github.com/bronze1man/kmg/dependencyInjection"
