@@ -97,4 +97,3 @@ func write_break(emitter *yaml_emitter_t, s []byte, i *int) bool {
 	}
 	return true
 }
-

@@ -461,7 +461,7 @@ func yaml_emitter_emit_sequence_start(emitter *yaml_emitter_t, event *yaml_event
 		return false
 	}
 	if emitter.flow_level > 0 || emitter.canonical || event.sequence_style() == yaml_FLOW_SEQUENCE_STYLE ||
-			yaml_emitter_check_empty_sequence(emitter) {
+		yaml_emitter_check_empty_sequence(emitter) {
 		emitter.state = yaml_EMIT_FLOW_SEQUENCE_FIRST_ITEM_STATE
 	} else {
 		emitter.state = yaml_EMIT_BLOCK_SEQUENCE_FIRST_ITEM_STATE
@@ -478,7 +478,7 @@ func yaml_emitter_emit_mapping_start(emitter *yaml_emitter_t, event *yaml_event_
 		return false
 	}
 	if emitter.flow_level > 0 || emitter.canonical || event.mapping_style() == yaml_FLOW_MAPPING_STYLE ||
-			yaml_emitter_check_empty_mapping(emitter) {
+		yaml_emitter_check_empty_mapping(emitter) {
 		emitter.state = yaml_EMIT_FLOW_MAPPING_FIRST_KEY_STATE
 	} else {
 		emitter.state = yaml_EMIT_BLOCK_MAPPING_FIRST_KEY_STATE

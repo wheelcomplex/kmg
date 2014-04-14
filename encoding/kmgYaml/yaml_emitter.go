@@ -173,10 +173,10 @@ func yaml_emitter_select_scalar_style(emitter *yaml_emitter_t, event *yaml_event
 	}
 
 	if style == yaml_PLAIN_SCALAR_STYLE {
-		if emitter.flow_level > 0 && !emitter.scalar_data.flow_plain_allowed{
+		if emitter.flow_level > 0 && !emitter.scalar_data.flow_plain_allowed {
 			style = yaml_SINGLE_QUOTED_SCALAR_STYLE
 		}
-		if emitter.flow_level == 0 && !emitter.scalar_data.block_plain_allowed{
+		if emitter.flow_level == 0 && !emitter.scalar_data.block_plain_allowed {
 			style = yaml_SINGLE_QUOTED_SCALAR_STYLE
 		}
 		if len(emitter.scalar_data.value) == 0 && (emitter.flow_level > 0 || emitter.simple_key_context) {

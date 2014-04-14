@@ -34,23 +34,23 @@ func yaml_emitter_check_simple_key(emitter *yaml_emitter_t) bool {
 			return false
 		}
 		length += len(emitter.anchor_data.anchor) +
-				len(emitter.tag_data.handle) +
-				len(emitter.tag_data.suffix) +
-				len(emitter.scalar_data.value)
+			len(emitter.tag_data.handle) +
+			len(emitter.tag_data.suffix) +
+			len(emitter.scalar_data.value)
 	case yaml_SEQUENCE_START_EVENT:
 		if !yaml_emitter_check_empty_sequence(emitter) {
 			return false
 		}
 		length += len(emitter.anchor_data.anchor) +
-				len(emitter.tag_data.handle) +
-				len(emitter.tag_data.suffix)
+			len(emitter.tag_data.handle) +
+			len(emitter.tag_data.suffix)
 	case yaml_MAPPING_START_EVENT:
 		if !yaml_emitter_check_empty_mapping(emitter) {
 			return false
 		}
 		length += len(emitter.anchor_data.anchor) +
-				len(emitter.tag_data.handle) +
-				len(emitter.tag_data.suffix)
+			len(emitter.tag_data.handle) +
+			len(emitter.tag_data.suffix)
 	default:
 		return false
 	}

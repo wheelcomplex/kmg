@@ -124,9 +124,9 @@ func yaml_emitter_write_tag_content(emitter *yaml_emitter_t, value []byte, need_
 
 func yaml_emitter_write_plain_scalar(emitter *yaml_emitter_t, value []byte, allow_breaks bool) bool {
 	/*
-	if bytes.IndexByte(value,[]byte(':'))!=-1{
-		return yaml_emitter_analyze_scalar()
-	}
+		if bytes.IndexByte(value,[]byte(':'))!=-1{
+			return yaml_emitter_analyze_scalar()
+		}
 	*/
 	if !emitter.whitespace {
 		if !put(emitter, ' ') {
@@ -250,7 +250,7 @@ func yaml_emitter_write_double_quoted_scalar(emitter *yaml_emitter_t, value []by
 
 	for i := 0; i < len(value); {
 		if !is_printable(value, i) || (!emitter.unicode && !is_ascii(value, i)) ||
-				is_bom(value, i) || is_break(value, i) ||
+			is_bom(value, i) || is_break(value, i) ||
 			value[i] == '"' || value[i] == '\\' {
 
 			octet := value[i]
