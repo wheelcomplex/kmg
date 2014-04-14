@@ -4,18 +4,18 @@ import "sort"
 
 //please use NewPossibilityWeightRander, field expose only for serialize
 type PossibilityWeightRander struct {
-	SearchList []int
-	Total      int
+	SearchList []float64
+	Total      float64
 }
 
 func (p PossibilityWeightRander) ChoiceOne(r *KmgRand) (Index int) {
-	intR := r.IntBetween(0, p.Total-1)
-	return sort.SearchInts(p.SearchList, intR)
+	floatR := r.Float64Between(0, p.Total)
+	return sort.SearchFloat64s(p.SearchList, floatR)
 }
 
-func NewPossibilityWeightRander(weightList []int) PossibilityWeightRander {
+func NewPossibilityWeightRander(weightList []float64) PossibilityWeightRander {
 	pwl := PossibilityWeightRander{
-		SearchList: make([]int, len(weightList)),
+		SearchList: make([]float64, len(weightList)),
 	}
 	for i, weight := range weightList {
 		pwl.SearchList[i] = pwl.Total

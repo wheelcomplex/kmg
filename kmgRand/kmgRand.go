@@ -83,6 +83,15 @@ func (r *KmgRand) Int63Between(min int64, max int64) int64 {
 	return r.Int63n(max-min) + min
 }
 
+func (r *KmgRand) Float64Between(min float64, max float64) float64 {
+	if min > max {
+		panic(fmt.Errorf("[KmgRand.Float64Between] min:%d<max:%d", min, max))
+	} else if min == max {
+		return min
+	}
+	return r.Float64()*(max-min) + min
+}
+
 func (r *KmgRand) TimeDurationBetween(min time.Duration, max time.Duration) time.Duration {
 	return time.Duration(r.Int63Between(int64(min), int64(max)))
 }
