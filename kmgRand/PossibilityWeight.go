@@ -10,7 +10,7 @@ type PossibilityWeightRander struct {
 
 func (p PossibilityWeightRander) ChoiceOne(r *KmgRand) (Index int) {
 	floatR := r.Float64Between(0, p.Total)
-	return sort.SearchFloat64s(p.SearchList, floatR)
+	return sort.SearchFloat64s(p.SearchList, floatR) - 1
 }
 
 func NewPossibilityWeightRander(weightList []float64) PossibilityWeightRander {
