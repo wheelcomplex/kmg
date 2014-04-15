@@ -71,6 +71,7 @@ func UploadDirMulitThread(ctx *Context, localRoot string, remoteRoot string) (er
 			len(batchRet), len(entryPathList))
 	}
 	for i, ret := range batchRet {
+		i := i
 		//验证hash,当文件不存在时,err是空
 		if ret.Error != "" && ret.Error != "no such file or directory" {
 			return fmt.Errorf("[UploadDirMulitThread] [remotePath:%s]ctx.client.BatchStat err[%s]",

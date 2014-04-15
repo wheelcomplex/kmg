@@ -39,6 +39,7 @@ func UploadFileWithHash(ctx *Context, localPath string, remotePath string, expec
 	}
 	uptoken := putPolicy.Token(nil)
 	err = qiniuIo.PutFile(nil, &ret, uptoken, remotePath, localPath, extra)
+	//fmt.Println(localPath,remotePath,err)
 	if err != nil {
 		return
 	}
