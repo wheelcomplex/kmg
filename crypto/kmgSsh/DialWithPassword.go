@@ -10,11 +10,11 @@ type typePassword string
 func (pass typePassword) Password(user string) (password string, err error) {
 	return string(pass), nil
 }
-func DialWithPassword(addr string, username string, password string) (client *ssh.ClientConn, err error) {
+func DialWithPassword(addr string, username string, password string) (client *ssh.Client, err error) {
 	clientConfig := &ssh.ClientConfig{
 		User: username,
-		Auth: []ssh.ClientAuth{
-			ssh.ClientAuthPassword(typePassword(password)),
+		Auth: []ssh.AuthMethod{
+			ssh.Password(password),
 		},
 	}
 	client, err = ssh.Dial("tcp", addr, clientConfig)

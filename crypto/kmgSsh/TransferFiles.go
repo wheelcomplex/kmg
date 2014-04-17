@@ -15,7 +15,7 @@ import (
 //transfer a directory to remote host,with single tcp and tar.gz format
 //Stdout will be ignore.
 //Stderr will treat as an error from remote command
-func CopyDirectory(client *ssh.ClientConn, selfPath string, remotePath string) (err error) {
+func CopyDirectory(client *ssh.Client, selfPath string, remotePath string) (err error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return fmt.Errorf("[CopyDirectory]Failed to create session: %s", err.Error())
@@ -55,7 +55,7 @@ func CopyDirectory(client *ssh.ClientConn, selfPath string, remotePath string) (
 //Stdout will be ignore.
 //Stderr will treat as an error from remote command
 //TODO test
-func CopyFile(client *ssh.ClientConn, selfPath string, remotePath string) (err error) {
+func CopyFile(client *ssh.Client, selfPath string, remotePath string) (err error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return fmt.Errorf("[CopyFile]Failed to create session: %s", err.Error())

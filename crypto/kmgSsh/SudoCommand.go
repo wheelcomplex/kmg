@@ -11,7 +11,7 @@ import (
 //run sudo a command in remote and ask password in current console,
 //Stdout will goto current console too.
 //Stderr will treat as an error from remote command
-func SudoCommand(client *ssh.ClientConn, cmd string) (err error) {
+func SudoCommand(client *ssh.Client, cmd string) (err error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return fmt.Errorf("[SudoCommand] Failed to create session: %s", err.Error())

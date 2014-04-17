@@ -9,20 +9,21 @@ import (
 )
 
 type consoleAskPassword struct {
+	user string
 	addr string
 }
 
-func (p consoleAskPassword) Password(user string) (password string, err error) {
-	fmt.Printf("[ssh] password for %s@%s", user, p.addr)
+func (p consoleAskPassword) Password() (password string, err error) {
+	fmt.Printf("[ssh] password for %s@%s", p.user, p.addr)
 	password = string(gopass.GetPasswd())
 	return password, nil
 }
 
 //TODO 某种认证方法只有一个会被使用,需要多次猜测
-func DialInConsole(addr string, username string) (client *ssh.ClientConn, err error) {
+func DialInConsole(addr string, username string) (client *ssh.Client, err error) {
 	//find cert file
 	pathList := certFilePathList()
-	authList := []ssh.ClientAuth{}
+	authList := []ssh.AuthMethod{}
 	for _, path := range pathList {
 		clientKeyBytes, err := ioutil.ReadFile(path)
 		if err != nil {
@@ -34,11 +35,15 @@ func DialInConsole(addr string, username string) (client *ssh.ClientConn, err er
 			if err != nil {
 				return nil, fmt.Errorf("[DialInConsole] ssh.ParsePrivateKey err:%s", err)
 			}
-			clientKey := &keychain{signer}
-			authList = append(authList, ssh.ClientAuthKeyring(clientKey))
+			//clientKey := &keychain{signer}
+			authList = append(authList, ssh.PublicKeys(signer))
 		}
 	}
-	authList = append(authList, ssh.ClientAuthPassword(consoleAskPassword{addr: addr}))
+	authList = append(authList, ssh.PasswordCallback(func() (secret string, err error) {
+		fmt.Printf("[ssh] password for %s@%s", username, addr)
+		secret = string(gopass.GetPasswd())
+		return
+	}))
 	clientConfig := &ssh.ClientConfig{
 		User: username,
 		Auth: authList,
