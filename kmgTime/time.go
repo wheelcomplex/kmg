@@ -11,6 +11,7 @@ const (
 	Iso3339Hour     = "2006-01-02T15"
 	Iso3339Minute   = "2006-01-02T15:04"
 	Iso3339Second   = "2006-01-02T15:04:05"
+	AppleJsonFormat = "2006-01-02 15:04:05 Etc/MST" //仅解决GMT的这个特殊情况.其他不管,如果苹果返回的字符串换时区了就悲剧了
 	Day             = 24 * time.Hour
 )
 
