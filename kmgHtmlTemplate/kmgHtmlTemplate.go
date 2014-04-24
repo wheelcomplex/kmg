@@ -68,13 +68,13 @@ func FileSet(templs []TemplateFile) (ot *Template, err error) {
 		if t == nil {
 			t, err = template.New(file.Name).Parse(file.Content)
 			if err != nil {
-				return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse 1 err:%s", err)
+				return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse name[%s] err:%s",file.Name, err)
 			}
 			continue
 		}
 		_, err = t.New(file.Name).Parse(file.Content)
 		if err != nil {
-			return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse 2 err:%s", err)
+			return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse name[%s] err:%s",file.Name, err)
 		}
 	}
 	return &Template{t}, nil
