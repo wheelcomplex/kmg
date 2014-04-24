@@ -2,6 +2,7 @@ package kmgHtmlTemplate
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 )
 
@@ -67,12 +68,13 @@ func FileSet(templs []TemplateFile) (ot *Template, err error) {
 		if t == nil {
 			t, err = template.New(file.Name).Parse(file.Content)
 			if err != nil {
-				return
+				return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse 1 err:%s", err)
 			}
+			continue
 		}
 		_, err = t.New(file.Name).Parse(file.Content)
 		if err != nil {
-			return
+			return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse 2 err:%s", err)
 		}
 	}
 	return &Template{t}, nil
