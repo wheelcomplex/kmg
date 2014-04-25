@@ -5,10 +5,11 @@ import (
 	"testing"
 )
 
-func TestMd5Hex(ot *testing.T) {
+func Test1(ot *testing.T) {
 	t := kmgTest.NewTestTools(ot)
 	//加密数据,可以正确解密测试
 	for _, origin := range [][]byte{
+		[]byte(""),
 		[]byte("1"),
 		[]byte("12"),
 		[]byte("123"),
@@ -29,14 +30,15 @@ func TestMd5Hex(ot *testing.T) {
 		t.Equal(err, nil)
 		t.Equal(ret, origin)
 
-		sob, err := EncryptString("1", string(origin))
+		sob, err := EncryptString("1", origin)
 		t.Equal(err, nil)
 		sret, err := DecryptString("1", sob)
 		t.Equal(err, nil)
-		t.Equal(sret, string(origin))
+		t.Equal(sret, origin)
 	}
 	//任意数据传入解密不会挂掉,并且会报错
 	for _, origin := range [][]byte{
+		[]byte(""),
 		[]byte("1"),
 		[]byte("12"),
 		[]byte("123"),

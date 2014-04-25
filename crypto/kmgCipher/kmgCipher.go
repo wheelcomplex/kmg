@@ -44,6 +44,9 @@ func Encrypt(key []byte, data []byte) (output []byte, err error) {
 	不会修改输入的数据
 */
 func Decrypt(key []byte, data []byte) (output []byte, err error) {
+	if len(data) == 0 {
+		return nil, fmt.Errorf("[kmgCipher.Decrypt] input data zero length")
+	}
 	keyHash := sha512.Sum384(key)
 	aseKey := keyHash[:32]
 	cbcIv := keyHash[32:]
