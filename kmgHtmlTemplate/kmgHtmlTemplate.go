@@ -62,8 +62,7 @@ type TemplateFile struct {
 }
 
 //something like template.ParseFile but in memory
-func FileSet(templs []TemplateFile) (ot *Template, err error) {
-	var t *template.Template
+func FileSet(t *template.Template, templs []TemplateFile) (ot *template.Template, err error) {
 	for _, file := range templs {
 		if t == nil {
 			t, err = template.New(file.Name).Parse(file.Content)
@@ -77,13 +76,5 @@ func FileSet(templs []TemplateFile) (ot *Template, err error) {
 			return nil, fmt.Errorf("[kmgHtmlTemplate.FileSet] template.Parse name[%s] err:%s", file.Name, err)
 		}
 	}
-	return &Template{t}, nil
-}
-
-func MustFileSet(templs []TemplateFile) *Template {
-	t, err := FileSet(templs)
-	if err != nil {
-		panic(err)
-	}
-	return t
+	return t, nil
 }
