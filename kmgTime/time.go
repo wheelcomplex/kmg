@@ -17,6 +17,7 @@ const (
 
 var ParseFormatGuessList = []string{
 	FormatMysql,
+	FormatDateMysql,
 	Iso3339Hour,
 	Iso3339Minute,
 	Iso3339Second,
@@ -26,6 +27,14 @@ var BeijingZone = time.FixedZone("Asia/Beijing", 8*60*60)
 
 func ParseAutoInLocal(sTime string) (t time.Time, err error) {
 	return ParseAutoInLocation(sTime, time.Local)
+}
+
+func MustParseAutoInLocal(sTime string) (t time.Time) {
+	t, err := ParseAutoInLocation(sTime, time.Local)
+	if err != nil {
+		panic(err)
+	}
+	return t
 }
 
 //auto guess format from ParseFormatGuessList
