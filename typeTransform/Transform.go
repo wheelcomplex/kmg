@@ -202,12 +202,14 @@ func MapToStruct(in reflect.Value, out reflect.Value) (err error) {
 			}
 		}
 	}
-	for _, structField := range kmgReflect.StructGetAllField(out.Type()) {
-		if structField.Anonymous {
-			continue
-		}
-		if !fieldNameMap[structField.Name] {
-			return fmt.Errorf("[MapToStruct]type:%s field:%s not found", out.Type().Name(), structField.Name)
+	if false {
+		for _, structField := range kmgReflect.StructGetAllField(out.Type()) {
+			if structField.Anonymous {
+				continue
+			}
+			if !fieldNameMap[structField.Name] {
+				return fmt.Errorf("[MapToStruct]type:%s field:%s not found", out.Type().Name(), structField.Name)
+			}
 		}
 	}
 	return
