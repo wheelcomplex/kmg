@@ -2,6 +2,7 @@ package LcgCalculateConstants
 
 /*
 //cgo not work in cygwin...,and main in c not work in cgo too..
+#cgo LDFLAGS: -lm
 #include "c/rand-lcg.h"
 #include "c/rand-lcg.c"
 #include "c/rand-primegen.h"
