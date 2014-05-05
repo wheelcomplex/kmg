@@ -15,3 +15,9 @@ func LcgCalculateConstants(m uint64, inC uint64) (a uint64, c uint64) {
 	c = inC
 	return
 }
+
+func LcgCalculateConstantsDebug(m uint64, inC uint64) (a uint64, c uint64) {
+	C.lcg_calculate_constants(C.uint64_t(m), (*C.uint64_t)(&a), (*C.uint64_t)(&inC), 1)
+	c = inC
+	return
+}
