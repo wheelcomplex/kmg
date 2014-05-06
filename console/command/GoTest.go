@@ -27,6 +27,8 @@ type GoTest struct {
 	dir        string
 	moduleName string
 	bench      string
+	onePackage bool
+	buildContext *build.Context
 }
 
 func (command *GoTest) GetNameConfig() *console.NameConfig {
@@ -37,7 +39,8 @@ func (command *GoTest) GetNameConfig() *console.NameConfig {
  -v 更详细的描述
  -m 一个模块名,从这个模块名开始递归目录测试
  -d 一个目录名,从这个目录开始递归目录测试
- -bench benchmarks参数,直接传递到go test`,
+ -bench benchmarks参数,直接传递到go test
+ -onePackage 不递归目录测试,仅测试一个package`,
 	}
 }
 func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
@@ -45,6 +48,7 @@ func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
 	f.StringVar(&commamd.dir, "d", "", "dir path to test")
 	f.StringVar(&commamd.moduleName, "m", "", "module name to test")
 	f.StringVar(&commamd.bench, "bench", "", "bench parameter pass to go test")
+	f.BoolVar(&commamd.onePackage,"onePackage",false,"only test one package")
 }
 func (command *GoTest) Execute(context *console.Context) (err error) {
 	command.context = context
@@ -63,10 +67,12 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 	if err != nil {
 		return
 	}
-
-	c := &build.Context{
+	command.buildContext = &build.Context{
 		GOPATH:   command.gopath,
 		Compiler: build.Default.Compiler,
+	}
+	if command.onePackage{
+		return command.handlePath(root)
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -78,24 +84,7 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 		if kmgFile.IsDotFile(path) {
 			return filepath.SkipDir
 		}
-		pkg, err := c.ImportDir(path, build.ImportMode(0))
-		if err != nil {
-			//仅忽略 不是golang的目录的错误
-			_, ok := err.(*build.NoGoError)
-			if ok {
-				return nil
-			}
-			return err
-		}
-		if pkg.IsCommand() {
-			return nil
-		}
-		if len(pkg.TestGoFiles) == 0 {
-			//如果没有测试文件,还会尝试build一下这个目录
-			return command.gobuild(path)
-			//return nil
-		}
-		return command.gotest(path)
+		return command.handlePath(path)
 	})
 }
 
@@ -133,6 +122,27 @@ func (command *GoTest) findRootPath(context *console.Context) (root string, err 
 		}
 	}
 	return
+}
+
+func (command *GoTest) handlePath(path string)error{
+	pkg, err := command.buildContext.ImportDir(path, build.ImportMode(0))
+	if err != nil {
+		//仅忽略 不是golang的目录的错误
+		_, ok := err.(*build.NoGoError)
+		if ok {
+			return nil
+		}
+		return err
+	}
+	if pkg.IsCommand() {
+		return nil
+	}
+	if len(pkg.TestGoFiles) == 0 {
+		//如果没有测试文件,还会尝试build一下这个目录
+		return command.gobuild(path)
+		//return nil
+	}
+	return command.gotest(path)
 }
 
 func (command *GoTest) gotest(path string) error {

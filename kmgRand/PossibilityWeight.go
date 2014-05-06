@@ -9,6 +9,9 @@ type PossibilityWeightRander struct {
 }
 
 func (p PossibilityWeightRander) ChoiceOne(r *KmgRand) (Index int) {
+	if len(p.SearchList)==0{
+		panic("[PossibilityWeightRander.ChoiceOne] len(p.SearchList)==0")
+	}
 	floatR := r.Float64Between(0, p.Total)
 	return sort.SearchFloat64s(p.SearchList, floatR) - 1
 }
