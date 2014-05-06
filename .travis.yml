@@ -3,4 +3,4 @@ go:
  - release
 
 script:
- - go run ./console/kmg/main.go gotest -v
+ - go run ./console/kmg/main.go gotest -v -bench=.

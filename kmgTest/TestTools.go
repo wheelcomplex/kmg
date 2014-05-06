@@ -69,13 +69,6 @@ func (tools *TestTools) Fatalf(format string, objs ...interface{}) {
 	tools.TestingTB.FailNow()
 }
 func (tools *TestTools) assertFail(msg string, skip int) {
-	/*
-		pc, file, line, ok := runtime.Caller(skip)
-		line_info := ""
-		if ok != false {
-			line_info = fmt.Sprintf("%v:%v:%x", file, line, pc)
-		}
-	*/
 	tools.Printf(`----------------------------------
 %s
 
@@ -85,6 +78,7 @@ func (tools *TestTools) assertFail(msg string, skip int) {
 }
 
 func isEqual(a interface{}, b interface{}) bool {
+	//不要加a==b这种快速通道,会出现 panic comparing uncomparable type []models.RoleId 的问题
 	if reflect.DeepEqual(a, b) {
 		return true
 	}

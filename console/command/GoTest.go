@@ -26,6 +26,7 @@ type GoTest struct {
 	v          bool
 	dir        string
 	moduleName string
+	bench      string
 }
 
 func (command *GoTest) GetNameConfig() *console.NameConfig {
@@ -35,13 +36,15 @@ func (command *GoTest) GetNameConfig() *console.NameConfig {
  支持.kmg.yml目录结构提示文件(该文件必须存在)
  -v 更详细的描述
  -m 一个模块名,从这个模块名开始递归目录测试
- -d 一个目录名,从这个目录开始递归目录测试`,
+ -d 一个目录名,从这个目录开始递归目录测试
+ -bench benchmarks参数,直接传递到go test`,
 	}
 }
 func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&commamd.v, "v", false, "show output of test")
 	f.StringVar(&commamd.dir, "d", "", "dir path to test")
 	f.StringVar(&commamd.moduleName, "m", "", "module name to test")
+	f.StringVar(&commamd.bench, "bench", "", "bench parameter pass to go test")
 }
 func (command *GoTest) Execute(context *console.Context) (err error) {
 	command.context = context
@@ -137,6 +140,9 @@ func (command *GoTest) gotest(path string) error {
 	args := []string{"test"}
 	if command.v {
 		args = append(args, "-v")
+	}
+	if command.bench != "" {
+		args = append(args, "-bench", command.bench)
 	}
 	cmd := console.NewStdioCmd(command.context, "go", args...)
 	cmd.Dir = path
