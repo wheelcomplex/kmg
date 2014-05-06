@@ -12,7 +12,7 @@ func (t *Tester) TestPossibilityWeigth() {
 		t.Ok(ret >= 0)
 		t.Ok(ret <= 3)
 	}
-	rander = NewPossibilityWeightRander([]float64{1, 0, 3, 0,1})
+	rander = NewPossibilityWeightRander([]float64{1, 0, 3, 0, 1})
 	for i := 0; i < 100; i++ {
 		ret := rander.ChoiceOne(r)
 		t.Ok(ret >= 0)

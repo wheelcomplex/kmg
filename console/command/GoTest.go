@@ -21,13 +21,13 @@ import (
  -d 一个目录名,从这个目录开始递归目录测试
 */
 type GoTest struct {
-	gopath     string
-	context    *console.Context
-	v          bool
-	dir        string
-	moduleName string
-	bench      string
-	onePackage bool
+	gopath       string
+	context      *console.Context
+	v            bool
+	dir          string
+	moduleName   string
+	bench        string
+	onePackage   bool
 	buildContext *build.Context
 }
 
@@ -48,7 +48,7 @@ func (commamd *GoTest) ConfigFlagSet(f *flag.FlagSet) {
 	f.StringVar(&commamd.dir, "d", "", "dir path to test")
 	f.StringVar(&commamd.moduleName, "m", "", "module name to test")
 	f.StringVar(&commamd.bench, "bench", "", "bench parameter pass to go test")
-	f.BoolVar(&commamd.onePackage,"onePackage",false,"only test one package")
+	f.BoolVar(&commamd.onePackage, "onePackage", false, "only test one package")
 }
 func (command *GoTest) Execute(context *console.Context) (err error) {
 	command.context = context
@@ -71,7 +71,7 @@ func (command *GoTest) Execute(context *console.Context) (err error) {
 		GOPATH:   command.gopath,
 		Compiler: build.Default.Compiler,
 	}
-	if command.onePackage{
+	if command.onePackage {
 		return command.handlePath(root)
 	}
 	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -124,7 +124,7 @@ func (command *GoTest) findRootPath(context *console.Context) (root string, err 
 	return
 }
 
-func (command *GoTest) handlePath(path string)error{
+func (command *GoTest) handlePath(path string) error {
 	pkg, err := command.buildContext.ImportDir(path, build.ImportMode(0))
 	if err != nil {
 		//仅忽略 不是golang的目录的错误
