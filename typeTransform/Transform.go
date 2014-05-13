@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-
 /*
 try best transform one type to another type
 special case:
@@ -20,10 +19,10 @@ special case:
 "" => 0.0
 */
 func Transform(in interface{}, out interface{}) (err error) {
-	return DefaultTransformer.Transform(in,out)
+	return DefaultTransformer.Transform(in, out)
 }
 
-func MapToMap(t Transformer,in reflect.Value, out reflect.Value) (err error) {
+func MapToMap(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	out.Set(reflect.MakeMap(out.Type()))
 	for _, key := range in.MapKeys() {
 		oKey := reflect.New(out.Type().Key()).Elem()
@@ -42,12 +41,12 @@ func MapToMap(t Transformer,in reflect.Value, out reflect.Value) (err error) {
 	return
 }
 
-func StringToString(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func StringToString(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	out.SetString(in.String())
 	return nil
 }
 
-func StringToTime(traner Transformer,in reflect.Value,out reflect.Value)(err error){
+func StringToTime(traner Transformer, in reflect.Value, out reflect.Value) (err error) {
 	var t time.Time
 	t, err = kmgTime.ParseAutoInLocal(in.String())
 	if err != nil {
@@ -57,12 +56,12 @@ func StringToTime(traner Transformer,in reflect.Value,out reflect.Value)(err err
 	return
 }
 
-func PtrToPtr(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func PtrToPtr(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	t.Tran(in.Elem(), out.Elem())
 	return
 }
 
-func MapToStruct(t Transformer,in reflect.Value, out reflect.Value) (err error) {
+func MapToStruct(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	oKey := reflect.New(reflect.TypeOf("")).Elem()
 	out.Set(reflect.New(out.Type()).Elem())
 	fieldNameMap := map[string]bool{}
@@ -85,7 +84,7 @@ func MapToStruct(t Transformer,in reflect.Value, out reflect.Value) (err error) 
 	}
 	return
 }
-func SliceToSlice(t Transformer,in reflect.Value, out reflect.Value) (err error) {
+func SliceToSlice(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	len := in.Len()
 	out.Set(reflect.MakeSlice(out.Type(), len, len))
 	for i := 0; i < len; i++ {
@@ -99,7 +98,7 @@ func SliceToSlice(t Transformer,in reflect.Value, out reflect.Value) (err error)
 }
 
 // "" => 0
-func StringToInt(t Transformer,in reflect.Value, out reflect.Value) (err error) {
+func StringToInt(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	inS := in.String()
 	inS = strings.TrimSpace(inS)
 	if inS == "" {
@@ -115,7 +114,7 @@ func StringToInt(t Transformer,in reflect.Value, out reflect.Value) (err error) 
 }
 
 // "" => 0.0
-func StringToFloat(t Transformer,in reflect.Value, out reflect.Value) (err error) {
+func StringToFloat(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	inS := in.String()
 	if inS == "" {
 		out.SetFloat(0.0)
@@ -130,7 +129,7 @@ func StringToFloat(t Transformer,in reflect.Value, out reflect.Value) (err error
 }
 
 // "" => false
-func StringToBool(t Transformer,in reflect.Value, out reflect.Value) (err error) {
+func StringToBool(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	inS := in.String()
 	if inS == "" {
 		out.SetBool(false)
@@ -144,12 +143,12 @@ func StringToBool(t Transformer,in reflect.Value, out reflect.Value) (err error)
 	return
 }
 
-func IntToInt(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func IntToInt(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	out.SetInt(in.Int())
 	return nil
 }
 
-func FloatToInt(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func FloatToInt(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	outf1 := in.Float()
 	if math.Floor(outf1) != outf1 {
 		return fmt.Errorf("[typeTransform.tran] it seems to lose some accuracy trying to convert from float to int,float:%f", outf1)
@@ -158,17 +157,17 @@ func FloatToInt(t Transformer,in reflect.Value,out reflect.Value)(err error){
 	return
 }
 
-func FloatToFloat(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func FloatToFloat(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	out.SetFloat(in.Float())
 	return
 }
 
-func NonePtrToPtr(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func NonePtrToPtr(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	if out.IsNil() {
 		out.Set(reflect.New(out.Type().Elem()))
 	}
 	return t.Tran(in, out.Elem())
 }
-func InterfaceToNoneInterface(t Transformer,in reflect.Value,out reflect.Value)(err error){
+func InterfaceToNoneInterface(t Transformer, in reflect.Value, out reflect.Value) (err error) {
 	return t.Tran(in.Elem(), out)
 }
