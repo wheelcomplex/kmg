@@ -75,11 +75,13 @@ func ToDateString(t time.Time) string {
 	return t.Format(FormatDateMysql)
 }
 
+//规则到日期,去掉时分秒
 func ToDate(t time.Time) time.Time {
 	y, m, d := t.Date()
 	return time.Date(y, m, d, 0, 0, 0, 0, t.Location())
 }
 
+//规整到日期然后相减
 func DateSub(t1 time.Time, t2 time.Time, loc *time.Location) time.Duration {
 	return ToDate(t1.In(loc)).Sub(ToDate(t2.In(loc)))
 }
