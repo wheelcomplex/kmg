@@ -221,6 +221,21 @@ func (t *S) TestMarshal() {
 	}
 }
 
+type T1 struct {
+	T2
+}
+type T2 struct {
+	Start int
+	End   int
+}
+
+//对golang系统的inline的支持
+func (t *S) TestGolangInline() {
+	data, err := Marshal(T1{T2{Start: 1, End: 2}})
+	t.Equal(err, nil)
+	t.Equal(string(data), "Start: 1\nEnd: 2\n")
+}
+
 var marshalErrorTests = []struct {
 	value interface{}
 	error string

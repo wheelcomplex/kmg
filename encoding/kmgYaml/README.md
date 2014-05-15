@@ -10,3 +10,4 @@ add following bugfix:
 * improve: Can unmarshal array problem now.
 * improve: Can unmarshal/marshal time.Time correct.
 * bug: use "总数 :" as value of a map will generate a not valid yaml ,fixed in yaml_emitter_analyze_scalar():w = width(value[i]) //bug origin width(value[0])
+* improve: Can understand golang inline of struct like encoding/json

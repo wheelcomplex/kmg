@@ -196,3 +196,8 @@ func (p PeriodList) IsIncludeOverlap() bool {
 func (p PeriodList) SetAtIndex(period Period, i int) {
 	p[i] = PeriodListElement{Period: period, OriginIndex: i}
 }
+
+//向后追加一个时间段,index为追加前的长度
+func (p PeriodList) Append(period Period) PeriodList {
+	return append(p, PeriodListElement{Period: period, OriginIndex: len(p)})
+}
