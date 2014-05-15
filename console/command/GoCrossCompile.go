@@ -45,7 +45,7 @@ func (command *GoCrossCompile) Execute(context *console.Context) (err error) {
 			fileName = fileName + ".exe"
 		}
 		outputFilePath := filepath.Join(command.outputPath, fileName)
-		cmd := console.NewStdioCmd(context, "go", "build", "-o", outputFilePath, targetFile)
+		cmd := kmgCmd.NewStdioCmd(context, "go", "build", "-o", outputFilePath, targetFile)
 		kmgCmd.SetCmdEnv(cmd, "GOOS", target.GetGOOS())
 		kmgCmd.SetCmdEnv(cmd, "GOARCH", target.GetGOARCH())
 		kmgCmd.SetCmdEnv(cmd, "GOPATH", kmgc.GOPATHToString())

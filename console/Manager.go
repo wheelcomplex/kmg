@@ -11,6 +11,8 @@ import (
 	"text/template"
 )
 
+var DefaultManager = NewManager()
+
 type Manager struct {
 	Map  map[string]Command
 	Name string

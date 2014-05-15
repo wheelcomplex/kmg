@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/console/kmgContext"
+	"github.com/bronze1man/kmg/kmgCmd"
 	"os"
 )
 
@@ -23,7 +24,7 @@ func (command *GoFmt) Execute(context *console.Context) (err error) {
 			return
 		}
 	}
-	cmd := console.NewStdioCmd(context, "gofmt", "-w=true", ".")
+	cmd := kmgCmd.NewStdioCmd(context, "gofmt", "-w=true", ".")
 	cmd.Dir = fmtDir
 	return cmd.Run()
 }

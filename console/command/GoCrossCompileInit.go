@@ -35,7 +35,7 @@ func (command *GoCrossCompileInit) Execute(context *console.Context) (err error)
 		makeShellArgs = []string{"--no-clean"}
 	}
 	for _, target := range kmgc.CrossCompileTarget {
-		cmd := console.NewStdioCmd(context, makeShellName, makeShellArgs...)
+		cmd := kmgCmd.NewStdioCmd(context, makeShellName, makeShellArgs...)
 		kmgCmd.SetCmdEnv(cmd, "GOOS", target.GetGOOS())
 		kmgCmd.SetCmdEnv(cmd, "GOARCH", target.GetGOARCH())
 		cmd.Dir = runCmdPath

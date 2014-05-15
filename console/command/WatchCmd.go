@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bronze1man/kmg/console"
 	"github.com/bronze1man/kmg/fsnotify"
+	"github.com/bronze1man/kmg/kmgCmd"
 	"os"
 	"os/exec"
 )
@@ -57,7 +58,7 @@ func (command *WatchCmd) restart() error {
 		return err
 	}
 
-	command.cmd = console.NewStdioCmd(command.context, command.context.Args[2], command.context.Args[3:]...)
+	command.cmd = kmgCmd.NewStdioCmd(command.context, command.context.Args[2], command.context.Args[3:]...)
 	err = command.cmd.Start()
 	if err != nil {
 		return fmt.Errorf("restart error: %s", err.Error())

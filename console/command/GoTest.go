@@ -154,7 +154,7 @@ func (command *GoTest) gotest(path string) error {
 	if command.bench != "" {
 		args = append(args, "-bench", command.bench)
 	}
-	cmd := console.NewStdioCmd(command.context, "go", args...)
+	cmd := kmgCmd.NewStdioCmd(command.context, "go", args...)
 	cmd.Dir = path
 	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.gopath)
 	if err != nil {
@@ -170,7 +170,7 @@ func (command *GoTest) gobuild(path string) error {
 			fmt.Println("building ")
 		} */
 	fmt.Printf("[gobuild] path[%s]\n", path)
-	cmd := console.NewStdioCmd(command.context, "go", "build")
+	cmd := kmgCmd.NewStdioCmd(command.context, "go", "build")
 	cmd.Dir = path
 	err := kmgCmd.SetCmdEnv(cmd, "GOPATH", command.gopath)
 	if err != nil {

@@ -6,6 +6,14 @@ import (
 	"os/exec"
 )
 
+func NewOsStdioCmd(name string, args ...string) *exec.Cmd {
+	cmd := exec.Command(name, args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd
+}
+
 type Stdio interface {
 	GetStdin() io.ReadCloser
 	GetStdout() io.WriteCloser
@@ -20,17 +28,17 @@ func NewStdioCmd(stdio Stdio, name string, args ...string) *exec.Cmd {
 	return cmd
 }
 
-var DefaultStdio = defaultStdio{}
+var OsStdio = osStdio{}
 
-type defaultStdio struct{}
+type osStdio struct{}
 
-func (io defaultStdio) GetStdin() io.ReadCloser {
+func (io osStdio) GetStdin() io.ReadCloser {
 	return os.Stdin
 }
 
-func (io defaultStdio) GetStdout() io.WriteCloser {
+func (io osStdio) GetStdout() io.WriteCloser {
 	return os.Stdout
 }
-func (io defaultStdio) GetStderr() io.WriteCloser {
+func (io osStdio) GetStderr() io.WriteCloser {
 	return os.Stderr
 }

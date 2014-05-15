@@ -89,7 +89,7 @@ func (command *GoWatch) restart() error {
 
 	command.debugPrintln("target file path: ", command.targetFilePath)
 
-	command.cmd = console.NewStdioCmd(command.context, "go", "build", "-o", command.targetFilePath, command.mainFilePath)
+	command.cmd = kmgCmd.NewStdioCmd(command.context, "go", "build", "-o", command.targetFilePath, command.mainFilePath)
 	err = kmgCmd.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (command *GoWatch) restart() error {
 	if err != nil {
 		return err
 	}
-	command.cmd = console.NewStdioCmd(command.context, command.targetFilePath)
+	command.cmd = kmgCmd.NewStdioCmd(command.context, command.targetFilePath)
 	err = kmgCmd.SetCmdEnv(command.cmd, "GOPATH", command.GOPATH)
 	if err != nil {
 		return err

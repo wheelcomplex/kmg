@@ -14,7 +14,7 @@ func (command *GoBuild) GetNameConfig() *console.NameConfig {
 }
 func (command *GoBuild) Execute(context *console.Context) (err error) {
 	args := append([]string{"build"}, context.Args[2:]...)
-	cmd := console.NewStdioCmd(context, "go", args...)
+	cmd := kmgCmd.NewStdioCmd(context, "go", args...)
 	kmgc, err := kmgContext.FindFromWd()
 	if err != nil {
 		return
