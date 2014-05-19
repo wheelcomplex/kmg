@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+
+
 //if you init it like &Context{xxx},please call Init()
 type Context struct {
 	GOPATH             []string
