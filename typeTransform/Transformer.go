@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bronze1man/kmg/kmgType"
 	"reflect"
+	"time"
 )
 
 //golang的kind分的太细
@@ -97,7 +98,7 @@ var DefaultTransformer = Transformer{
 		Int:    StringToInt,
 		Float:  StringToFloat,
 		Bool:   StringToBool,
-		Time:   StringToTime,
+		Time:   NewStringToTimeFunc(time.Local),
 		Ptr:    NonePtrToPtr,
 	},
 	Ptr: map[Kind]TransformerFunc{
