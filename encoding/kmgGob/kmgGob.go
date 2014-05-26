@@ -36,9 +36,23 @@ func Marshal(obj interface{}) (out []byte, err error) {
 	return b.Bytes(), nil
 }
 
+func MustMarshal(obj interface{}) (out []byte) {
+	out, err := Marshal(obj)
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
 func Unmarshal(data []byte, obj interface{}) (err error) {
 	b := bytes.NewBuffer(data)
 	encoder := gob.NewDecoder(b)
 	err = encoder.Decode(obj)
+	return
+}
+func MustUnmarshal(data []byte, obj interface{}) {
+	err := Unmarshal(data, obj)
+	if err != nil {
+		panic(err)
+	}
 	return
 }
