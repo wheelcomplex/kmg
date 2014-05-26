@@ -17,6 +17,13 @@ func ReadFile(path string, obj interface{}) error {
 	return Unmarshal(b, obj)
 }
 
+func MustReadFile(path string, obj interface{}) {
+	err := ReadFile(path, obj)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func WriteFile(path string, obj interface{}) error {
 	out, err := Marshal(obj)
 	if err != nil {

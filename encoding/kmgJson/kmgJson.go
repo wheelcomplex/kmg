@@ -15,6 +15,13 @@ func ReadFile(path string, obj interface{}) error {
 	return json.Unmarshal(b, obj)
 }
 
+func MustReadFile(path string, obj interface{}) {
+	err := ReadFile(path, obj)
+	if err != nil {
+		panic(err)
+	}
+}
+
 //读取json文件,并修正json的类型问题(map key 必须是string的问题)
 func ReadFileTypeFix(path string, obj interface{}) error {
 	b, err := ioutil.ReadFile(path)

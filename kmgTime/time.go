@@ -23,9 +23,6 @@ var ParseFormatGuessList = []string{
 	Iso3339Second,
 }
 
-var BeijingZone = time.FixedZone("CST", 8*60*60)
-var ESTZone = time.FixedZone("EST", -5*60*60) // Eastern Standard Time(加拿大)
-
 func ParseAutoInLocal(sTime string) (t time.Time, err error) {
 	return ParseAutoInLocation(sTime, time.Local)
 }

@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+var Default *Context
+
+func init() {
+	Default, _ = FindFromWd() //TODO 调用者错误处理过于复杂?
+}
+
 //if you init it like &Context{xxx},please call Init()
 type Context struct {
 	GOPATH             []string
@@ -25,19 +31,6 @@ type Context struct {
 	GOROOT string
 	//should come from dir of ".kmg.yml"
 	ProjectPath string
-}
-
-// see http://golang.org/doc/install/source to get all possiable GOOS and GOARCH
-// should be something like "windows_amd64","darwin_386",etc..
-type CompileTarget string
-
-func (target CompileTarget) GetGOOS() string {
-	part := strings.Split(string(target), "_")
-	return part[0]
-}
-func (target CompileTarget) GetGOARCH() string {
-	part := strings.Split(string(target), "_")
-	return part[1]
 }
 
 func (context *Context) GOPATHToString() string {
